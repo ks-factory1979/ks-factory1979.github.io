@@ -19,7 +19,7 @@
       "logo": "typing-logo.webp",
       "note": "洞窟の比較はブラウザごとの自己ベストで集計します。30件未満は集計中と表示されます。"
     },
-    {"id":"hiragana-town","title":"ひらがなタウン","status":"coming-soon"},
+    {"id":"hiragana-town","title":"ひらがなタウンをつくろう！","status":"coming-soon"},
     {"id":"tower-of-ten","title":"10の塔","status":"coming-soon"},
     {"id":"coloring-logic","title":"ぬりえロジック","status":"coming-soon"},
     {"id":"calculation-battle","title":"ひっぱれ！けいさんバトル","status":"coming-soon"}
