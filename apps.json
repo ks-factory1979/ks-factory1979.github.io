@@ -1,0 +1,27 @@
+{
+  "siteName": "K's Factory",
+  "siteSubtitle": "教育アプリ",
+  "siteUrl": "https://ks-factory1979.github.io/",
+  "apps": [
+    {
+      "id": "typing-village",
+      "title": "ことば探検タイピング村",
+      "category": "ことば・タイピング",
+      "status": "published",
+      "featured": true,
+      "lead": "村を育てて、その先の洞窟へ。",
+      "description": "ことばを打って素材を集め、自分の村を育てよう。村を完成させたら「試練の洞窟」へ。どこまで進めるか挑戦して、みんなの記録と自分のベストを比べられます。",
+      "tags": ["ローマ字入力", "村づくり", "自己ベストに挑戦"],
+      "requirements": "キーボード推奨・Googleログイン不要",
+      "url": "https://script.google.com/macros/s/AKfycbx2Mif7UiKL39yoMH2xBmJafxYC4tVGCuxAabwfFC2Zfq9blBA0UBKlG5NI1-sIZpLOhg/exec",
+      "cover": "typing-cave.png",
+      "coverAlt": "試練の洞窟のゲーム画面。たいまつの残り時間を見ながら、表示されたことばを入力します。",
+      "logo": "typing-logo.webp",
+      "note": "洞窟の比較はブラウザごとの自己ベストで集計します。30件未満は集計中と表示されます。"
+    },
+    {"id":"hiragana-town","title":"ひらがなタウン","status":"coming-soon"},
+    {"id":"tower-of-ten","title":"10の塔","status":"coming-soon"},
+    {"id":"coloring-logic","title":"ぬりえロジック","status":"coming-soon"},
+    {"id":"calculation-battle","title":"ひっぱれ！けいさんバトル","status":"coming-soon"}
+  ]
+}
