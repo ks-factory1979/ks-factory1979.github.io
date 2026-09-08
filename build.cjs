@@ -10,6 +10,9 @@ const pageTitle = data.pageTitle || `${data.siteName}｜遊んで学べる教育
 const description = data.description || '学校やおうちで使える教育アプリのポータルサイト。';
 const websiteSchema = JSON.stringify({'@context':'https://schema.org','@type':'WebSite',name:data.siteName,alternateName:`${data.siteName} ${data.siteSubtitle}`,url:data.siteUrl,inLanguage:'ja',description}).replace(/</g,'\\u003c');
 const verificationMeta = data.googleSiteVerification ? `<meta name="google-site-verification" content="${escape(data.googleSiteVerification)}" />` : '';
+const counterUrl = data.counterUrl || '';
+if (counterUrl && !/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(counterUrl)) throw new Error('Invalid counter URL.');
+if (counterUrl && !fs.existsSync(path.join(__dirname, 'counter.js'))) throw new Error('Missing counter.js');
 const ids = new Set();
 for (const app of publicApps) {
   if (ids.has(app.id)) throw new Error('Duplicate app ID: ' + app.id);
@@ -83,8 +86,13 @@ const page = `<!DOCTYPE html>
         <div><h3>授業の前にひと遊び</h3><p>学校の端末では、アクセスの制限がある場合があります。使う端末で、画面・入力・音の設定を先に確かめてください。</p></div>
       </div>
     </section>
+    ${counterUrl ? `<aside class="visit-count" id="access-counter" data-endpoint="${escape(counterUrl)}" aria-label="累計アクセス数">
+      <div class="visit-count-heading"><p class="visit-count-label">累計アクセス</p><p class="visit-count-number" aria-live="polite"><strong id="access-count">—</strong><span>回</span></p></div>
+      <div class="visit-count-note"><p id="access-count-status" role="status">集計中…</p><p>ページを開いた回数です。再読み込みも含みます。</p><noscript><p>カウンターの表示にはJavaScriptが必要です。</p></noscript></div>
+    </aside>` : ''}
   </main>
-  <footer class="site-footer"><p class="footer-brand">${escape(data.siteName)} <span>${escape(data.siteSubtitle)}</span></p><p>この紹介ページでは、名前の入力や利用記録の収集を行いません。</p><a href="#">ページの上へ ↑</a></footer>
+  <footer class="site-footer"><p class="footer-brand">${escape(data.siteName)} <span>${escape(data.siteSubtitle)}</span></p><p>${counterUrl ? 'アクセス数は合計だけを集計し、名前や利用者IDは保存しません。' : 'この紹介ページでは、名前の入力や利用記録の収集を行いません。'}</p><a href="#">ページの上へ ↑</a></footer>
+  ${counterUrl ? '<script src="counter.js" defer></script>' : ''}
 </body>
 </html>
 `;
