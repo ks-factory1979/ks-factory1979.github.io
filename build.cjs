@@ -4,6 +4,12 @@ const data = JSON.parse(fs.readFileSync(path.join(__dirname, 'apps.json'), 'utf8
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
 const publicApps = data.apps.filter(app => app.status === 'published');
 const upcomingApps = data.apps.filter(app => app.status === 'coming-soon');
+const siteUrl = new URL(data.siteUrl);
+if(siteUrl.protocol !== 'https:' || siteUrl.pathname !== '/' || siteUrl.search || siteUrl.hash) throw new Error('Use the canonical HTTPS site root.');
+const pageTitle = data.pageTitle || `${data.siteName}｜遊んで学べる教育アプリ`;
+const description = data.description || '学校やおうちで使える教育アプリのポータルサイト。';
+const websiteSchema = JSON.stringify({'@context':'https://schema.org','@type':'WebSite',name:data.siteName,alternateName:`${data.siteName} ${data.siteSubtitle}`,url:data.siteUrl,inLanguage:'ja',description}).replace(/</g,'\\u003c');
+const verificationMeta = data.googleSiteVerification ? `<meta name="google-site-verification" content="${escape(data.googleSiteVerification)}" />` : '';
 const ids = new Set();
 for (const app of publicApps) {
   if (ids.has(app.id)) throw new Error('Duplicate app ID: ' + app.id);
@@ -37,16 +43,18 @@ const page = `<!DOCTYPE html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>${escape(data.siteName)}｜遊んで学べる教育アプリ</title>
-  <meta name="description" content="学校やおうちで使える教育アプリのポータルサイト。ことば探検タイピング村で、ローマ字入力・村づくり・試練の洞窟への挑戦を楽しもう。">
+  <title>${escape(pageTitle)}</title>
+  <meta name="description" content="${escape(description)}">
+  ${verificationMeta}
   <meta name="theme-color" content="#142b49">
   <link rel="canonical" href="${escape(data.siteUrl)}">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ja_JP">
-  <meta property="og:title" content="${escape(data.siteName)}｜遊んで学べる教育アプリ">
-  <meta property="og:description" content="学校やおうちで使える、教育アプリの入り口です。今日の「やってみたい」を見つけよう。">
+  <meta property="og:title" content="${escape(pageTitle)}">
+  <meta property="og:description" content="${escape(description)}">
   <meta property="og:url" content="${escape(data.siteUrl)}">
   <link rel="stylesheet" href="styles.css">
+  <script type="application/ld+json">${websiteSchema}</script>
 </head>
 <body>
   <a class="skip-link" href="#apps">アプリ一覧へ進む</a>
@@ -58,7 +66,7 @@ const page = `<!DOCTYPE html>
     <section class="intro" aria-labelledby="intro-title">
       <p class="eyebrow"><span aria-hidden="true"></span> 遊んで、見つける。自分の「できた！」</p>
       <h1 id="intro-title">「やってみたい」が、<br><em>学びのはじまり。</em></h1>
-      <p class="intro-text">学校やおうちで使える、教育アプリの入り口です。<br class="desktop-break">気になるアプリを選んで、さっそく遊んでみよう。</p>
+      <p class="intro-text">小学生が遊びながら学べる、無料の教育アプリ。<br class="desktop-break">学校でも、おうちでも。気になるアプリで遊んでみよう。</p>
       <a class="browse-link" href="#apps">アプリをえらぶ <span aria-hidden="true">↓</span></a>
     </section>
     <section class="app-section" id="apps" aria-labelledby="apps-title">
@@ -81,4 +89,6 @@ const page = `<!DOCTYPE html>
 </html>
 `;
 fs.writeFileSync(path.join(__dirname, 'index.html'), page);
-console.log(`Built portal: ${publicApps.length} published app(s), ${Buffer.byteLength(page)} bytes of HTML.`);
+fs.writeFileSync(path.join(__dirname, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${new URL('sitemap.xml',data.siteUrl).href}\n`);
+fs.writeFileSync(path.join(__dirname, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${escape(data.siteUrl)}</loc></url>\n</urlset>\n`);
+console.log(`Built portal: ${publicApps.length} published app(s), ${Buffer.byteLength(page)} bytes of HTML; robots.txt and sitemap.xml ready.`);
