@@ -3,7 +3,7 @@
   "siteSubtitle": "教育アプリ",
   "siteUrl": "https://ks-factory1979.github.io/",
   "pageTitle": "K's Factory｜小学生向けの無料教育ゲーム",
-  "description": "小学生が遊びながら学べる無料の教育ゲーム。ことば探検タイピング村でローマ字入力を練習し、村づくりや試練の洞窟に挑戦。学校や家庭で使える教育アプリを紹介しています。",
+  "description": "小学生が遊びながら学べる無料の教育ゲーム。ことば探検タイピング村でローマ字入力、ひらがなタウンをつくろう！でひらがなの読みを練習。学校や家庭で使える教育アプリを紹介しています。",
   "googleSiteVerification": "lk7gTjAaGcX70h_opGOd6GD_nm6KaXMOuPx9XsMFYYo",
   "counterUrl": "https://script.google.com/macros/s/AKfycbzx1yag8bWOtnXKi4fnHjg3QL83Isjy8URSExovs2kK0XPrLoWGEAy5fxl2WKoREf5k/exec",
   "apps": [
@@ -23,7 +23,21 @@
       "logo": "typing-logo.webp",
       "note": "洞窟の比較はブラウザごとの自己ベストで集計します。30件未満は集計中と表示されます。"
     },
-    {"id":"hiragana-town","title":"ひらがなタウンをつくろう！","status":"coming-soon"},
+    {
+      "id": "hiragana-town",
+      "title": "ひらがなタウンをつくろう！",
+      "category": "ことば・ひらがな",
+      "status": "published",
+      "lead": "ことばを見つけて、自分だけの町へ。",
+      "description": "ひらがなを読んで、ぴったりの絵を選ぼう。宝箱から集めたアイテムを好きな場所に並べて、自分だけの町づくり。あ行からわ行まで220語に挑戦できます。",
+      "tags": ["ひらがなの読み", "220語のことば", "自由な町づくり"],
+      "requirements": "タッチ・マウス対応・Googleログイン不要",
+      "url": "https://ks-factory1979.github.io/hiragana-town/",
+      "cover": "hiragana-cover.webp",
+      "coverAlt": "ひらがなタウンの明るい町の背景",
+      "logo": "hiragana-logo.webp",
+      "note": "町の記録はこの端末・ブラウザに保存。「せんせい」メニューからセーブを書き出したり、GAS版の記録を読み込んだりできます。"
+    },
     {"id":"tower-of-ten","title":"10の塔","status":"coming-soon"},
     {"id":"coloring-logic","title":"ぬりえロジック","status":"coming-soon"},
     {"id":"calculation-battle","title":"ひっぱれ！けいさんバトル","status":"coming-soon"}
