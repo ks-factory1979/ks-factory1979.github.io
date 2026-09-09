@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#49aee8">
+  <title>ひらがなタウンをつくろう！｜無料ひらがな学習ゲーム - K's Factory</title>
+  <meta name="description" content="ひらがなを読んで正しい絵を選び、自分の町をつくる無料の学習ゲーム。あ行からわ行まで220語。タブレットやChromebookで、ログインなしで遊べます。">
+  <link rel="canonical" href="https://ks-factory1979.github.io/hiragana-town/">
+  <meta property="og:title" content="ひらがなタウンをつくろう！">
+  <meta property="og:description" content="ひらがなを読んで、えをえらぼう。220語のことばで、自分だけの町づくり。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ks-factory1979.github.io/hiragana-town/">
+  <meta property="og:image" content="https://ks-factory1979.github.io/hiragana-town/ui-menuLogo-66da3e23a9.webp">
+  <link rel="stylesheet" href="style.css">
+  <script src="assets.js" defer></script>
+  <script src="manifest.js" defer></script>
+</head>
+<body>
+<noscript>このゲームを遊ぶには、ブラウザのJavaScriptを有効にしてください。</noscript>
+<div id="app" class="app-shell">
+  <section id="menuScreen" class="screen menu-screen active" aria-label="メニュー">
+    <h1 class="menu-title-text">ひらがなタウンをつくろう！</h1>
+    <div class="menu-overlay">
+      <img id="menuLogo" class="menu-logo" alt="ひらがなタウンをつくろう！">
+      <div class="menu-actions">
+        <button id="menuQuizBtn" class="image-menu-button" type="button" aria-label="もんだいを とく">
+          <img id="menuQuizImage" alt="もんだいを とく">
+        </button>
+        <button id="menuTownBtn" class="image-menu-button" type="button" aria-label="まちを みにいく">
+          <img id="menuTownImage" alt="まちを みにいく">
+        </button>
+      </div>
+    </div>
+    <a class="portal-return" href="../">ほかのゲーム</a>
+    <button id="teacherBtn" class="teacher-button" type="button">せんせい</button>
+  </section>
+
+  <section id="rowScreen" class="screen standard-screen" aria-label="ぎょうを えらぶ">
+    <header class="screen-header">
+      <button class="round-back" id="rowBackBtn" type="button" aria-label="メニューにもどる">←</button>
+      <div>
+        <h1>どの ぎょうに する？</h1>
+        <p>おおきな もじを おしてね</p>
+      </div>
+    </header>
+    <main class="row-main">
+      <div id="rowGrid" class="row-grid"></div>
+    </main>
+  </section>
+
+  <section id="quizScreen" class="screen standard-screen" aria-label="もんだい">
+    <header class="quiz-header">
+      <button id="quizRowBtn" class="small-pill secondary" type="button">ぎょうを かえる</button>
+      <div class="quiz-status">
+        <span id="quizRowLabel" class="status-pill">あぎょう</span>
+        <span class="status-pill"><b id="questionNo">1</b> / 5</span>
+        <span class="status-pill treasure-status">✨ <b id="batchTreasureCount">0</b></span>
+      </div>
+      <button id="quizMenuBtn" class="small-pill secondary" type="button">メニュー</button>
+    </header>
+    <main class="quiz-main">
+      <div class="question-card">
+        <div class="question-guide">この ことばは どれ？</div>
+        <div id="questionWord" class="question-word">あめ</div>
+      </div>
+      <div id="choices" class="choices" aria-live="polite"></div>
+      <div id="feedback" class="feedback">えを えらんでね</div>
+    </main>
+  </section>
+
+  <section id="townScreen" class="screen town-screen" aria-label="まち">
+    <header class="town-header">
+      <div class="town-header-left">
+        <button id="townMenuBtn" class="small-pill secondary" type="button">メニュー</button>
+        <button id="townRowBtn" class="small-pill secondary" type="button">ぎょうを かえる</button>
+      </div>
+      <div id="townMessage" class="town-message">アイテムを うごかせるよ</div>
+      <div class="zoom-box">
+        <span aria-hidden="true">🔍</span>
+        <input id="zoomRange" type="range" min="35" max="110" step="1" value="70" aria-label="まちの おおきさ">
+        <span id="zoomLabel">70%</span>
+      </div>
+    </header>
+    <main class="town-main">
+      <div id="mapShell" class="map-shell">
+        <div id="mapSizer" class="map-sizer">
+          <div id="bigMap" class="big-map">
+            <div id="mapItems" class="map-layer"></div>
+            <div id="chestLayer" class="map-layer chest-layer"></div>
+            <div id="completionBanner" class="completion-banner"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <div id="townContinueBar" class="town-continue hidden">
+      <button id="continueBatchBtn" class="continue-button" type="button">つぎの5もんへ</button>
+    </div>
+  </section>
+
+  <div id="loadingOverlay" class="overlay hidden" role="status" aria-live="polite">
+    <div class="overlay-card">
+      <div class="spinner" aria-hidden="true"></div>
+      <div id="loadingText" class="overlay-title">じゅんびしているよ…</div>
+      <div id="loadingDetail" class="overlay-detail"></div>
+    </div>
+  </div>
+
+  <div id="errorOverlay" class="overlay hidden" role="alertdialog" aria-modal="true">
+    <div class="overlay-card error-card">
+      <div class="error-icon">🌱</div>
+      <div class="overlay-title">うまく よみこめなかったよ</div>
+      <div id="errorMessage" class="overlay-detail"></div>
+      <div class="dialog-actions">
+        <button id="retryBtn" type="button">もういちど</button>
+        <button id="errorMenuBtn" class="secondary" type="button">メニューにもどる</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="teacherModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="teacherTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="teacherTitle">せんせい メニュー</h2>
+        <button id="teacherCloseBtn" class="icon-close" type="button" aria-label="とじる">×</button>
+      </div>
+      <p>この端末の町の記録を、書き出したり読み込んだりできます。</p><p class="save-help">記録はこの端末・このブラウザに保存します。名前やメールアドレスの入力は不要です。GAS版から引き継ぐときは、GAS版の「せんせい」でセーブを書き出し、ここで読み込んでください。端末を変える前やブラウザのデータを消す前にも、セーブを書き出しておくと安心です。</p>
+      <div class="teacher-actions">
+        <button id="exportSaveBtn" type="button">セーブを書き出す</button>
+        <button id="importSaveBtn" type="button">セーブを読み込む</button>
+        <input id="importSaveInput" type="file" accept="application/json,.json" hidden>
+        <button id="clearCacheBtn" class="secondary" type="button">問題データのキャッシュを消す</button>
+        <button id="resetSaveBtn" class="danger" type="button">町の記録をリセット</button>
+      </div>
+      <div id="teacherInfo" class="teacher-info"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</div>
+<script src="game.js" defer></script>
+</body>
+</html>
