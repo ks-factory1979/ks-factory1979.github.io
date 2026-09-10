@@ -15,3 +15,15 @@
 @media(max-height:720px) and (orientation:landscape){.menu-overlay{padding:12px;gap:6px}.menu-logo{max-height:31vh;width:min(65vw,730px)}.menu-actions{width:min(52vw,630px);gap:7px}.image-menu-button img{max-height:18vh}.question-card{min-height:125px}.question-word{font-size:clamp(52px,11vh,94px)}.quiz-main{gap:8px;padding-top:8px}.choice-card{height:clamp(160px,30vh,235px)}.feedback{font-size:clamp(21px,4vh,34px);min-height:38px}.row-card{min-height:135px}.screen-header{min-height:82px;padding:10px 30px}.screen-header h1{font-size:38px}}
 @media(orientation:portrait){.menu-logo{width:94vw;max-height:32vh}.menu-actions{width:90vw}.image-menu-button img{max-height:15vh}.row-grid{grid-template-columns:repeat(2,1fr)}.choices{grid-template-columns:repeat(3,1fr)}.choice-card{height:clamp(175px,25vh,270px)}}
 .portal-return{position:absolute;left:16px;bottom:16px;z-index:3;padding:9px 15px;border-radius:24px;background:rgba(255,255,255,.94);color:#17384b;text-decoration:none;font-size:14px;font-weight:700;min-height:40px}.save-help{font-size:13px;line-height:1.7}.menu-title-text{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+/* Reserve a footer so music controls never cover answers or town items. */
+.app-shell{--music-height:calc(54px + env(safe-area-inset-bottom,0px))}
+.screen{height:calc(100% - var(--music-height))}
+.town-screen{position:relative}
+.music-controls{position:absolute;inset:auto 0 0;z-index:900;height:var(--music-height);display:flex;align-items:center;justify-content:center;gap:12px;padding:5px 12px calc(5px + env(safe-area-inset-bottom,0px));background:#f5fbff;border-top:2px solid #d2eaf6;color:#315f75;font-size:14px;font-weight:800}
+.music-toggle{min-height:42px;padding:6px 15px;border:2px solid #cdeaf8;border-radius:999px;background:#fff;color:#176487;white-space:nowrap}
+.music-toggle[aria-pressed="false"]{color:#58717e;background:#eaf1f5}
+.music-controls input{width:120px;height:38px;margin:0;accent-color:#2789bb}
+.music-controls output{min-width:4ch;font-variant-numeric:tabular-nums}
+.toast{bottom:calc(var(--music-height) + 12px)}
+@media(max-width:620px){.music-controls{gap:7px;padding-left:8px;padding-right:8px;font-size:12px}.music-toggle{padding:6px 10px}.music-controls input{width:72px}.music-controls label{max-width:4em;text-align:center;line-height:1.2}}

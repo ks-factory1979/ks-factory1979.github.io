@@ -12,7 +12,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://ks-factory1979.github.io/hiragana-town/">
   <meta property="og:image" content="https://ks-factory1979.github.io/hiragana-town/ui-menuLogo-66da3e23a9.webp">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=bgm-1">
   <script src="assets.js" defer></script>
   <script src="manifest.js" defer></script>
 </head>
@@ -136,8 +136,15 @@
     </div>
   </div>
 
+  <div id="musicControls" class="music-controls" role="group" aria-label="おんがくの せってい">
+    <button id="musicToggle" class="music-toggle" type="button" aria-pressed="true" aria-label="おんがくを ながす">♪ タップで おんがく</button>
+    <label for="musicVolume">おとの おおきさ</label>
+    <input id="musicVolume" type="range" min="0" max="100" step="5" value="30">
+    <output id="musicVolumeValue" for="musicVolume">30%</output>
+  </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </div>
-<script src="game.js" defer></script>
+<script src="bgm.js?v=1" defer></script>
+<script src="game.js?v=bgm-1" defer></script>
 </body>
 </html>

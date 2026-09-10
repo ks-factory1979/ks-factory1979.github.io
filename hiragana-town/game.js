@@ -40,7 +40,7 @@ function sample(a,n){return shuffle(a).slice(0,n)}
 function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
 function clamp(n,min,max){return Math.max(min,Math.min(max,n))}
 function showToast(msg){els.toast.textContent=msg;els.toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>els.toast.classList.remove('show'),2300)}
-function setScreen(name){for(const s of [els.menuScreen,els.rowScreen,els.quizScreen,els.townScreen])s.classList.toggle('active',s.id===name+'Screen')}
+function setScreen(name){for(const s of [els.menuScreen,els.rowScreen,els.quizScreen,els.townScreen])s.classList.toggle('active',s.id===name+'Screen');window.HIRAGANA_BGM?.setScreen(name)}
 function showLoading(title='じゅんびしているよ…',detail=''){els.loadingText.textContent=title;els.loadingDetail.textContent=detail;els.loadingOverlay.classList.remove('hidden')}
 function hideLoading(){els.loadingOverlay.classList.add('hidden')}
 function showError(err,retry){hideLoading();runtime.lastLoadAction=retry;els.errorMessage.textContent=err&&err.message?err.message:String(err||'もういちど ためしてね');els.errorOverlay.classList.remove('hidden')}
@@ -366,6 +366,6 @@ function wireEvents(){
   els.exportSaveBtn.addEventListener('click',exportSave);els.importSaveBtn.addEventListener('click',()=>els.importSaveInput.click());els.importSaveInput.addEventListener('change',()=>{const f=els.importSaveInput.files[0];if(f)importSaveFile(f);els.importSaveInput.value='' });els.clearCacheBtn.addEventListener('click',async()=>{try{await idbClear();runtime.loadedPacks.clear();showToast('問題データのキャッシュを消しました')}catch(_){showToast('キャッシュを消せませんでした')}});els.resetSaveBtn.addEventListener('click',resetSave);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){finishActiveDrag('visibilitychange');saveNow()}});window.addEventListener('beforeunload',()=>{finishActiveDrag('beforeunload');saveNow()});
 }
-function init(){initializeAssets();loadSave();wireEvents();buildRows();applyZoom(saveState.mapZoom,false);updateTeacherInfo();setScreen('menu')}
+function init(){initializeAssets();loadSave();window.HIRAGANA_BGM?.init({toggle:$('musicToggle'),range:$('musicVolume'),value:$('musicVolumeValue'),onError:showToast});wireEvents();buildRows();applyZoom(saveState.mapZoom,false);updateTeacherInfo();setScreen('menu')}
 init();
 })();
