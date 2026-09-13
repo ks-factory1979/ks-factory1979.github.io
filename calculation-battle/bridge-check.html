@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>けいさんバトル 接続確認</title></head>
+<body><h1>けいさんバトル 接続確認</h1>
+<p>記録を保存せず、共有記録サーバーとの往復通信だけを確認します。</p>
+<button id="check" type="button">接続を確認する</button><pre id="result" role="status">確認待ち</pre>
+<script src="config.js"></script><script src="gas-bridge-client.js"></script>
+<script>
+const client = new HkbGasBridgeClient(HKB_CONFIG.gasWebAppUrl);
+document.getElementById('check').addEventListener('click', async () => {
+  const output = document.getElementById('result');
+  output.textContent = '接続を確認しています…';
+  const start = performance.now();
+  try {
+    const answer = await client.call('ping');
+    output.textContent = JSON.stringify({success:answer.ok === true && answer.storageTouched === false,elapsedMs:Math.round(performance.now()-start),answer},null,2);
+  } catch (error) { output.textContent = '接続できませんでした: ' + error.message; }
+});
+</script></body></html>
