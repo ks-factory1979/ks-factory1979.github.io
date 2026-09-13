@@ -12,7 +12,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://ks-factory1979.github.io/hiragana-town/">
   <meta property="og:image" content="https://ks-factory1979.github.io/hiragana-town/ui-menuLogo-66da3e23a9.webp">
-  <link rel="stylesheet" href="style.css?v=bgm-1">
+  <link rel="stylesheet" href="style.css?v=mobile-1">
   <script src="assets.js" defer></script>
   <script src="manifest.js" defer></script>
 </head>
@@ -51,7 +51,7 @@
 
   <section id="quizScreen" class="screen standard-screen" aria-label="もんだい">
     <header class="quiz-header">
-      <button id="quizRowBtn" class="small-pill secondary" type="button">ぎょうを かえる</button>
+      <button id="quizRowBtn" class="small-pill secondary" type="button" aria-label="ぎょうを かえる"><span class="wide-label">ぎょうを かえる</span><span class="phone-label">ぎょう</span></button>
       <div class="quiz-status">
         <span id="quizRowLabel" class="status-pill">あぎょう</span>
         <span class="status-pill"><b id="questionNo">1</b> / 5</span>
@@ -73,13 +73,16 @@
     <header class="town-header">
       <div class="town-header-left">
         <button id="townMenuBtn" class="small-pill secondary" type="button">メニュー</button>
-        <button id="townRowBtn" class="small-pill secondary" type="button">ぎょうを かえる</button>
+        <button id="townRowBtn" class="small-pill secondary" type="button" aria-label="ぎょうを かえる"><span class="wide-label">ぎょうを かえる</span><span class="phone-label">ぎょう</span></button>
       </div>
       <div id="townMessage" class="town-message">アイテムを うごかせるよ</div>
-      <div class="zoom-box">
-        <span aria-hidden="true">🔍</span>
-        <input id="zoomRange" type="range" min="35" max="110" step="1" value="70" aria-label="まちの おおきさ">
-        <span id="zoomLabel">70%</span>
+      <div id="zoomControls" class="zoom-controls">
+        <button id="zoomPanelBtn" class="phone-control small-pill secondary" type="button" aria-label="まちの おおきさを かえる" aria-controls="zoomPanel" aria-expanded="false">🔍</button>
+        <div id="zoomPanel" class="zoom-box" role="group" aria-label="まちの おおきさ">
+          <span aria-hidden="true">🔍</span>
+          <input id="zoomRange" type="range" min="35" max="110" step="1" value="70" aria-label="まちの おおきさ">
+          <span id="zoomLabel">70%</span>
+        </div>
       </div>
     </header>
     <main class="town-main">
@@ -93,6 +96,11 @@
         </div>
       </div>
     </main>
+    <button id="townGuide" class="town-guide hidden" type="button" aria-label="まちの あそびかた。おして とじる">
+      <strong>アイテムを うごかしてみよう！</strong>
+      <span id="townGuidePan">スクロールで まちを みわたせるよ</span>
+      <small>おして とじる</small>
+    </button>
     <div id="townContinueBar" class="town-continue hidden">
       <button id="continueBatchBtn" class="continue-button" type="button">つぎの5もんへ</button>
     </div>
@@ -137,14 +145,19 @@
   </div>
 
   <div id="musicControls" class="music-controls" role="group" aria-label="おんがくの せってい">
-    <button id="musicToggle" class="music-toggle" type="button" aria-pressed="true" aria-label="おんがくを ながす">♪ タップで おんがく</button>
-    <label for="musicVolume">おとの おおきさ</label>
-    <input id="musicVolume" type="range" min="0" max="100" step="5" value="30">
-    <output id="musicVolumeValue" for="musicVolume">30%</output>
+    <button id="musicPanelBtn" class="phone-control music-panel-button" type="button" aria-label="おんがくの せってい" aria-controls="musicPanel" aria-expanded="false">♪</button>
+    <div id="musicPanel" class="music-panel">
+      <strong class="phone-control">おんがく</strong>
+      <button id="musicPanelClose" class="phone-control icon-close" type="button" aria-label="おんがくの せっていを とじる">×</button>
+      <button id="musicToggle" class="music-toggle" type="button" aria-pressed="true" aria-label="おんがくを ながす">♪ タップで おんがく</button>
+      <label for="musicVolume">おとの おおきさ</label>
+      <input id="musicVolume" type="range" min="0" max="100" step="5" value="30">
+      <output id="musicVolumeValue" for="musicVolume">30%</output>
+    </div>
   </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </div>
 <script src="bgm.js?v=1" defer></script>
-<script src="game.js?v=bgm-1" defer></script>
+<script src="game.js?v=mobile-1" defer></script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 'use strict';
 (() => {
 const SAVE_KEY='hiraganaTownSave_v5_a_latest_map';
+const TOWN_GUIDE_KEY='hiraganaTownGuide_v1';
 const DB_NAME='ksFactoryHiraganaTownPacksDB';
 const DB_VERSION=2;
 const STORE_NAME='packs';
@@ -22,6 +23,8 @@ const runtime={
 const dragState={active:false,finishing:false,item:null,id:null,pointerId:null,pointerType:null,grabOffsetX:0,grabOffsetY:0,clientX:0,clientY:0,raf:0,changed:false};
 const saveState={unlockedIds:[],reviewIds:[],placements:{},zOrder:{},nextZ:20,completedPacks:[],lastRowKey:'a',playMode:'row',mapZoom:.70};
 let saveAvailable=true,toastTimer=null;
+let questionFitFrame=0,townGuideSeen=false;
+const phoneLayout=window.matchMedia('(max-width:620px)');
 
 const $=id=>document.getElementById(id);
 const els={
@@ -40,7 +43,7 @@ function sample(a,n){return shuffle(a).slice(0,n)}
 function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
 function clamp(n,min,max){return Math.max(min,Math.min(max,n))}
 function showToast(msg){els.toast.textContent=msg;els.toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>els.toast.classList.remove('show'),2300)}
-function setScreen(name){for(const s of [els.menuScreen,els.rowScreen,els.quizScreen,els.townScreen])s.classList.toggle('active',s.id===name+'Screen');window.HIRAGANA_BGM?.setScreen(name)}
+function setScreen(name){closePhonePanels();$("townGuide").classList.add('hidden');for(const s of [els.menuScreen,els.rowScreen,els.quizScreen,els.townScreen])s.classList.toggle('active',s.id===name+'Screen');window.HIRAGANA_BGM?.setScreen(name);if(name==='quiz')scheduleQuestionFit()}
 function showLoading(title='じゅんびしているよ…',detail=''){els.loadingText.textContent=title;els.loadingDetail.textContent=detail;els.loadingOverlay.classList.remove('hidden')}
 function hideLoading(){els.loadingOverlay.classList.add('hidden')}
 function showError(err,retry){hideLoading();runtime.lastLoadAction=retry;els.errorMessage.textContent=err&&err.message?err.message:String(err||'もういちど ためしてね');els.errorOverlay.classList.remove('hidden')}
@@ -51,6 +54,84 @@ function initializeAssets(){
   els.menuScreen.style.backgroundImage=`url("${ASSETS.menuBackground}")`;
   els.menuLogo.src=ASSETS.menuLogo;els.menuQuizImage.src=ASSETS.quizButton;els.menuTownImage.src=ASSETS.townButton;
   els.bigMap.style.backgroundImage=`url("${ASSETS.townMap}")`;
+}
+
+// Measure the rendered word, resetting the CSS size first so short words stay large.
+function fitQuestionWord(){
+  if(!els.quizScreen.classList.contains('active'))return;
+  const word=els.questionWord,card=word.parentElement;
+  word.style.fontSize='';word.style.letterSpacing='';
+  const cardStyle=getComputedStyle(card);
+  const available=card.clientWidth-parseFloat(cardStyle.paddingLeft)-parseFloat(cardStyle.paddingRight)-2;
+  if(available<=0)return;
+  let width=word.getBoundingClientRect().width;
+  if(width<=available)return;
+  word.style.letterSpacing='.02em';
+  width=word.getBoundingClientRect().width;
+  if(width<=available)return;
+  const baseSize=parseFloat(getComputedStyle(word).fontSize);
+  let size=Math.floor(baseSize*available/width*10)/10;
+  word.style.fontSize=size+'px';
+  // Allow for subpixel/font rounding without a character-count lookup table.
+  for(let i=0;i<4&&word.getBoundingClientRect().width>available;i++){
+    size=Math.max(1,size-.5);word.style.fontSize=size+'px';
+  }
+}
+function scheduleQuestionFit(){cancelAnimationFrame(questionFitFrame);questionFitFrame=requestAnimationFrame(fitQuestionWord)}
+
+const phonePanels=[
+  {root:'musicControls',panel:'musicPanel',button:'musicPanelBtn',first:'musicToggle'},
+  {root:'zoomControls',panel:'zoomPanel',button:'zoomPanelBtn',first:'zoomRange'}
+];
+function closePhonePanels(restoreFocus=false){
+  for(const entry of phonePanels){
+    const root=$(entry.root),panel=$(entry.panel),button=$(entry.button);
+    if(restoreFocus&&phoneLayout.matches&&root.classList.contains('is-open')&&panel.contains(document.activeElement))button.focus({preventScroll:true});
+    root.classList.remove('is-open');button.setAttribute('aria-expanded','false');
+  }
+}
+function dismissTownGuide(){
+  if(townGuideSeen||$('townGuide').classList.contains('hidden'))return;
+  townGuideSeen=true;$('townGuide').classList.add('hidden');
+  try{localStorage.setItem(TOWN_GUIDE_KEY,'1')}catch(_){}
+}
+function showTownGuide(){
+  if(townGuideSeen||runtime.chestAnimating||!els.townScreen.classList.contains('active'))return;
+  $('townGuidePan').textContent=window.matchMedia('(pointer:coarse)').matches?'なにもない ところを なぞると まちを みわたせるよ':'スクロールで まちを みわたせるよ';
+  $('townGuide').classList.remove('hidden');
+}
+function initializeDisplayControls(){
+  try{townGuideSeen=localStorage.getItem(TOWN_GUIDE_KEY)==='1'}catch(_){}
+  $('townGuide').addEventListener('click',dismissTownGuide);
+  for(const entry of phonePanels){
+    $(entry.button).addEventListener('click',()=>{
+      if(!phoneLayout.matches)return;
+      const open=!$(entry.root).classList.contains('is-open');
+      closePhonePanels();
+      if(open){$(entry.root).classList.add('is-open');$(entry.button).setAttribute('aria-expanded','true');$(entry.first).focus({preventScroll:true})}
+    });
+  }
+  $('musicPanelClose').addEventListener('click',()=>closePhonePanels(true));
+  document.addEventListener('pointerdown',event=>{
+    for(const entry of phonePanels){
+      if($(entry.root).classList.contains('is-open')&&!$(entry.root).contains(event.target))closePhonePanels(true);
+    }
+  },{passive:true});
+  document.addEventListener('keydown',event=>{if(event.key==='Escape')closePhonePanels(true)});
+  document.addEventListener('focusin',event=>{
+    for(const entry of phonePanels){if($(entry.root).classList.contains('is-open')&&!$(entry.root).contains(event.target))closePhonePanels()}
+  });
+  const onLayoutChange=()=>{closePhonePanels(true);scheduleQuestionFit()};
+  if(phoneLayout.addEventListener)phoneLayout.addEventListener('change',onLayoutChange);
+  else phoneLayout.addListener(onLayoutChange);
+  window.addEventListener('resize',scheduleQuestionFit);
+  window.addEventListener('orientationchange',scheduleQuestionFit);
+  window.visualViewport?.addEventListener('resize',scheduleQuestionFit);
+  if(window.ResizeObserver){
+    let lastWidth=0;
+    new ResizeObserver(entries=>{const width=entries[0].contentRect.width;if(width!==lastWidth){lastWidth=width;scheduleQuestionFit()}}).observe(els.questionWord.parentElement);
+  }
+  if(document.fonts){document.fonts.ready.then(scheduleQuestionFit);document.fonts.addEventListener?.('loadingdone',scheduleQuestionFit)}
 }
 
 function sanitizeSave(data){
@@ -76,7 +157,7 @@ function sanitizeSave(data){
 }
 function loadSave(){try{const raw=localStorage.getItem(SAVE_KEY);if(raw)Object.assign(saveState,sanitizeSave(JSON.parse(raw)))}catch(e){saveAvailable=false;console.warn(e)}}
 function saveNow(){
-  const data={app:'hiragana-town',saveVersion:8,appVersion:'1.2.1-pages',updatedAt:new Date().toISOString(),unlockedIds:unique(saveState.unlockedIds).filter(id=>VALID_IDS.has(id)),reviewIds:unique(saveState.reviewIds).filter(id=>VALID_IDS.has(id)),placements:saveState.placements,zOrder:saveState.zOrder,nextZ:saveState.nextZ,completedPacks:unique(saveState.completedPacks).filter(id=>VALID_PACK_IDS.has(id)),lastRowKey:saveState.lastRowKey,playMode:saveState.playMode,mapZoom:saveState.mapZoom};
+  const data={app:'hiragana-town',saveVersion:8,appVersion:'1.2.2-pages',updatedAt:new Date().toISOString(),unlockedIds:unique(saveState.unlockedIds).filter(id=>VALID_IDS.has(id)),reviewIds:unique(saveState.reviewIds).filter(id=>VALID_IDS.has(id)),placements:saveState.placements,zOrder:saveState.zOrder,nextZ:saveState.nextZ,completedPacks:unique(saveState.completedPacks).filter(id=>VALID_PACK_IDS.has(id)),lastRowKey:saveState.lastRowKey,playMode:saveState.playMode,mapZoom:saveState.mapZoom};
   try{localStorage.setItem(SAVE_KEY,JSON.stringify(data));saveAvailable=true}catch(e){saveAvailable=false;showToast('この端末では 保存できませんでした')}
   updateTeacherInfo();return data;
 }
@@ -222,6 +303,7 @@ function renderQuestion(){
   const q=runtime.questions[runtime.currentIndex];if(!q){enterTownBreak();return}
   const renderToken=(runtime.questionRenderToken=(runtime.questionRenderToken||0)+1);
   runtime.currentMissed=false;runtime.inputLocked=false;els.quizRowLabel.textContent=runtime.currentMode==='all'?'ぜんぶ':ROW_BY_KEY.get(runtime.currentRowKey).initial+'ぎょう';els.questionNo.textContent=runtime.currentIndex+1;els.batchTreasureCount.textContent=runtime.batchNewIds.length;els.questionWord.textContent=q.word;els.feedback.textContent='えを えらんでね';els.feedback.className='feedback';els.choices.innerHTML='';
+  scheduleQuestionFit();
   for(const c of runtime.questionChoices.get(q.id)){
     const b=document.createElement('button');b.type='button';b.className='choice-card';b.dataset.id=c.id;b.setAttribute('aria-label',c.word);
     const img=document.createElement('img');img.src=c.image;img.alt=c.word;img.draggable=false;
@@ -311,6 +393,7 @@ function startItemDrag(item,id,e){
 }
 function finishActiveDrag(reason='end'){
   if(!dragState.active||dragState.finishing)return;dragState.finishing=true;updateDraggedItemPosition();const item=dragState.item,id=dragState.id,pointerId=dragState.pointerId;
+  if(dragState.changed)dismissTownGuide();
   dragState.active=false;if(dragState.raf)cancelAnimationFrame(dragState.raf);dragState.raf=0;
   if(id&&saveState.placements[id]){const p=clampItemCenter(saveState.placements[id].x,saveState.placements[id].y);saveState.placements[id]=p;if(item){item.style.left=p.x+'px';item.style.top=p.y+'px';item.style.zIndex=String(saveState.zOrder[id]||20)}}
   if(item){item.classList.remove('dragging');try{if(item.hasPointerCapture&&item.hasPointerCapture(pointerId))item.releasePointerCapture(pointerId)}catch(_){}}
@@ -323,7 +406,7 @@ function onLostPointerCapture(e){if(dragState.active&&e.pointerId===dragState.po
 function panToPoint(p,behavior='smooth'){els.mapShell.scrollTo({left:clamp(p.x*saveState.mapZoom-els.mapShell.clientWidth/2,0,Math.max(0,MAP_W*saveState.mapZoom-els.mapShell.clientWidth)),top:clamp(p.y*saveState.mapZoom-els.mapShell.clientHeight/2,0,Math.max(0,MAP_H*saveState.mapZoom-els.mapShell.clientHeight)),behavior})}
 async function showTown({fromBatch=false}={}){
   runtime.townFromBatch=fromBatch;showLoading('まちを じゅんびしているよ…','');
-  try{await ensureTownPacks();hideLoading();setScreen('town');applyZoom(saveState.mapZoom,false);const pending=fromBatch?[...runtime.batchNewIds]:[];renderTown(pending);els.townContinueBar.classList.add('hidden');els.townRowBtn.style.display=fromBatch?'inline-block':'inline-block';if(fromBatch){if(pending.length){els.townMessage.textContent=`たからばこを ${pending.length}こ あけるよ！`;await runChestSequence(pending)}else{els.townMessage.textContent='また ちょうせんしよう！';finishTownBreak()}}else{els.townMessage.textContent='アイテムを すきなばしょへ うごかせるよ'}}catch(e){showError(e,()=>showTown({fromBatch}))}
+  try{await ensureTownPacks();hideLoading();setScreen('town');applyZoom(saveState.mapZoom,false);const pending=fromBatch?[...runtime.batchNewIds]:[];renderTown(pending);els.townContinueBar.classList.add('hidden');els.townRowBtn.style.display=fromBatch?'inline-block':'inline-block';if(fromBatch){if(pending.length){els.townMessage.textContent=`たからばこを ${pending.length}こ あけるよ！`;await runChestSequence(pending)}else{els.townMessage.textContent='また ちょうせんしよう！';finishTownBreak()}}else{els.townMessage.textContent='アイテムを すきなばしょへ うごかせるよ'}showTownGuide()}catch(e){showError(e,()=>showTown({fromBatch}))}
 }
 async function enterTownBreak(){await showTown({fromBatch:true})}
 async function runChestSequence(ids){
@@ -331,7 +414,7 @@ async function runChestSequence(ids){
   for(let i=0;i<ids.length;i++){const id=ids[i],p=saveState.placements[id];els.townMessage.textContent=`たからばこ ${i+1} / ${ids.length}`;panToPoint(p);await sleep(420);const chest=document.createElement('div');chest.className='chest wiggle';chest.style.left=(p.x-37)+'px';chest.style.top=(p.y-37)+'px';chest.innerHTML=`<img src="${ASSETS.treasure.closed}" alt="たからばこ">`;els.chestLayer.innerHTML='';els.chestLayer.appendChild(chest);await sleep(500);chest.classList.remove('wiggle');chest.innerHTML=`<img src="${ASSETS.treasure.open}" alt="ひらいた たからばこ">${ASSETS.treasure.sparkle?`<img class="sparkle" src="${ASSETS.treasure.sparkle}" alt="">`:''}`;await sleep(650);const item=els.mapItems.querySelector(`[data-id="${CSS.escape(id)}"]`);if(item){item.classList.remove('pending');item.classList.add('reveal');setTimeout(()=>item.classList.remove('reveal'),650)}els.chestLayer.innerHTML='';await sleep(280)}
   runtime.chestAnimating=false;setTownControlsDisabled(false);saveNow();checkCompletions();finishTownBreak();
 }
-function setTownControlsDisabled(v){els.townMenuBtn.disabled=v;els.townRowBtn.disabled=v;els.zoomRange.disabled=v}
+function setTownControlsDisabled(v){els.townMenuBtn.disabled=v;els.townRowBtn.disabled=v;els.zoomRange.disabled=v;$('zoomPanelBtn').disabled=v;if(v)closePhonePanels()}
 function finishTownBreak(){runtime.batchNewIds=[];els.townMessage.textContent='アイテムを すきなばしょへ うごかせるよ';els.townContinueBar.classList.remove('hidden')}
 function checkCompletions(){
   const unlocked=new Set(saveState.unlockedIds);for(const row of ROWS){if(saveState.completedPacks.includes(row.packId))continue;const ids=MANIFEST.words.filter(w=>w.rowKey===row.rowKey).map(w=>w.id);if(ids.length&&ids.every(id=>unlocked.has(id))){saveState.completedPacks.push(row.packId);saveNow();showCompletion(row);break}}
@@ -366,6 +449,6 @@ function wireEvents(){
   els.exportSaveBtn.addEventListener('click',exportSave);els.importSaveBtn.addEventListener('click',()=>els.importSaveInput.click());els.importSaveInput.addEventListener('change',()=>{const f=els.importSaveInput.files[0];if(f)importSaveFile(f);els.importSaveInput.value='' });els.clearCacheBtn.addEventListener('click',async()=>{try{await idbClear();runtime.loadedPacks.clear();showToast('問題データのキャッシュを消しました')}catch(_){showToast('キャッシュを消せませんでした')}});els.resetSaveBtn.addEventListener('click',resetSave);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){finishActiveDrag('visibilitychange');saveNow()}});window.addEventListener('beforeunload',()=>{finishActiveDrag('beforeunload');saveNow()});
 }
-function init(){initializeAssets();loadSave();window.HIRAGANA_BGM?.init({toggle:$('musicToggle'),range:$('musicVolume'),value:$('musicVolumeValue'),onError:showToast});wireEvents();buildRows();applyZoom(saveState.mapZoom,false);updateTeacherInfo();setScreen('menu')}
+function init(){initializeAssets();loadSave();window.HIRAGANA_BGM?.init({toggle:$('musicToggle'),range:$('musicVolume'),value:$('musicVolumeValue'),onError:showToast});initializeDisplayControls();wireEvents();buildRows();applyZoom(saveState.mapZoom,false);updateTeacherInfo();setScreen('menu')}
 init();
 })();
