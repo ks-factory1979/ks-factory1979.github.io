@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#58b9ef">
+  <title>ひっぱれ！けいさんバトル</title>
+
+  <script src="config.js"></script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <main id="app" aria-live="polite">
+    <section id="title-screen" class="screen sky-bg active" aria-label="タイトル画面">
+      <div class="flags" aria-hidden="true"></div>
+      <div id="title-crown-status" class="title-crown-status loading" aria-live="polite">
+        <span class="crown-icon"><img class="master-crown-img" alt="" data-crown-image></span>
+        <span><strong>王者データ よみこみ中</strong><small>つうしん中…</small></span>
+      </div>
+      <div class="title-controls">
+        <button class="small-control sound-toggle" data-label-style="full" type="button" aria-label="音のオンオフ">おと ON</button>
+        <button class="small-control effect-mode-toggle" type="button" aria-label="妨害演出の強さ">ひっさつ ふつう</button>
+        <button id="howto-button" class="small-control" type="button">？ あそびかた</button>
+      </div>
+      <span id="title-version" class="title-version"></span>
+      <div class="title-wrap screen-content title-enter">
+        <div class="title-emblem">
+          <div class="title-emblem-art" aria-hidden="true"></div>
+          <span class="title-player boy" aria-hidden="true"></span>
+          <span class="title-player girl" aria-hidden="true"></span>
+          <span class="title-player mole" aria-hidden="true"></span>
+          <span class="title-player rabbit" aria-hidden="true"></span>
+          <span class="title-player turtle" aria-hidden="true"></span>
+          <div class="title-copy">
+            <div class="eyebrow">けいさん × つなひき</div>
+            <h1 class="sr-only">ひっぱれ！けいさんバトル</h1>
+            <div class="title-lettering-art" aria-hidden="true"></div>
+          </div>
+        </div>
+        <p class="tagline">こたえて ひっぱれ！</p>
+        <div class="title-actions">
+          <button id="start-button" class="primary-button" type="button">スタート！</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="mode-screen" class="screen sky-bg select-screen" aria-label="遊び方選択画面">
+      <div class="flags" aria-hidden="true"></div>
+      <header class="select-header screen-content">
+        <button class="small-control back-button" data-go="title" type="button">← もどる</button>
+        <h2>あそびかたを えらぼう！</h2>
+        <span id="mode-crown-summary" class="crown-summary-mini"></span>
+      </header>
+      <div class="mode-grid screen-content">
+        <button id="solo-mode-button" class="mode-card" type="button">
+          <div class="mode-icon" aria-hidden="true"><span class="mode-figure red-boy"></span><b class="mode-vs">VS</b><span class="mode-figure rabbit"></span></div>
+          <h3>ひとりで たいせん</h3>
+          <p>どうぶつCPUと<br>けいさん しょうぶ！</p>
+          <span class="mode-go">えらぶ！</span>
+        </button>
+        <button id="duo-mode-button" class="mode-card duo" type="button">
+          <div class="mode-icon" aria-hidden="true"><span class="mode-figure red-boy"></span><i class="mode-rope"></i><span class="mode-figure white-girl"></span></div>
+          <h3>ふたりで たいせん</h3>
+          <p>1だいを はさんで<br>赤ぐみ VS 白ぐみ！</p>
+          <span class="mode-go">えらぶ！</span>
+        </button>
+      </div>
+    </section>
+
+    <section id="solo-type-screen" class="screen sky-bg select-screen" aria-label="1人用の対戦種類選択画面">
+      <div class="flags" aria-hidden="true"></div>
+      <header class="select-header screen-content">
+        <button class="small-control back-button" data-go="mode" type="button">← もどる</button>
+        <h2>どの しょうぶにする？</h2><span></span>
+      </header>
+      <div class="solo-type-grid screen-content">
+        <button class="solo-type-card" data-solo-type="free" type="button">
+          <span class="solo-type-icon free-duel-icon" aria-hidden="true"><span class="mode-figure red-boy"></span><b>VS</b><span class="mode-figure rabbit"></span></span>
+          <h3>CPUと じゆうたいせん</h3>
+          <p>すきなCPUと しょうぶ！<br>れんしゅうにも ぴったり。</p>
+          <span class="type-go">えらぶ！</span>
+        </button>
+        <button id="official-type-button" class="solo-type-card official" data-solo-type="official" type="button" disabled>
+          <span class="solo-type-icon"><img id="official-lion-icon" class="lion-asset-img" alt="王者ライオン"></span>
+          <h3>王者を めざす！</h3>
+          <p>さいきょうの王者ライオンと 60びょう。<br>まけても 公式記録は のこるよ！</p>
+          <span id="official-type-note" class="network-note">王者データ よみこみ中…</span>
+          <span class="type-go">公式戦！</span>
+        </button>
+        <button id="ghost-type-button" class="solo-type-card ghost" data-solo-type="ghost" type="button" disabled>
+          <span class="solo-type-icon"><img class="master-crown-img" alt="" data-crown-image></span>
+          <h3>王者ゴーストと しょうぶ！</h3>
+          <p>今月のマスターの動きと<br>ほんものの けいさんバトル！</p>
+          <span id="ghost-type-note" class="network-note">王者データ よみこみ中…</span>
+          <span class="type-go">ちょうせん！</span>
+        </button>
+      </div>
+    </section>
+
+
+    <section id="character-screen" class="screen sky-bg select-screen" aria-label="キャラクター選択画面">
+      <header class="select-header screen-content">
+        <button class="small-control back-button" data-go="mode" type="button">← もどる</button>
+        <h2>キャラクターを えらぼう！</h2><span></span>
+      </header>
+      <div id="character-select-grid" class="character-select-grid screen-content"></div>
+      <footer class="select-footer screen-content">
+        <button id="character-next" class="primary-button" type="button">つぎへ！</button>
+      </footer>
+    </section>
+
+    <section id="cpu-screen" class="screen sky-bg select-screen" aria-label="CPU選択画面">
+      <div class="flags" aria-hidden="true"></div>
+      <header class="select-header screen-content">
+        <button class="small-control back-button" data-go="character" type="button">← もどる</button>
+        <h2>だれと しょうぶする？</h2><span></span>
+      </header>
+      <div id="cpu-grid" class="card-grid screen-content"></div>
+      <footer class="select-footer screen-content">
+        <button id="cpu-next" class="primary-button" type="button" disabled>このあいてに ちょうせん！</button>
+      </footer>
+    </section>
+
+    <section id="level-screen" class="screen sky-bg select-screen" aria-label="問題レベル選択画面">
+      <div class="flags" aria-hidden="true"></div>
+      <header class="select-header screen-content">
+        <button id="level-back-button" class="small-control back-button" type="button">← もどる</button>
+        <h2>もんだいを えらぼう！</h2><span></span>
+      </header>
+      <div id="level-grid" class="card-grid screen-content"></div>
+      <footer class="select-footer screen-content">
+        <span id="solo-official-condition" class="official-condition" hidden><img id="official-condition-lion" class="lion-condition-icon" alt="">公式戦：王者ライオン・60びょう・ひっさつ ふつう</span>
+        <button id="battle-start" class="primary-button" type="button" disabled>たいせんスタート！</button>
+      </footer>
+    </section>
+
+    <section id="battle-screen" class="screen" aria-label="対戦画面">
+      <header class="battle-topbar">
+        <div class="team-name red">赤ぐみ</div><div class="vs">VS</div>
+        <div id="battle-cpu-name" class="team-name white">CPU</div>
+        <div id="timer" class="timer-box">のこり 60</div>
+        <button class="icon-button sound-toggle" data-label-style="icon" type="button" aria-label="音のオンオフ" title="おと">音</button>
+        <button id="pause-button" class="icon-button" type="button" aria-label="一時停止" title="いちじていし">Ⅱ</button>
+        <button id="fullscreen-button" class="icon-button" type="button" aria-label="全画面" title="ぜんがめん">全</button>
+      </header>
+
+      <section id="arena" class="arena" aria-label="綱引きのようす">
+        <div class="flags arena-flags" aria-hidden="true"></div>
+        <div id="player-character" class="character player"></div>
+        <div id="cpu-character" class="character cpu"></div>
+        <div id="lion-special-aura" class="lion-special-aura" aria-hidden="true"><img alt=""></div>
+        <div id="lion-shockwave" class="lion-shockwave" aria-hidden="true"><img alt=""></div>
+        <div class="rope-track">
+          <div class="rope-line"></div>
+          <div id="rope-marker" class="rope-marker" aria-label="綱の位置"><span></span><span></span></div>
+        </div>
+      </section>
+
+      <section class="battle-status">
+        <div class="status-pill">コンボ <span id="combo-value">0</span></div>
+        <div class="status-pill burst-meter"><span>ひっさつ</span><div class="meter-track"><div id="burst-meter-fill" class="meter-fill"></div></div></div>
+        <div id="cpu-status" class="status-pill cpu-message">けいさん中…</div>
+      </section>
+
+      <section class="problem-zone" aria-label="計算問題と答え">
+        <div id="problem-display" class="problem-card">3 ＋ 4</div>
+        <div id="answer-card" class="answer-card">
+          <span class="answer-label">こたえ</span><span id="answer-display" class="empty"></span>
+          <span id="remainder-group" class="remainder-group"><b>あまり</b><span id="remainder-display" class="empty"></span></span>
+        </div>
+        <div id="feedback" class="feedback-card">こたえを いれよう！</div>
+      </section>
+
+      <section id="keypad" class="keypad" aria-label="数字キーパッド">
+        <button class="key" data-key="7" type="button">7</button><button class="key" data-key="8" type="button">8</button><button class="key" data-key="9" type="button">9</button>
+        <button class="key" data-key="4" type="button">4</button><button class="key" data-key="5" type="button">5</button><button class="key" data-key="6" type="button">6</button>
+        <button class="key" data-key="1" type="button">1</button><button class="key" data-key="2" type="button">2</button><button class="key" data-key="3" type="button">3</button>
+        <button id="delete-key" class="key delete" data-action="delete" type="button">けす</button><button class="key" data-key="0" type="button">0</button><button class="key submit" data-action="submit" type="button">こたえる</button>
+        <div class="mole-dust-layer" aria-hidden="true"></div>
+      </section>
+
+      <div id="burst-overlay" class="burst-overlay" aria-hidden="true"></div>
+      <div id="burst-banner" class="burst-banner"><strong id="solo-special-title">ぜんりょくびき！</strong><small id="solo-special-effect">MAX POWER</small><div class="burst-time-track"><div id="burst-time-fill" class="burst-time-fill"></div></div></div>
+      <div id="lion-special-banner" class="lion-special-banner" aria-hidden="true"><strong>おうじゃのほうこう！ キングスロアー！</strong><span>ライオン1.6ばい ／ こちらの力を65％に</span></div>
+
+      <div id="countdown-overlay" class="center-overlay"><div id="countdown-text">3</div></div>
+      <div id="pause-overlay" class="center-overlay">
+        <div class="overlay-box panel"><h2>いちじていし</h2><button id="resume-button" class="primary-button" type="button">さいかい！</button></div>
+      </div>
+    </section>
+
+    <section id="duo-screen" class="screen" aria-label="2人対戦画面">
+      <section id="duo-white-info-panel" class="duo-info-panel white duo-facing-top" aria-label="白組の対戦情報">
+        <div class="duo-team-label white">白ぐみ</div>
+        <div id="duo-white-timer" class="duo-timer"><small>のこり</small><strong>60</strong></div>
+        <div class="duo-combo-box"><span>コンボ</span><strong id="duo-white-combo">0</strong></div>
+        <div class="duo-meter-label"><span>ひっさつ</span><span id="duo-white-meter-count">0 / 10</span></div>
+        <div class="duo-meter"><i id="duo-white-meter"></i></div>
+        <div id="duo-white-burst-label" class="duo-burst-label">ためて ぜんりょく！</div>
+      </section>
+
+      <section id="duo-white-input-panel" class="duo-input-panel white duo-facing-top" aria-label="白組の問題と入力">
+        <div id="duo-white-problem" class="duo-problem">？ ＋ ？</div>
+        <div id="duo-white-answer-card" class="duo-answer-wrap">
+          <span class="answer-label">こたえ</span><span id="duo-white-answer" class="duo-answer empty"></span>
+          <span id="duo-white-remainder-group" class="remainder-group"><b>あまり</b><span id="duo-white-remainder" class="duo-remainder empty"></span></span>
+          <div id="duo-white-feedback" class="duo-feedback">じゅんびしよう！</div>
+        </div>
+        <section id="duo-white-keypad" class="duo-keypad white" aria-label="白組の数字キーパッド"></section>
+      </section>
+
+      <section id="duo-arena" class="duo-arena" aria-label="画面の上から下まで続く縦向きの綱引き">
+        <div id="duo-white-burst" class="duo-burst-half white"></div>
+        <div id="duo-red-burst" class="duo-burst-half red"></div>
+        <div id="duo-white-combo-fx" class="duo-combo-fx white" aria-hidden="true">
+          <div class="duo-fx-content"><strong id="duo-white-combo-fx-number">3</strong><span>COMBO!</span></div>
+          <div class="duo-pixels"></div>
+        </div>
+        <div id="duo-red-combo-fx" class="duo-combo-fx red" aria-hidden="true">
+          <div class="duo-fx-content"><strong id="duo-red-combo-fx-number">3</strong><span>COMBO!</span></div>
+          <div class="duo-pixels"></div>
+        </div>
+        <div id="duo-white-power-fx" class="duo-power-fx white" aria-hidden="true">
+          <div class="duo-fx-content"><div><strong id="duo-white-power-title">ぜんりょくびき！</strong><small id="duo-white-power-subtitle">MAX POWER</small></div></div>
+          <div class="duo-pixels"></div>
+        </div>
+        <div id="duo-red-power-fx" class="duo-power-fx red" aria-hidden="true">
+          <div class="duo-fx-content"><div><strong id="duo-red-power-title">ぜんりょくびき！</strong><small id="duo-red-power-subtitle">MAX POWER</small></div></div>
+          <div class="duo-pixels"></div>
+        </div>
+        <div class="vertical-rope"></div>
+        <div id="duo-rope-marker" class="duo-rope-marker" aria-label="綱の位置"><span></span><span></span></div>
+        <div id="duo-white-person" class="duo-person white"></div>
+        <div id="duo-red-person" class="duo-person red"></div>
+        <button id="duo-pause-button" class="duo-pause-button" type="button" aria-label="1秒長押しで一時停止" title="1びょう ながおし">Ⅱ</button>
+      </section>
+
+      <section id="duo-red-info-panel" class="duo-info-panel red" aria-label="赤組の対戦情報">
+        <div class="duo-team-label red">赤ぐみ</div>
+        <div id="duo-red-timer" class="duo-timer"><small>のこり</small><strong>60</strong></div>
+        <div class="duo-combo-box"><span>コンボ</span><strong id="duo-red-combo">0</strong></div>
+        <div class="duo-meter-label"><span>ひっさつ</span><span id="duo-red-meter-count">0 / 10</span></div>
+        <div class="duo-meter"><i id="duo-red-meter"></i></div>
+        <div id="duo-red-burst-label" class="duo-burst-label">ためて ぜんりょく！</div>
+      </section>
+
+      <section id="duo-red-input-panel" class="duo-input-panel red" aria-label="赤組の問題と入力">
+        <div id="duo-red-problem" class="duo-problem">？ ＋ ？</div>
+        <div id="duo-red-answer-card" class="duo-answer-wrap">
+          <span class="answer-label">こたえ</span><span id="duo-red-answer" class="duo-answer empty"></span>
+          <span id="duo-red-remainder-group" class="remainder-group"><b>あまり</b><span id="duo-red-remainder" class="duo-remainder empty"></span></span>
+          <div id="duo-red-feedback" class="duo-feedback">じゅんびしよう！</div>
+        </div>
+        <section id="duo-red-keypad" class="duo-keypad red" aria-label="赤組の数字キーパッド"></section>
+      </section>
+
+      <div id="duo-ready-overlay" class="duo-ready-overlay">
+        <div class="duo-ready-card white duo-facing-top">
+          <div id="duo-white-ready-character" class="duo-ready-character"></div>
+          <div id="duo-white-ready-course" class="special-note">もんだい</div>
+          <div class="duo-hand-question">白ぐみ　どちらの手で<br>入力する？</div>
+          <div class="duo-hand-options">
+            <button class="duo-hand-button" data-hand-side="white" data-hand="left" type="button">ひだり手</button>
+            <button class="duo-hand-button" data-hand-side="white" data-hand="right" type="button">みぎ手</button>
+          </div>
+          <button id="duo-white-ready" class="duo-ready-button" type="button">じゅんびOK！</button>
+        </div>
+        <div class="duo-ready-center">
+          <h2>タブレットを<br>まんなかに おいてね</h2>
+          <p><strong id="duo-ready-level">10までのたし算</strong> ／ 60びょう</p>
+          <div class="duo-ready-tools">
+            <button id="duo-change-level" class="small-control" type="button">← もんだい</button>
+            <button class="small-control effect-mode-toggle" type="button">ひっさつ ふつう</button>
+            <button class="small-control sound-toggle" data-label-style="icon" type="button" aria-label="音のオンオフ">音</button>
+            <button id="duo-ready-fullscreen" class="small-control" type="button">全画面</button>
+          </div>
+        </div>
+        <div class="duo-ready-card red">
+          <div id="duo-red-ready-character" class="duo-ready-character"></div>
+          <div id="duo-red-ready-course" class="special-note">もんだい</div>
+          <div class="duo-hand-question">赤ぐみ　どちらの手で<br>入力する？</div>
+          <div class="duo-hand-options">
+            <button class="duo-hand-button" data-hand-side="red" data-hand="left" type="button">ひだり手</button>
+            <button class="duo-hand-button" data-hand-side="red" data-hand="right" type="button">みぎ手</button>
+          </div>
+          <button id="duo-red-ready" class="duo-ready-button red" type="button">じゅんびOK！</button>
+        </div>
+      </div>
+
+      <div id="duo-countdown" class="duo-countdown"><div id="duo-countdown-text">3</div></div>
+      <div id="duo-pause-overlay" class="duo-pause-overlay">
+        <div class="overlay-box panel">
+          <h2>いちじていし</h2>
+          <p>「さいかい！」を 1びょう ながおし</p>
+          <button id="duo-resume-button" class="hold-action" type="button">さいかい！</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="duo-result-screen" class="screen" aria-label="2人対戦結果画面">
+      <section class="duo-result-side top">
+        <div id="duo-white-result-message" class="duo-result-message">白ぐみ</div>
+        <div id="duo-white-result-stats" class="duo-result-stats"></div>
+        <button id="duo-white-retry" class="duo-retry" type="button">もういちど！</button>
+      </section>
+      <section class="duo-result-center">
+        <div class="duo-result-actions">
+          <button id="duo-result-level" class="secondary-button" type="button">もんだいを かえる</button>
+          <button id="duo-result-title" class="secondary-button" type="button">タイトルへ</button>
+          <button id="duo-result-fullscreen" class="secondary-button" type="button">ぜんがめん</button>
+        </div>
+        <div>
+          <div id="duo-result-winner" class="duo-result-winner">ひきわけ！</div>
+          <div style="text-align:center;color:#fff;font-weight:1000;text-shadow:0 2px 0 #76530a">おたがいに はくしゅ！</div>
+        </div>
+        <div id="duo-result-rope" class="duo-result-rope">
+          <div id="duo-result-marker" class="duo-result-marker"><i></i><i></i></div>
+        </div>
+      </section>
+      <section class="duo-result-side">
+        <div id="duo-red-result-message" class="duo-result-message">赤ぐみ</div>
+        <div id="duo-red-result-stats" class="duo-result-stats"></div>
+        <button id="duo-red-retry" class="duo-retry" type="button">もういちど！</button>
+      </section>
+    </section>
+
+    <section id="result-screen" class="screen sky-bg" aria-label="結果画面">
+      <div class="flags" aria-hidden="true"></div>
+      <header class="result-title screen-content"><h2 id="result-heading">かったよ！</h2></header>
+      <div class="result-main screen-content">
+        <section class="result-character panel">
+          <div id="result-cpu-picture" class="cpu-picture"></div>
+          <p id="cpu-remark" class="cpu-remark"></p>
+        </section>
+        <section class="result-stats panel">
+          <div id="result-meta" class="result-meta"></div>
+          <div id="official-result-status" aria-live="polite"></div>
+          <div class="stats-grid">
+            <div class="stat-row"><span>せいかい</span><strong id="stat-correct">0</strong></div>
+            <div class="stat-row"><span>まちがい</span><strong id="stat-wrong">0</strong></div>
+            <div class="stat-row"><span>せいかくりつ</span><strong id="stat-accuracy">0%</strong></div>
+            <div class="stat-row"><span>さいだいコンボ</span><strong id="stat-combo">0</strong></div>
+            <div class="stat-row"><span>ひっさつわざ</span><strong id="stat-burst">0回</strong></div>
+            <div class="stat-row"><span>つなのいち</span><strong id="stat-rope">まんなか</strong></div>
+          </div>
+        </section>
+      </div>
+      <footer class="result-actions screen-content">
+        <button id="retry-button" class="secondary-button" type="button">もういちど</button>
+        <button id="change-cpu-button" class="secondary-button" type="button">あいてをかえる</button>
+        <button id="title-button" class="secondary-button" type="button">タイトルへ</button>
+      </footer>
+    </section>
+  </main>
+
+  <div id="howto-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="howto-title">
+    <div class="modal-box panel">
+      <h2 id="howto-title">あそびかた</h2>
+      <div class="howto-steps">
+        <div class="howto-step"><b>1</b><span>ひとりか ふたりか、あそびかたを えらぼう！</span></div>
+        <div class="howto-step"><b>2</b><span>けいさんして、すうじを おそう！</span></div>
+        <div class="howto-step"><b>3</b><span>「こたえる」で つなを ひっぱろう！</span></div>
+        <div class="howto-step"><b>★</b><span>10コンボで キャラの「ひっさつわざ！」。60びょう さいごまで しょうぶ！</span></div>
+        <div class="howto-step"><b>○</b><span>「ひっさつ やさしい」にすると、すなけむりや キーのへんかが やさしくなるよ。</span></div>
+      </div>
+      <div style="text-align:center"><button id="howto-close" class="primary-button" type="button">わかった！</button></div>
+    </div>
+  </div>
+  <div id="achievement-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="achievement-heading">
+    <div id="achievement-box" class="modal-box panel achievement-box">
+      <div class="achievement-crown"><img id="achievement-image" alt="金色の王冠"></div>
+      <h2 id="achievement-heading">月間王者になったよ！</h2>
+      <p id="achievement-message"></p>
+      <button id="achievement-close" class="primary-button" type="button">やったー！</button>
+    </div>
+  </div>
+  <div id="duo-confirm-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="duo-confirm-text">
+    <div class="modal-box panel" style="max-width:520px;text-align:center">
+      <h2 id="duo-confirm-text">もどっても いい？</h2>
+      <div style="display:flex;justify-content:center;gap:12px">
+        <button id="duo-confirm-cancel" class="secondary-button" type="button">やめる</button>
+        <button id="duo-confirm-ok" class="primary-button" type="button" style="min-height:52px;font-size:24px">もどる</button>
+      </div>
+    </div>
+  </div>
+  <div class="orientation-blocker" aria-live="assertive"><div>↻<br>よこむきに してね</div></div>
+  <div id="toast" role="status"></div>
+
+  <script src="bgm.js"></script>
+  <script src="gas-bridge-client.js"></script>
+  <script src="competition-service.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
