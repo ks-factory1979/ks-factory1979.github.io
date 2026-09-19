@@ -1,9 +1,9 @@
 # ひっぱれ！けいさんバトル
 
-GitHub Pages移植版 **v1.3.0-beta**。移植元はGAS正式版v1.2.4です。
+GitHub Pages移植版 **v1.3.0**。移植元はGAS正式版v1.2.4です。
 計算問題、CPU、演出、キャラクターと綱の位置設定、ゲームルール（`lion-rules-3`）を引き継いでいます。
 
-公開予定URL: https://ks-factory1979.github.io/calculation-battle/
+公開URL: https://ks-factory1979.github.io/calculation-battle/
 
 ## 配信と共有データ
 
@@ -34,6 +34,6 @@ GAS版とGitHub版は保存元のサイトが異なるため、GAS版の端末ID
 | `assets/` | v1.2.4から取り出した画像26点 |
 | `bridge-check.html` | 共有記録を書かない接続確認 |
 
-## テスト中の掲載状態
+## 掲載状態
 
-共有機能と保存を含む移植確認が完了するまで、K's Factoryの掲載状態は`coming-soon`のままです。正式公開時にv1.3.0へ更新します。
+通常CPU戦、月間王者、ゴースト戦、結果送信と再送、音、全画面、既存データ互換を確認し、K's Factoryへ正式掲載しています。
