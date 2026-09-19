@@ -1,6 +1,6 @@
 window.HKB_CONFIG = Object.freeze({
   appVersion: '1.3.0',
-  gasWebAppUrl: 'https://script.google.com/a/macros/oskedu.jp/s/AKfycbwrbwJTPlTbYlmHro4WWW7GQGZB1y3Sat6gM-p7kIiKKmbR5oe-sddqJIsJxpbLt2YT/exec'
+  gasWebAppUrl: 'https://script.google.com/macros/s/AKfycbyQGXY443rRJOb68mTsdWS7Ywd8eXbK5ymECV7QYwa4DpntAkWyYh5xvqGCJ8xpa_D2EQ/exec'
 });
 
     /* ================================================================
@@ -50,3 +50,4 @@ window.HKB_CONFIG = Object.freeze({
         }
       }
     });
+
