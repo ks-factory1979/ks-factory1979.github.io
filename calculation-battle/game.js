@@ -1955,9 +1955,10 @@
     /* ---------- 全画面 ---------- */
     function requestFullScreen() {
       const root=document.documentElement;
-      if (!root.requestFullscreen) { UI.toast('ぜんがめんに できませんでした。そのまま あそべます。'); return; }
+      const request=root.requestFullscreen||root.webkitRequestFullscreen;
+      if (!request) { UI.toast('ぜんがめんに できませんでした。そのまま あそべます。'); return; }
       try {
-        const p=root.requestFullscreen({navigationUI:'hide'});
+        const p=request.call(root);
         if (p&&p.catch) p.catch(()=>UI.toast('ぜんがめんに できませんでした。そのまま あそべます。'));
       } catch (_) { UI.toast('ぜんがめんに できませんでした。そのまま あそべます。'); }
     }
@@ -2039,7 +2040,7 @@
     }
 
     /* ---------- イベント設定 ---------- */
-    $('start-button').addEventListener('click',()=>{ AudioManager.play('tap'); requestFullScreen(); UI.showScreen('mode'); });
+    $('start-button').addEventListener('click',()=>{ requestFullScreen(); AudioManager.play('tap'); UI.showScreen('mode'); });
     $('howto-button').addEventListener('click',()=>{ AudioManager.play('tap'); $('howto-modal').classList.add('active'); });
     $('howto-close').addEventListener('click',()=>{ AudioManager.play('tap'); $('howto-modal').classList.remove('active'); });
     $('howto-modal').addEventListener('click',e=>{ if(e.target===$('howto-modal')) $('howto-modal').classList.remove('active'); });
@@ -2138,7 +2139,7 @@
     });
     $('pause-button').addEventListener('click',()=>{ AudioManager.play('tap'); GameController.togglePause(); });
     $('resume-button').addEventListener('click',()=>{ AudioManager.play('tap'); GameController.togglePause(false); });
-    $('fullscreen-button').addEventListener('click',()=>{ AudioManager.play('tap'); requestFullScreen(); });
+    $('fullscreen-button').addEventListener('click',()=>{ requestFullScreen(); AudioManager.play('tap'); });
     $('retry-button').addEventListener('click',()=>{ AudioManager.play('tap'); GameController.startMatch(); });
     $('change-cpu-button').addEventListener('click',()=>{
       AudioManager.play('tap');
@@ -2169,8 +2170,8 @@
       if(state.duo.sides.red.ready||state.duo.sides.white.ready)return;
       AudioManager.play('tap'); state.duo.phase='idle'; UI.showScreen('level'); UI.renderLevelCards();
     });
-    $('duo-ready-fullscreen').addEventListener('click',()=>{ AudioManager.play('tap'); requestFullScreen(); });
-    $('duo-result-fullscreen').addEventListener('click',()=>{ AudioManager.play('tap'); requestFullScreen(); });
+    $('duo-ready-fullscreen').addEventListener('click',()=>{ requestFullScreen(); AudioManager.play('tap'); });
+    $('duo-result-fullscreen').addEventListener('click',()=>{ requestFullScreen(); AudioManager.play('tap'); });
     $('duo-red-retry').addEventListener('click',()=>toggleDuoRetry('red'));
     $('duo-white-retry').addEventListener('click',()=>toggleDuoRetry('white'));
     $('duo-result-level').addEventListener('click',()=>openDuoConfirm('level','もんだいを かえても いい？'));
