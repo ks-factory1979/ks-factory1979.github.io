@@ -465,30 +465,26 @@
         });
         const arenaRect=arena.getBoundingClientRect();
         if(!(arenaRect.width>0&&arenaRect.height>0)) return false;
-        const ropeRect=rope.getBoundingClientRect();
-        const baselineRopeCenter=ropeRect.top-arenaRect.top+ropeRect.height/2;
         const unresolved=[];
         const characterStates=[];
 
+        /*
+         * 位置調整エディタで確定した値は「既存のレスポンシブ基準配置 + 補正値」。
+         * ここで手の位置を綱へ再スナップすると、基準配置そのものが置き換わり、
+         * 綱 offsetY とキャラ dy が意図と違う相対位置で二重に効いてしまう。
+         * そのため top/bottom はCSSの基準配置へ戻し、補正は個別 translate のみで重ねる。
+         */
         for(const item of identities) {
-          const gripY=CHARACTER_GRIP_Y[item.character];
           const element=item.element;
           const adjustment=resolveCharacterAdjustment(profile,item.role,item.character,item.asset,item.pose);
           setIdentity(element,{profile,...item,key:adjustment.key});
-          if(!adjustment.found||!Number.isFinite(gripY)) {
+          if(!adjustment.found) {
             clearVisual(element);
             unresolved.push(adjustment.key);
             characterStates.push({role:item.role,character:item.character,asset:item.asset,pose:item.pose,
               key:adjustment.key,found:false,dx:0,dy:0,scale:1,appliedPx:{x:0,y:0,scale:1}});
             continue;
           }
-          const boxWidth=element.offsetWidth;
-          const boxHeight=element.offsetHeight;
-          const renderedImageHeight=Math.min(boxWidth,boxHeight);
-          const imageTop=(boxHeight-renderedImageHeight)/2;
-          const gripOffset=imageTop+renderedImageHeight*gripY;
-          element.style.bottom='auto';
-          element.style.top=`${(baselineRopeCenter-gripOffset).toFixed(2)}px`;
           const appliedPx=applyVisual(element,adjustment,arenaRect);
           characterStates.push({role:item.role,character:item.character,asset:item.asset,pose:item.pose,
             key:adjustment.key,found:true,dx:adjustment.dx,dy:adjustment.dy,scale:adjustment.scale,appliedPx});
