@@ -82,7 +82,7 @@ const page = `<!DOCTYPE html>
       <div class="guide-title"><p class="section-kicker">学校でも、おうちでも</p><h2 id="guide-title">使う方へ</h2></div>
       <div class="guide-items">
         <div><h3>ボタンから、すぐに</h3><p>「あそぶ」を押すと、新しいタブでアプリが開きます。アプリごとの案内を読んで、遊びはじめてください。</p></div>
-        <div><h3>記録はアプリごとに</h3><p>タイピング村とひらがなタウンは、同じ端末・同じブラウザで続きから遊べます。計算バトルの公式記録・月間王者は、学校アカウントで共有されます。</p></div>
+        <div><h3>記録はアプリごとに</h3><p>タイピング村とひらがなタウンは、同じ端末・同じブラウザで続きから遊べます。計算バトルはGoogleログイン不要で公式記録・月間王者を共有し、氏名・メールアドレスは保存しません。</p></div>
         <div><h3>授業の前にひと遊び</h3><p>学校の端末では、アクセスの制限がある場合があります。使う端末で、画面・入力・音の設定を先に確かめてください。</p></div>
       </div>
     </section>
@@ -101,3 +101,4 @@ fs.writeFileSync(path.join(__dirname, 'robots.txt'), `User-agent: *\nAllow: /\n\
 const sitemapUrls = [...new Set([data.siteUrl, ...publicApps.map(app => new URL(app.url)).filter(url => url.origin === siteUrl.origin && !url.search && !url.hash).map(url => url.href)])];
 fs.writeFileSync(path.join(__dirname, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls.map(url => `  <url><loc>${escape(url)}</loc></url>`).join('\n')}\n</urlset>\n`);
 console.log(`Built portal: ${publicApps.length} published app(s), ${Buffer.byteLength(page)} bytes of HTML; robots.txt and sitemap.xml ready.`);
+
