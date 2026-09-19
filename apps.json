@@ -48,12 +48,13 @@
       "lead": "こたえて、ひっぱれ！",
       "description": "たし算・ひき算・かけ算・わり算に答えて、綱引き勝負。動物CPUとの対戦、1台をはさんだ2人対戦、月間王者のゴーストへの挑戦を楽しめます。",
       "tags": ["四則計算", "ひとり・ふたり対戦", "月間王者に挑戦"],
-      "requirements": "タッチ・キーボード対応・共有記録は学校アカウントが必要",
+      "requirements": "タッチ・キーボード対応・Googleログイン不要",
       "url": "https://ks-factory1979.github.io/calculation-battle/",
       "cover": "calculation-battle/assets/characters/17c516aac6e586eb7300.png",
       "coverAlt": "運動場を舞台にした、ひっぱれ！けいさんバトルのゲーム画面",
       "logo": "calculation-battle/assets/backgrounds/c7fcae6f3938fd48f7bc.png",
-      "note": "通常CPU戦と2人対戦は通信できない時も遊べます。公式記録・月間王者・ゴーストは学校の共有データを利用します。"
+      "note": "通常CPU戦と2人対戦は通信できない時も遊べます。公式記録・月間王者・ゴーストはK's Factory一般公開サーバーを利用し、氏名・メールアドレスは保存しません。"
     }
   ]
 }
+
