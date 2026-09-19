@@ -19,7 +19,7 @@ for (const app of publicApps) {
   ids.add(app.id);
   if (!app.title || !app.description || new URL(app.url).protocol !== 'https:') throw new Error('Invalid published app: ' + app.id);
   for (const image of [app.cover, app.logo].filter(Boolean)) {
-    if (!/^[a-z0-9-]+\.(png|webp|jpg)$/.test(image) || !fs.existsSync(path.join(__dirname, image))) throw new Error('Missing image: ' + image);
+    if (!/^(?:[a-z0-9-]+\/)*[a-z0-9-]+\.(png|webp|jpg)$/.test(image) || !fs.existsSync(path.join(__dirname, image))) throw new Error('Missing image: ' + image);
   }
 }
 if (!publicApps.length) throw new Error('At least one published app is required.');
@@ -82,7 +82,7 @@ const page = `<!DOCTYPE html>
       <div class="guide-title"><p class="section-kicker">学校でも、おうちでも</p><h2 id="guide-title">使う方へ</h2></div>
       <div class="guide-items">
         <div><h3>ボタンから、すぐに</h3><p>「あそぶ」を押すと、新しいタブでアプリが開きます。アプリごとの案内を読んで、遊びはじめてください。</p></div>
-        <div><h3>記録はアプリごとに</h3><p>タイピング村とひらがなタウンは、同じ端末・同じブラウザで続きから遊べます。ひらがなタウンは、セーブの書き出し・読み込みで別の端末へ引き継げます。</p></div>
+        <div><h3>記録はアプリごとに</h3><p>タイピング村とひらがなタウンは、同じ端末・同じブラウザで続きから遊べます。計算バトルの公式記録・月間王者は、学校アカウントで共有されます。</p></div>
         <div><h3>授業の前にひと遊び</h3><p>学校の端末では、アクセスの制限がある場合があります。使う端末で、画面・入力・音の設定を先に確かめてください。</p></div>
       </div>
     </section>
