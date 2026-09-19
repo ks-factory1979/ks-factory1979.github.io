@@ -1,5 +1,5 @@
 window.HKB_CONFIG = Object.freeze({
-  appVersion: '1.3.0-beta',
+  appVersion: '1.3.0',
   gasWebAppUrl: 'https://script.google.com/a/macros/oskedu.jp/s/AKfycbwrbwJTPlTbYlmHro4WWW7GQGZB1y3Sat6gM-p7kIiKKmbR5oe-sddqJIsJxpbLt2YT/exec'
 });
 
@@ -7,7 +7,7 @@ window.HKB_CONFIG = Object.freeze({
        せんせい用 かんたん設定（数値を変えると調整できます）
        ================================================================ */
     window.APP_CONFIG = Object.freeze({
-      APP_VERSION: '1.3.0-beta',
+      APP_VERSION: '1.3.0',
       RULES_VERSION: 'lion-rules-3',
       MATCH_SECONDS: 60,
       COUNTDOWN_SECONDS: 3,
@@ -50,4 +50,3 @@ window.HKB_CONFIG = Object.freeze({
         }
       }
     });
-  
