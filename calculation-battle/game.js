@@ -174,12 +174,84 @@
     }
 
     /* 1人用と2人用は入口で分け、各対戦内でも両側の状態を独立させます。 */
+    /* SafariのブラウザUIによる短い非表示は許容し、実際の画面離脱だけを対象外にします。 */
+    const OFFICIAL_VISIBILITY_GRACE_MS = 2000;
+    let officialVisibilityTimer = 0;
+
     function createOfficialAttempt() {
       return {
         playId: '', pausedUsed: false, interrupted: false,
         events: [], questionStartedAtMs: 0, submitted: false,
-        lionFirstDefeatLocal: false
+        lionFirstDefeatLocal: false,
+        diagnostics: [], diagnosticStartedAt: performance.now(),
+        hiddenSince: 0, hiddenSource: '', pageHidden: false,
+        eligibilityDecision: null
       };
+    }
+
+    function officialMatchIsActive() {
+      return state.playType==='official'&&(state.phase==='playing'||state.phase==='countdown');
+    }
+
+    function recordOfficialDiagnostic(type,detail={}) {
+      if(state.playType!=='official'||!state.officialAttempt) return;
+      const attempt=state.officialAttempt;
+      const entry={
+        type:String(type||'event').slice(0,40),
+        matchMs:clamp(Math.round(state.elapsed*1000),0,CONFIG.MATCH_SECONDS*1000),
+        sinceStartMs:Math.max(0,Math.round(performance.now()-attempt.diagnosticStartedAt)),
+        visibility:document.visibilityState
+      };
+      Object.entries(detail||{}).forEach(([key,value])=>{
+        if(['string','number','boolean'].includes(typeof value)) entry[key]=value;
+      });
+      attempt.diagnostics.push(entry);
+      if(attempt.diagnostics.length>40) attempt.diagnostics.splice(0,attempt.diagnostics.length-40);
+    }
+
+    function clearOfficialVisibilityTimer() {
+      clearTimeout(officialVisibilityTimer);
+      officialVisibilityTimer=0;
+    }
+
+    function markOfficialInterrupted(source,durationMs=0) {
+      if(!officialMatchIsActive()) return false;
+      const attempt=state.officialAttempt;
+      if(!attempt.interrupted) {
+        attempt.interrupted=true;
+        recordOfficialDiagnostic('interrupted',{source,durationMs:Math.max(0,Math.round(durationMs))});
+      }
+      return true;
+    }
+
+    function beginOfficialHidden(source,persisted=false) {
+      if(!officialMatchIsActive()) return;
+      const attempt=state.officialAttempt;
+      if(!attempt.hiddenSince) attempt.hiddenSince=Date.now();
+      attempt.hiddenSource=source;
+      attempt.pageHidden=attempt.pageHidden||Boolean(persisted);
+      recordOfficialDiagnostic(source,{state:'hidden',persisted:Boolean(persisted)});
+      clearOfficialVisibilityTimer();
+      const currentAttempt=attempt;
+      officialVisibilityTimer=setTimeout(()=>{
+        if(state.officialAttempt!==currentAttempt||!officialMatchIsActive()) return;
+        const hiddenFor=Date.now()-currentAttempt.hiddenSince;
+        if(document.hidden||currentAttempt.pageHidden) markOfficialInterrupted(currentAttempt.hiddenSource||source,hiddenFor);
+      },OFFICIAL_VISIBILITY_GRACE_MS);
+    }
+
+    function restoreOfficialVisibility(source) {
+      const attempt=state.officialAttempt;
+      if(!attempt?.hiddenSince) return;
+      const hiddenFor=Date.now()-attempt.hiddenSince;
+      clearOfficialVisibilityTimer();
+      if(officialMatchIsActive()&&hiddenFor>=OFFICIAL_VISIBILITY_GRACE_MS) {
+        markOfficialInterrupted(attempt.hiddenSource||source,hiddenFor);
+      }
+      recordOfficialDiagnostic(source,{state:'visible',durationMs:Math.max(0,Math.round(hiddenFor))});
+      attempt.hiddenSince=0;
+      attempt.hiddenSource='';
+      attempt.pageHidden=false;
     }
 
     const state = {
@@ -199,6 +271,7 @@
       officialAttempt: createOfficialAttempt(),
       competition: {
         network: 'loading', monthKey: '', monthLabel: '',
+        appVersion: '', rulesVersion: '',
         champions: {}, myChampionCourses: [], previousChampionCourses: [],
         lionDefeatedCourses: []
       },
@@ -1858,6 +1931,7 @@
     /* ---------- ゲーム全体制御 ---------- */
     const GameController = {
       resetMatch() {
+        clearOfficialVisibilityTimer();
         if(state.playType==='official') {
           state.gentleEffects=false;
           updateEffectModeButtons();
@@ -1873,7 +1947,10 @@
         state.countdownStart=performance.now(); state.inputLockRemaining=0; state.feedbackRemaining=0;
         state.pendingProblem=false; state.warningPlayed=false; state.history=[];
         state.officialAttempt=createOfficialAttempt();
-        if(state.playType==='official') state.officialAttempt.playId=createClientId();
+        if(state.playType==='official') {
+          state.officialAttempt.playId=createClientId();
+          recordOfficialDiagnostic('match_start',{phase:'countdown'});
+        }
         CPUController.reset(); GhostController.reset(); nextProblem(); UI.prepareBattle(); UI.resetFeedback();
         $('arena').classList.remove('end-shake'); $('player-character').className='character player';
         $('cpu-character').className=`character cpu${state.playType==='official'?' lion':''}`;
@@ -1893,13 +1970,21 @@
       togglePause(force) {
         if (state.phase!=='playing') return;
         state.paused=typeof force==='boolean'?force:!state.paused;
-        if(state.playType==='official'&&state.paused) state.officialAttempt.pausedUsed=true;
+        if(state.playType==='official'&&state.paused) {
+          state.officialAttempt.pausedUsed=true;
+          recordOfficialDiagnostic('pause',{used:true});
+        }
         $('pause-overlay').classList.toggle('active',state.paused); $('pause-button').textContent=state.paused?'▶':'Ⅱ';
         if (!state.paused) state.lastFrame=performance.now();
         void (state.paused ? GameBGM.pause() : GameBGM.resume());
       },
       finish() {
         if (state.phase==='ending'||state.phase==='ended') return;
+        if(state.playType==='official') recordOfficialDiagnostic('match_finish',{
+          pausedUsed:state.officialAttempt.pausedUsed,
+          interrupted:state.officialAttempt.interrupted
+        });
+        clearOfficialVisibilityTimer();
         state.phase='ending'; state.remaining=0; state.finalRope=state.ropeTarget;
         GameBGM.updateRemaining(0);
         void GameBGM.stop({fadeSeconds:.30,preserveRemaining:true});
@@ -2374,15 +2459,22 @@
 
     const matchInProgress=()=>state.phase==='playing'||state.phase==='countdown'||['playing','countdown','resume-countdown','paused','settling','ending'].includes(state.duo.phase);
     document.addEventListener('visibilitychange',()=>{
-      if(document.hidden&&state.playType==='official'&&(state.phase==='playing'||state.phase==='countdown')) {
-        state.officialAttempt.interrupted=true;
+      if(document.hidden) beginOfficialHidden('visibilitychange');
+      else {
+        restoreOfficialVisibility('visibilitychange');
+        BattlePositioning.syncToCurrentState();
       }
-      if(!document.hidden) BattlePositioning.syncToCurrentState();
     });
-    window.addEventListener('pagehide',()=>{
-      if(state.playType==='official'&&(state.phase==='playing'||state.phase==='countdown')) {
-        state.officialAttempt.interrupted=true;
+    window.addEventListener('pagehide',event=>{
+      if(!officialMatchIsActive()) return;
+      if(event.persisted) beginOfficialHidden('pagehide',true);
+      else {
+        recordOfficialDiagnostic('pagehide',{persisted:false});
+        markOfficialInterrupted('pagehide',0);
       }
+    });
+    window.addEventListener('pageshow',event=>{
+      if(event.persisted) restoreOfficialVisibility('pageshow');
     });
     window.addEventListener('beforeunload',e=>{ if(matchInProgress()){ e.preventDefault(); e.returnValue=''; } });
     window.addEventListener('popstate',()=>{ if(matchInProgress()){ history.pushState({battle:true},''); UI.toast('たいせん中だよ。タイトルへは けっか画面から もどれるよ。'); } });
@@ -2409,8 +2501,18 @@
         selectedLevels:state.selectedLevels,selectedCharacters:state.selectedCharacters,remaining:state.remaining,
         input:state.input,remainderInput:state.remainderInput,inputPart:state.inputPart,problem:state.currentProblem,
         ropeTarget:state.ropeTarget,player:state.sides.player,opponent:state.sides.opponent,paused:state.paused,
-        gentleEffects:state.gentleEffects,playType:state.playType,competition:state.competition
+        gentleEffects:state.gentleEffects,playType:state.playType,competition:state.competition,
+        officialAttempt:{
+          playId:state.officialAttempt.playId,pausedUsed:state.officialAttempt.pausedUsed,
+          interrupted:state.officialAttempt.interrupted,events:state.officialAttempt.events,
+          diagnostics:state.officialAttempt.diagnostics,
+          eligibilityDecision:state.officialAttempt.eligibilityDecision,
+          savePayload:state.officialAttempt.savePayload
+            ? (({deviceId,...safePayload})=>safePayload)(state.officialAttempt.savePayload)
+            : null
+        }
       })),
+      officialVisibilityGraceMs:()=>OFFICIAL_VISIBILITY_GRACE_MS,
       forceFinish:(rope=state.ropeTarget)=>{state.ropeTarget=clamp(Number(rope)||0,-100,100);GameController.finish();},
       setProblem:(a,b,op,answer,remainder=null)=>{
         state.currentProblem={a,b,op,answer,remainder,requiresRemainder:remainder!==null,text:`${a} ${op} ${b}`,key:`test`};

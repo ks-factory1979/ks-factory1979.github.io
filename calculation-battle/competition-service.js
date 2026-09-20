@@ -129,6 +129,8 @@ function createHkbCompetitionService() {
       applyBootstrap(data) {
         if(!data?.ok) throw new Error('王者データを読み込めませんでした。');
         state.competition.network='ready';
+        state.competition.appVersion=String(data.appVersion||'');
+        state.competition.rulesVersion=String(data.rulesVersion||'');
         state.competition.monthKey=data.monthKey;
         state.competition.monthLabel=data.monthLabel;
         state.competition.champions=Object.fromEntries((data.champions||[]).map(item=>[item.courseId,item]));
@@ -341,9 +343,72 @@ function createHkbCompetitionService() {
           finalRope:Number(state.finalRope.toFixed(3)),
           result:state.winner,
           events:state.officialAttempt.events,
-          appVersion:CONFIG.APP_VERSION,
+          // appVersion is the official-record protocol advertised by GAS.
+          // clientAppVersion keeps the actual UI build available for diagnosis.
+          appVersion:state.competition.appVersion||CONFIG.APP_VERSION,
+          clientAppVersion:CONFIG.APP_VERSION,
           rulesVersion:CONFIG.RULES_VERSION
         };
+      },
+      officialReasonCodes(result) {
+        const values=[result?.reason,result?.reasons,result?.eligibilityReasons,result?.validationErrors]
+          .flatMap(value=>Array.isArray(value)?value:[value])
+          .filter(value=>value!==undefined&&value!==null&&value!=='')
+          .flatMap(value=>String(value).split(','))
+          .map(value=>value.trim().toLowerCase())
+          .filter(Boolean);
+        return [...new Set(values)];
+      },
+      officialIneligibleMessage(result) {
+        const codes=this.officialReasonCodes(result);
+        const matches=pattern=>codes.some(code=>pattern.test(code));
+        if(matches(/(^|_)paused($|_)/)) {
+          return 'いちじていしを つかったため、今回は公式記録には入りません。';
+        }
+        if(matches(/(^|_)interrupted($|_)/)) {
+          return 'たいせん中に画面を はなれたため、今回は公式記録には入りません。';
+        }
+        if(matches(/app.?version|version.?mismatch|unsupported.?version|wrong.?version/)) {
+          return 'アプリのバージョンが合わないため、今回は公式記録には入りません。';
+        }
+        if(matches(/rules.?mismatch/)) {
+          return 'ゲームのルール情報が合わないため、今回は公式記録には入りません。';
+        }
+        if(matches(/month.?changed/)) {
+          return '月が かわったため、今回は公式記録には入りません。もういちど ちょうせんしてね。';
+        }
+        if(matches(/gentle.?effects/)) {
+          return 'ひっさつの設定が 公式戦とちがうため、今回は公式記録には入りません。';
+        }
+        return '記録データを確認できなかったため、今回は公式記録には入りません。';
+      },
+      logOfficialDecision(payload,result) {
+        const reasonCodes=this.officialReasonCodes(result);
+        state.officialAttempt.eligibilityDecision={
+          eligible:Boolean(result?.eligible),
+          reasonCodes:[...reasonCodes]
+        };
+        recordOfficialDiagnostic('eligible_decision',{
+          eligible:Boolean(result?.eligible),
+          reason:reasonCodes.join(',').slice(0,160)
+        });
+        console.info('[HKB official decision]',{
+          playId:payload.playId,
+          eligible:Boolean(result?.eligible),
+          reasonCodes,
+          appVersion:payload.appVersion,
+          clientAppVersion:payload.clientAppVersion,
+          rulesVersion:payload.rulesVersion,
+          pausedUsed:payload.pausedUsed,
+          interrupted:payload.interrupted,
+          eventCount:payload.events.length,
+          correctEventCount:payload.events.filter(event=>event.ok).length,
+          firstEventMs:payload.events[0]?.t??null,
+          lastEventMs:payload.events[payload.events.length-1]?.t??null,
+          correct:payload.correct,
+          wrong:payload.wrong,
+          timeline:state.officialAttempt.diagnostics.map(item=>({...item}))
+        });
       },
       setResultStatus(text,kind='') {
         const box=$('official-result-status');
@@ -361,14 +426,20 @@ function createHkbCompetitionService() {
         const attempt=state.officialAttempt;
         if(attempt.submitted) return;
         attempt.submitted=true;
+        recordOfficialDiagnostic('submit',{
+          pausedUsed:attempt.pausedUsed,
+          interrupted:attempt.interrupted,
+          eventCount:attempt.events.length
+        });
         const payload=attempt.savePayload||(attempt.savePayload=JSON.parse(JSON.stringify(this.buildOfficialPayload())));
         this.setResultStatus('公式記録を おくっているよ…');
         try {
           this.enqueue(payload);
           const result=await this.sendQueued(payload);
+          this.logOfficialDecision(payload,result);
           if(!this.isCurrentOfficialResult(attempt,payload)) return;
           if(!result.eligible) {
-            this.setResultStatus('今回は 公式記録の条件から はずれました。','try');
+            this.setResultStatus(this.officialIneligibleMessage(result),'try');
             return;
           }
           const lionWon=payload.result==='player';
