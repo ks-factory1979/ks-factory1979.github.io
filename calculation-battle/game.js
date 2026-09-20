@@ -669,6 +669,7 @@
         BattlePositioning.onScreenChange(name);
         CompetitionService.onScreenChanged(name);
         void GameBGM.onScreenChange(name);
+        ViewportManager.schedule();
       },
       setDustEffect(element,remaining) {
         if(!element)return;
@@ -1948,16 +1949,165 @@
       }
     };
 
-    /* ---------- 全画面 ---------- */
-    function requestFullScreen() {
-      const root=document.documentElement;
-      const request=root.requestFullscreen||root.webkitRequestFullscreen;
-      if (!request) { UI.toast('ぜんがめんに できませんでした。そのまま あそべます。'); return; }
-      try {
-        const p=request.call(root);
-        if (p&&p.catch) p.catch(()=>UI.toast('ぜんがめんに できませんでした。そのまま あそべます。'));
-      } catch (_) { UI.toast('ぜんがめんに できませんでした。そのまま あそべます。'); }
-    }
+    /* ---------- 実表示領域・端末向けレイアウト ---------- */
+    const FullscreenManager = (() => {
+      const selector='#fullscreen-button,#duo-ready-fullscreen,#duo-result-fullscreen';
+      let sessionAvailable=true;
+
+      const requestMethod=()=>{
+        const root=document.documentElement;
+        return root.requestFullscreen||root.webkitRequestFullscreen||null;
+      };
+
+      function isSupported() {
+        if(!sessionAvailable||!requestMethod()) return false;
+        if(document.fullscreenEnabled===false||document.webkitFullscreenEnabled===false) return false;
+        return true;
+      }
+
+      function refresh() {
+        const supported=isSupported();
+        document.body.classList.toggle('fullscreen-unavailable',!supported);
+        document.querySelectorAll(selector).forEach(button=>{
+          button.hidden=!supported;
+          button.setAttribute('aria-hidden',String(!supported));
+          button.tabIndex=supported?0:-1;
+        });
+        return supported;
+      }
+
+      async function request() {
+        const method=requestMethod();
+        if(!isSupported()||!method) {
+          sessionAvailable=false;
+          refresh();
+          return false;
+        }
+        try {
+          await method.call(document.documentElement);
+          return true;
+        } catch (_) {
+          /* 子どもには技術エラーを見せず、このセッションでは入口を隠す。 */
+          sessionAvailable=false;
+          refresh();
+          return false;
+        }
+      }
+
+      return {
+        request,refresh,
+        getState:()=>({supported:isSupported(),sessionAvailable,active:Boolean(document.fullscreenElement||document.webkitFullscreenElement)})
+      };
+    })();
+
+    const ViewportManager = (() => {
+      const modeClasses=[
+        'viewport-phone','viewport-phone-portrait','viewport-phone-landscape',
+        'viewport-phone-landscape-compact','viewport-phone-landscape-ultra'
+      ];
+      let frame=0;
+      let duoEntryPending=false;
+      let snapshot=null;
+
+      function resolveMode(width,height) {
+        const portrait=height>=width;
+        const phonePortrait=portrait&&width<=600;
+        const phoneLandscape=!portrait&&height<=500&&width<=1024;
+        let mode='desktop';
+        if(phonePortrait) mode='phone-portrait';
+        else if(phoneLandscape&&height<=360) mode='phone-landscape-ultra';
+        else if(phoneLandscape&&height<=430) mode='phone-landscape-compact';
+        else if(phoneLandscape) mode='phone-landscape';
+        return {
+          mode,width,height,portrait,
+          phone:phonePortrait||phoneLandscape,
+          phonePortrait,phoneLandscape,
+          compactLandscape:phoneLandscape&&height<=430,
+          ultraCompactLandscape:phoneLandscape&&height<=360
+        };
+      }
+
+      function measure() {
+        const viewport=window.visualViewport;
+        const width=Math.max(1,Math.round(viewport?.width||window.innerWidth||document.documentElement.clientWidth||1));
+        const height=Math.max(1,Math.round(viewport?.height||window.innerHeight||document.documentElement.clientHeight||1));
+        return {
+          ...resolveMode(width,height),
+          offsetLeft:Math.max(0,Math.round(viewport?.offsetLeft||0)),
+          offsetTop:Math.max(0,Math.round(viewport?.offsetTop||0))
+        };
+      }
+
+      function updateDuoOrientationGate(metrics=snapshot||measure()) {
+        const duoScreen=['character','level','duo','duo-result'].includes(state.screen);
+        const required=Boolean(metrics.phoneLandscape&&(duoEntryPending||(state.mode==='duo'&&duoScreen)));
+        document.body.classList.toggle('duo-rotation-required',required);
+        const blocker=$('orientation-blocker');
+        blocker?.setAttribute('aria-hidden',String(!required));
+        return required;
+      }
+
+      function apply() {
+        frame=0;
+        const metrics=measure();
+        snapshot=metrics;
+        const root=document.documentElement;
+        root.style.setProperty('--visual-width',`${metrics.width}px`);
+        root.style.setProperty('--visual-height',`${metrics.height}px`);
+        root.style.setProperty('--visual-offset-left',`${metrics.offsetLeft}px`);
+        root.style.setProperty('--visual-offset-top',`${metrics.offsetTop}px`);
+        modeClasses.forEach(className=>document.body.classList.remove(className));
+        document.body.classList.toggle('viewport-phone',metrics.phone);
+        document.body.classList.toggle('viewport-phone-portrait',metrics.phonePortrait);
+        document.body.classList.toggle('viewport-phone-landscape',metrics.phoneLandscape);
+        document.body.classList.toggle('viewport-phone-landscape-compact',metrics.compactLandscape);
+        document.body.classList.toggle('viewport-phone-landscape-ultra',metrics.ultraCompactLandscape);
+        document.body.classList.toggle('portrait-layout',metrics.portrait);
+        document.body.dataset.viewportMode=metrics.mode;
+        FullscreenManager.refresh();
+
+        if(duoEntryPending&&!metrics.phoneLandscape) {
+          duoEntryPending=false;
+          state.mode='duo';
+          UI.showScreen('character');
+          UI.renderCharacterCards();
+          return metrics;
+        }
+        updateDuoOrientationGate(metrics);
+        /* 既存の2人対戦Ready遷移は、表示領域の再同期後も維持する。 */
+        if(state.duo.pendingStart&&state.duo.sides.red.ready&&state.duo.sides.white.ready) {
+          state.duo.pendingStart=false;
+          DuoGameController.beginCountdown(false);
+        }
+        BattlePositioning.syncToCurrentState();
+        return metrics;
+      }
+
+      function schedule() {
+        if(frame) return frame;
+        frame=requestAnimationFrame(apply);
+        return frame;
+      }
+
+      function requestDuoEntry() {
+        const metrics=snapshot||measure();
+        state.mode='duo';
+        if(metrics.phoneLandscape) {
+          duoEntryPending=true;
+          updateDuoOrientationGate(metrics);
+          return false;
+        }
+        duoEntryPending=false;
+        updateDuoOrientationGate(metrics);
+        return true;
+      }
+
+      return {
+        schedule,apply,resolveMode,requestDuoEntry,updateDuoOrientationGate,
+        isPhoneLandscape:()=>Boolean((snapshot||measure()).phoneLandscape),
+        getSnapshot:()=>({...((snapshot||measure())),duoEntryPending})
+      };
+    })();
 
     function renderDuoKeypad(sideKey) {
       const side=state.duo.sides[sideKey],order=side?.effects?.keyOrder||standardKeyOrder();
@@ -2036,12 +2186,17 @@
     }
 
     /* ---------- イベント設定 ---------- */
-    $('start-button').addEventListener('click',()=>{ requestFullScreen(); AudioManager.play('tap'); UI.showScreen('mode'); });
+    $('start-button').addEventListener('click',()=>{ AudioManager.play('tap'); UI.showScreen('mode'); });
     $('howto-button').addEventListener('click',()=>{ AudioManager.play('tap'); $('howto-modal').classList.add('active'); });
     $('howto-close').addEventListener('click',()=>{ AudioManager.play('tap'); $('howto-modal').classList.remove('active'); });
     $('howto-modal').addEventListener('click',e=>{ if(e.target===$('howto-modal')) $('howto-modal').classList.remove('active'); });
     $('solo-mode-button').addEventListener('click',()=>{ state.mode='solo'; AudioManager.play('tap'); UI.showScreen('solo-type'); });
-    $('duo-mode-button').addEventListener('click',()=>{ state.mode='duo'; AudioManager.play('tap'); UI.showScreen('character'); UI.renderCharacterCards(); });
+    $('duo-mode-button').addEventListener('click',()=>{
+      AudioManager.play('tap');
+      if(!ViewportManager.requestDuoEntry()) return;
+      UI.showScreen('character');
+      UI.renderCharacterCards();
+    });
 
     document.addEventListener('click',e=>{
       const character=e.target.closest('.character-card');
@@ -2123,7 +2278,7 @@
         } catch (error) {
           if(!CompetitionService.isBattlePreparationCurrent(request)) return;
           CompetitionService.finishBattlePreparation(request);
-          UI.toast(error?.message||'王者データを よみこめませんでした。');
+          UI.toast('つうしんできませんでした。じゆうたいせんは あそべるよ！');
           UI.renderLevelCards();
           return;
         }
@@ -2135,7 +2290,7 @@
     });
     $('pause-button').addEventListener('click',()=>{ AudioManager.play('tap'); GameController.togglePause(); });
     $('resume-button').addEventListener('click',()=>{ AudioManager.play('tap'); GameController.togglePause(false); });
-    $('fullscreen-button').addEventListener('click',()=>{ requestFullScreen(); AudioManager.play('tap'); });
+    $('fullscreen-button').addEventListener('click',()=>{ void FullscreenManager.request(); AudioManager.play('tap'); });
     $('retry-button').addEventListener('click',()=>{ AudioManager.play('tap'); GameController.startMatch(); });
     $('change-cpu-button').addEventListener('click',()=>{
       AudioManager.play('tap');
@@ -2166,8 +2321,8 @@
       if(state.duo.sides.red.ready||state.duo.sides.white.ready)return;
       AudioManager.play('tap'); state.duo.phase='idle'; UI.showScreen('level'); UI.renderLevelCards();
     });
-    $('duo-ready-fullscreen').addEventListener('click',()=>{ requestFullScreen(); AudioManager.play('tap'); });
-    $('duo-result-fullscreen').addEventListener('click',()=>{ requestFullScreen(); AudioManager.play('tap'); });
+    $('duo-ready-fullscreen').addEventListener('click',()=>{ void FullscreenManager.request(); AudioManager.play('tap'); });
+    $('duo-result-fullscreen').addEventListener('click',()=>{ void FullscreenManager.request(); AudioManager.play('tap'); });
     $('duo-red-retry').addEventListener('click',()=>toggleDuoRetry('red'));
     $('duo-white-retry').addEventListener('click',()=>toggleDuoRetry('white'));
     $('duo-result-level').addEventListener('click',()=>openDuoConfirm('level','もんだいを かえても いい？'));
@@ -2231,19 +2386,13 @@
     });
     window.addEventListener('beforeunload',e=>{ if(matchInProgress()){ e.preventDefault(); e.returnValue=''; } });
     window.addEventListener('popstate',()=>{ if(matchInProgress()){ history.pushState({battle:true},''); UI.toast('たいせん中だよ。タイトルへは けっか画面から もどれるよ。'); } });
-    const handleOrientation=()=>{
-      const portrait=matchMedia('(orientation: portrait)').matches;
-      document.body.classList.toggle('portrait-layout',portrait);
-      BattlePositioning.syncToCurrentState();
-      /* v0.8：2人対戦は縦向きが正式。回転しても試合状態は止めない。 */
-      if(state.duo.pendingStart&&state.duo.sides.red.ready&&state.duo.sides.white.ready) {
-        state.duo.pendingStart=false;
-        DuoGameController.beginCountdown(false);
-      }
-    };
-    window.addEventListener('orientationchange',handleOrientation);
-    window.addEventListener('resize',handleOrientation);
-    document.addEventListener('fullscreenchange',()=>BattlePositioning.syncToCurrentState());
+    const scheduleViewportSync=()=>ViewportManager.schedule();
+    window.addEventListener('orientationchange',scheduleViewportSync);
+    window.addEventListener('resize',scheduleViewportSync);
+    window.visualViewport?.addEventListener('resize',scheduleViewportSync);
+    window.visualViewport?.addEventListener('scroll',scheduleViewportSync);
+    document.addEventListener('fullscreenchange',scheduleViewportSync);
+    document.addEventListener('webkitfullscreenchange',scheduleViewportSync);
     try { history.replaceState({app:true},''); history.pushState({app:true},''); } catch (_) {}
 
     document.addEventListener('dragstart',e=>e.preventDefault());
@@ -2252,6 +2401,9 @@
     /* 自動テスト用（画面には表示されません） */
     window.__HKB_TEST__ = {
       versions:()=>({appVersion:CONFIG.APP_VERSION,rulesVersion:CONFIG.RULES_VERSION}),
+      viewport:()=>ViewportManager.getSnapshot(),
+      classifyViewport:(width,height)=>ViewportManager.resolveMode(Number(width),Number(height)),
+      fullscreen:()=>FullscreenManager.getState(),
       snapshot:()=>JSON.parse(JSON.stringify({
         screen:state.screen,phase:state.phase,selectedCpu:state.selectedCpu,selectedLevel:state.selectedLevel,
         selectedLevels:state.selectedLevels,selectedCharacters:state.selectedCharacters,remaining:state.remaining,
@@ -2348,7 +2500,7 @@
     void GameBGM.syncToGameState();
 
     $('title-version').textContent=`v${CONFIG.APP_VERSION}`;
+    ViewportManager.apply();
     renderDuoKeypads(); updateSoundButtons(); updateEffectModeButtons(); UI.renderCharacterCards(); UI.renderCpuCards(); UI.renderLevelCards();
     CompetitionService.initialize();
     requestAnimationFrame(t=>{ state.lastFrame=t; GameController.frame(t); });
-  

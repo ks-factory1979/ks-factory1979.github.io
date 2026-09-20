@@ -112,14 +112,14 @@
           <span class="solo-type-icon"><img id="official-lion-icon" class="lion-asset-img" alt="王者ライオン"></span>
           <h3>王者を めざす！</h3>
           <p>さいきょうの王者ライオンと 60びょう。<br>まけても 公式記録は のこるよ！</p>
-          <span id="official-type-note" class="network-note">王者データ よみこみ中…</span>
+          <span id="official-type-note" class="network-note" data-mobile-label="○ よみこみ中…">王者データ よみこみ中…</span>
           <span class="type-go">公式戦！</span>
         </button>
         <button id="ghost-type-button" class="solo-type-card ghost" data-solo-type="ghost" type="button" disabled>
           <span class="solo-type-icon"><img class="master-crown-img" alt="" data-crown-image></span>
           <h3>王者ゴーストと しょうぶ！</h3>
           <p>今月のマスターの動きと<br>ほんものの けいさんバトル！</p>
-          <span id="ghost-type-note" class="network-note">王者データ よみこみ中…</span>
+          <span id="ghost-type-note" class="network-note" data-mobile-label="○ よみこみ中…">王者データ よみこみ中…</span>
           <span class="type-go">ちょうせん！</span>
         </button>
       </div>
@@ -411,7 +411,13 @@
       </div>
     </div>
   </div>
-  <div class="orientation-blocker" aria-live="assertive"><div>↻<br>よこむきに してね</div></div>
+  <div id="orientation-blocker" class="orientation-blocker" aria-live="assertive" aria-hidden="true">
+    <div class="orientation-message">
+      <span aria-hidden="true">↻</span>
+      <strong>スマホを たてにしてね！</strong>
+      <small>ふたりでたいせんは<br>たて画面で あそぶよ</small>
+    </div>
+  </div>
   <div id="toast" role="status"></div>
 
   <script src="bgm.js"></script>

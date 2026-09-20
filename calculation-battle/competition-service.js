@@ -159,10 +159,16 @@ function createHkbCompetitionService() {
           : '';
         $('official-type-button').disabled=!ready;
         $('ghost-type-button').disabled=!ready;
-        $('official-type-note').textContent=ready?`${competition.monthLabel}・王冠 ${count}こ・ライオン撃破 ${lionCount}/21`:'王者データ よみこみ中…';
-        $('ghost-type-note').textContent=ready
+        const officialNote=$('official-type-note');
+        const ghostNote=$('ghost-type-note');
+        officialNote.textContent=ready?`${competition.monthLabel}・王冠 ${count}こ・ライオン撃破 ${lionCount}/21`:'王者データ よみこみ中…';
+        ghostNote.textContent=ready
           ? (Object.keys(competition.champions).length?`${Object.keys(competition.champions).length}コースに 王者あり`:'まだ 王者ぼしゅう中！')
           : '王者データ よみこみ中…';
+        officialNote.dataset.mobileLabel=ready?'● じゅんびOK':'○ よみこみ中…';
+        ghostNote.dataset.mobileLabel=ready
+          ? (Object.keys(competition.champions).length?'● 王者あり':'△ 王者ぼしゅう中')
+          : '○ よみこみ中…';
         if(state.screen==='level') UI.renderLevelCards();
       },
       showAchievement(heading,message,options={}) {
