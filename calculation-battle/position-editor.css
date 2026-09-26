@@ -1,0 +1,238 @@
+:root.position-editor-enabled {
+  --position-editor-accent: #ffb400;
+  --position-editor-panel: rgba(20, 29, 43, .96);
+  --position-editor-line: rgba(255, 216, 59, .92);
+}
+
+body.position-editor-active .position-editor-target {
+  cursor: grab !important;
+  touch-action: none !important;
+  outline: 3px solid var(--position-editor-accent) !important;
+  outline-offset: 3px;
+}
+
+body.position-editor-dragging .position-editor-target { cursor: grabbing !important; }
+
+#position-editor-panel {
+  position: fixed;
+  z-index: 12000;
+  top: max(8px, env(safe-area-inset-top));
+  right: max(8px, env(safe-area-inset-right));
+  width: min(310px, calc(100vw - 16px));
+  max-height: min(500px, calc(100dvh - 16px));
+  overflow: auto;
+  color: #f8fbff;
+  background: var(--position-editor-panel);
+  border: 2px solid rgba(255,255,255,.38);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0,0,0,.34);
+  font: 700 13px/1.35 system-ui, -apple-system, "Segoe UI", sans-serif;
+  user-select: none;
+}
+
+#position-editor-panel * { box-sizing: border-box; font: inherit; }
+
+.position-editor-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 10px;
+  background: #172235;
+  border-bottom: 1px solid rgba(255,255,255,.18);
+  cursor: move;
+}
+
+.position-editor-head strong { color: #ffd84c; font-size: 14px; }
+
+.position-editor-collapse {
+  width: 34px;
+  min-height: 28px;
+  padding: 0;
+  color: #fff;
+  background: #35445c;
+  border: 1px solid rgba(255,255,255,.35);
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+#position-editor-panel.is-collapsed .position-editor-body { display: none; }
+
+.position-editor-body { padding: 9px; }
+
+.position-editor-meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 3px 8px;
+  margin-bottom: 8px;
+  padding: 7px;
+  color: #dbe9ff;
+  background: rgba(255,255,255,.07);
+  border-radius: 8px;
+}
+
+.position-editor-meta b { color: #fff; text-align: right; overflow-wrap: anywhere; }
+
+.position-editor-field {
+  display: grid;
+  grid-template-columns: 82px minmax(0,1fr);
+  align-items: center;
+  gap: 7px;
+  margin: 7px 0;
+}
+
+.position-editor-field > span { color: #c9d7eb; }
+
+#position-editor-panel select,
+#position-editor-panel input,
+#position-editor-json {
+  width: 100%;
+  min-height: 34px;
+  padding: 5px 7px;
+  color: #101826;
+  background: #fff;
+  border: 2px solid #98a9c0;
+  border-radius: 7px;
+  user-select: text;
+}
+
+.position-editor-values {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 5px;
+  margin: 9px 0;
+}
+
+.position-editor-values label { color: #c9d7eb; font-size: 11px; text-align: center; }
+.position-editor-values input { margin-top: 3px; text-align: right; }
+
+.position-editor-scale-row {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+  gap: 5px;
+  margin: 7px 0 10px;
+}
+
+#position-editor-panel input[type="range"] { min-height: 26px; padding: 0; }
+
+.position-editor-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 6px;
+}
+
+#position-editor-panel button {
+  min-height: 36px;
+  padding: 6px 8px;
+  color: #fff;
+  background: #40516d;
+  border: 1px solid rgba(255,255,255,.35);
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+#position-editor-panel button:hover { filter: brightness(1.12); }
+#position-editor-panel button:disabled { cursor: default; opacity: .45; }
+#position-editor-finish { grid-column: 1 / -1; background: #bd6400 !important; font-size: 14px !important; }
+
+.position-editor-hint {
+  margin: 8px 1px 0;
+  color: #bfcce0;
+  font-size: 11px;
+}
+
+.position-editor-guides {
+  position: absolute;
+  z-index: 100;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.position-editor-rope-guide {
+  position: absolute;
+  border-color: var(--position-editor-line);
+  filter: drop-shadow(0 0 2px #172235);
+}
+
+.position-editor-rope-guide.horizontal {
+  left: 0;
+  right: 0;
+  border-top: 1px dashed var(--position-editor-line);
+}
+
+.position-editor-rope-guide.vertical {
+  top: 0;
+  bottom: 0;
+  border-left: 1px dashed var(--position-editor-line);
+}
+
+.position-editor-grip {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background:
+    linear-gradient(90deg, transparent 45%, #ff3b30 45% 55%, transparent 55%),
+    linear-gradient(transparent 45%, #ff3b30 45% 55%, transparent 55%);
+  box-shadow: 0 0 0 2px rgba(21,31,47,.75);
+  transform: translate(-50%, -50%);
+}
+
+.position-editor-grip::after {
+  content: attr(data-side);
+  position: absolute;
+  left: 14px;
+  top: -5px;
+  padding: 1px 4px;
+  color: #172235;
+  background: rgba(255,255,255,.9);
+  border-radius: 4px;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+#position-editor-output {
+  position: fixed;
+  z-index: 13000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(8,13,23,.74);
+}
+
+#position-editor-output[hidden] { display: none; }
+
+.position-editor-output-box {
+  width: min(760px, 100%);
+  max-height: calc(100dvh - 32px);
+  display: grid;
+  grid-template-rows: auto minmax(220px, 1fr) auto;
+  gap: 9px;
+  padding: 14px;
+  color: #f7fbff;
+  background: #172235;
+  border: 2px solid #ffd34d;
+  border-radius: 12px;
+  box-shadow: 0 18px 50px rgba(0,0,0,.45);
+}
+
+.position-editor-output-box h2 { margin: 0; font-size: 18px; }
+#position-editor-json { min-height: 300px; resize: vertical; font: 12px/1.4 ui-monospace, Consolas, monospace; }
+.position-editor-output-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
+
+@media (max-width: 560px) {
+  #position-editor-panel { top: auto; bottom: max(5px, env(safe-area-inset-bottom)); max-height: 46dvh; }
+  #position-editor-panel.is-collapsed { width: 210px; }
+  .position-editor-body { padding: 7px; }
+  .position-editor-meta { display: none; }
+  .position-editor-field { grid-template-columns: 68px minmax(0,1fr); margin: 4px 0; }
+  .position-editor-values { margin: 5px 0; }
+  .position-editor-actions button { min-height: 32px; padding: 4px; }
+}

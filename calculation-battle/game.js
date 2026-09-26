@@ -68,13 +68,82 @@
       lion: 0.553
     });
 
-    /* v1.2.4：位置調整エディタで確定した、対戦arena専用の正規化補正。 */
+    /* 3つの基準画面で目視確定した位置補正。旧GAS版の値は未調整の組み合わせ用。 */
     const BATTLE_POSITION_CONFIG = Object.freeze({
-      schemaVersion:'hkb-position/1',
-      editorVersion:'1.0.0',
+      schemaVersion:'hkb-position/2',
+      editorVersion:'2.0.0',
       sourceSha256:'06bc014dcd952ce8cca8432df1b3ad6ca180850346aa39e86280b33c95c010ac',
       sourceZipSha256:'4a4ecef00c2ec3bebd1f48d759368b8e1a29050e42336e2e516b128f5d75e39a',
       sourceIndexSha256:'671ef7977f6a18265f0210c449b036f017ac9bcd14de998632aebb48cf066a6a',
+      /* Values approved in the three reference layouts. The legacy values below
+         remain as defaults for character combinations absent from the export. */
+      layoutRopes:Object.freeze({
+        "duo|compact-landscape":Object.freeze({offsetX:0,offsetY:0,start:0,end:1,thickness:1}),
+        "duo|portrait":Object.freeze({offsetX:0,offsetY:0,start:0,end:1,thickness:1}),
+        "duo|wide":Object.freeze({offsetX:0,offsetY:0,start:0,end:1,thickness:1}),
+        "solo|compact-landscape":Object.freeze({offsetX:0,offsetY:-0.282,start:0,end:1,thickness:1}),
+        "solo|portrait":Object.freeze({offsetX:0,offsetY:-0.125,start:0,end:1,thickness:1}),
+        "solo|wide":Object.freeze({offsetX:0,offsetY:-0.24754,start:0,end:1,thickness:1}),
+      }),
+      layoutCharacters:Object.freeze({
+        "duo|compact-landscape|red|boy|player_red_boy":Object.freeze({dx:0,dy:0,scale:1,snap:false}),
+        "duo|compact-landscape|red|girl|player_red_girl":Object.freeze({dx:0,dy:0,scale:1,snap:false}),
+        "duo|compact-landscape|red|mole|cpu_mole":Object.freeze({dx:0,dy:0,scale:1,snap:false}),
+        "duo|compact-landscape|white|boy|player_white_boy":Object.freeze({dx:0,dy:0,scale:1,snap:false}),
+        "duo|compact-landscape|white|rabbit|cpu_rabbit":Object.freeze({dx:0,dy:0,scale:1,snap:false}),
+        "duo|compact-landscape|white|turtle|cpu_turtle":Object.freeze({dx:0,dy:0,scale:1,snap:false}),
+        "duo|portrait|red|boy|player_red_boy":Object.freeze({dx:0.06,dy:-0.17,scale:1,snap:false}),
+        "duo|portrait|red|girl|player_red_girl":Object.freeze({dx:0.06,dy:-0.17,scale:0.9,snap:false}),
+        "duo|portrait|red|mole|cpu_mole":Object.freeze({dx:0.06,dy:-0.115,scale:0.9,snap:false}),
+        "duo|portrait|red|rabbit|cpu_rabbit":Object.freeze({dx:0.09,dy:-0.24,scale:0.9,snap:false}),
+        "duo|portrait|red|turtle|cpu_turtle":Object.freeze({dx:0.06,dy:-0.18,scale:0.9,snap:false}),
+        "duo|portrait|white|boy|player_white_boy":Object.freeze({dx:-0.06,dy:-0.17,scale:0.9,snap:false}),
+        "duo|portrait|white|girl|player_white_girl":Object.freeze({dx:-0.06,dy:-0.17,scale:0.9,snap:false}),
+        "duo|portrait|white|mole|cpu_mole":Object.freeze({dx:-0.06,dy:-0.115,scale:0.9,snap:false}),
+        "duo|portrait|white|rabbit|cpu_rabbit":Object.freeze({dx:-0.09,dy:-0.24,scale:0.9,snap:false}),
+        "duo|portrait|white|turtle|cpu_turtle":Object.freeze({dx:-0.06,dy:-0.18,scale:0.9,snap:false}),
+        "duo|wide|red|girl|player_red_girl":Object.freeze({dx:0,dy:0,scale:1,snap:false}),
+        "duo|wide|white|turtle|cpu_turtle":Object.freeze({dx:0,dy:0,scale:1,snap:false}),
+        "solo|compact-landscape|cpu|mole|cpu_mole":Object.freeze({dx:0,dy:-0.2,scale:1,snap:false}),
+        "solo|compact-landscape|cpu|rabbit|cpu_rabbit":Object.freeze({dx:0,dy:-0.26,scale:1,snap:false}),
+        "solo|compact-landscape|cpu|turtle|cpu_turtle":Object.freeze({dx:0,dy:-0.22,scale:1,snap:false}),
+        "solo|compact-landscape|ghost|boy|player_white_boy":Object.freeze({dx:0,dy:-0.22,scale:1,snap:false}),
+        "solo|compact-landscape|ghost|girl|player_white_girl":Object.freeze({dx:0,dy:-0.22,scale:1,snap:false}),
+        "solo|compact-landscape|official|lion|lion_defeated":Object.freeze({dx:0,dy:-0.23,scale:1,snap:false}),
+        "solo|compact-landscape|official|lion|lion_roar":Object.freeze({dx:0,dy:-0.23,scale:1,snap:false}),
+        "solo|compact-landscape|official|lion|lion_tug":Object.freeze({dx:0,dy:-0.23,scale:1,snap:false}),
+        "solo|compact-landscape|player|boy|player_red_boy":Object.freeze({dx:0,dy:-0.22,scale:1,snap:false}),
+        "solo|compact-landscape|player|girl|player_red_girl":Object.freeze({dx:0,dy:-0.22,scale:1,snap:false}),
+        "solo|compact-landscape|player|mole|cpu_mole":Object.freeze({dx:0,dy:-0.21,scale:1,snap:false}),
+        "solo|compact-landscape|player|rabbit|cpu_rabbit":Object.freeze({dx:0,dy:-0.26,scale:1,snap:false}),
+        "solo|compact-landscape|player|turtle|cpu_turtle":Object.freeze({dx:0,dy:-0.22,scale:1,snap:false}),
+        "solo|portrait|cpu|mole|cpu_mole":Object.freeze({dx:0.055,dy:0.05,scale:1,snap:false}),
+        "solo|portrait|cpu|rabbit|cpu_rabbit":Object.freeze({dx:0.06,dy:-0.02,scale:1,snap:false}),
+        "solo|portrait|cpu|turtle|cpu_turtle":Object.freeze({dx:0.055,dy:0.018,scale:1,snap:false}),
+        "solo|portrait|ghost|boy|player_white_boy":Object.freeze({dx:0.055,dy:0.02,scale:1,snap:false}),
+        "solo|portrait|ghost|girl|player_white_girl":Object.freeze({dx:0.055,dy:0.02,scale:1,snap:false}),
+        "solo|portrait|official|lion|lion_defeated":Object.freeze({dx:0.055,dy:0.02,scale:1,snap:false}),
+        "solo|portrait|official|lion|lion_roar":Object.freeze({dx:0.055,dy:0.02,scale:1,snap:false}),
+        "solo|portrait|official|lion|lion_tug":Object.freeze({dx:0.055,dy:0.02,scale:1,snap:false}),
+        "solo|portrait|player|boy|player_red_boy":Object.freeze({dx:-0.055,dy:0.02,scale:1,snap:false}),
+        "solo|portrait|player|girl|player_red_girl":Object.freeze({dx:-0.055,dy:0.02,scale:1,snap:false}),
+        "solo|portrait|player|mole|cpu_mole":Object.freeze({dx:-0.055,dy:0.05,scale:1,snap:false}),
+        "solo|portrait|player|rabbit|cpu_rabbit":Object.freeze({dx:-0.06,dy:-0.02,scale:1,snap:false}),
+        "solo|portrait|player|turtle|cpu_turtle":Object.freeze({dx:-0.055,dy:0.018,scale:1,snap:false}),
+        "solo|wide|cpu|mole|cpu_mole":Object.freeze({dx:-0.000916,dy:-0.22,scale:1,snap:false}),
+        "solo|wide|cpu|rabbit|cpu_rabbit":Object.freeze({dx:0,dy:-0.28,scale:1,snap:false}),
+        "solo|wide|cpu|turtle|cpu_turtle":Object.freeze({dx:0,dy:-0.23,scale:1,snap:false}),
+        "solo|wide|ghost|boy|player_white_boy":Object.freeze({dx:-0.008237,dy:-0.25,scale:1,snap:false}),
+        "solo|wide|ghost|girl|player_white_girl":Object.freeze({dx:0,dy:-0.25,scale:1,snap:false}),
+        "solo|wide|official|lion|lion_defeated":Object.freeze({dx:0,dy:-0.25,scale:1,snap:false}),
+        "solo|wide|official|lion|lion_roar":Object.freeze({dx:0,dy:-0.25,scale:1,snap:false}),
+        "solo|wide|official|lion|lion_tug":Object.freeze({dx:0,dy:-0.25,scale:1,snap:false}),
+        "solo|wide|player|boy|player_red_boy":Object.freeze({dx:0,dy:-0.25,scale:1,snap:false}),
+        "solo|wide|player|girl|player_red_girl":Object.freeze({dx:0,dy:-0.25,scale:1,snap:false}),
+        "solo|wide|player|mole|cpu_mole":Object.freeze({dx:0,dy:-0.22,scale:1,snap:false}),
+        "solo|wide|player|rabbit|cpu_rabbit":Object.freeze({dx:0,dy:-0.28,scale:1,snap:false}),
+        "solo|wide|player|turtle|cpu_turtle":Object.freeze({dx:0,dy:-0.23,scale:1,snap:false}),
+      }),
       profiles:Object.freeze({
         solo:Object.freeze({offsetX:0,offsetY:-.138,start:0,end:1,thickness:1}),
         'duo-landscape':Object.freeze({offsetX:0,offsetY:0,start:0,end:1,thickness:1}),
@@ -405,7 +474,7 @@
       }
     };
 
-    /* ---------- v1.2.4：対戦arena位置補正 ---------- */
+    /* ---------- 対戦舞台と個別位置補正 ---------- */
     const BattlePositioning = (() => {
       const BASE_ADJUSTMENT=Object.freeze({dx:0,dy:0,scale:1,snap:false});
       let scheduledFrame=0;
@@ -437,8 +506,44 @@
           ? (asset||`lion_${pose}`)
           : asset;
         const key=[profile,role,character,resolvedAsset].join('|');
-        const found=Boolean(profile&&role&&character&&resolvedAsset&&BATTLE_POSITION_CONFIG.characters[key]);
-        return {key,found,...(found?BATTLE_POSITION_CONFIG.characters[key]:BASE_ADJUSTMENT)};
+        const layoutValue=BATTLE_POSITION_CONFIG.layoutCharacters[key];
+        const legacyProfile=profile?.startsWith('solo|')?'solo'
+          :profile==='duo|portrait'?'duo-portrait'
+          :profile?.startsWith('duo|')?'duo-landscape':profile;
+        const legacyValue=BATTLE_POSITION_CONFIG.characters[[legacyProfile,role,character,resolvedAsset].join('|')];
+        const value=layoutValue||legacyValue;
+        return {key,found:Boolean(value),...(value||BASE_ADJUSTMENT)};
+      }
+
+      function layoutProfile() {
+        const width=window.visualViewport?.width||window.innerWidth;
+        const height=window.visualViewport?.height||window.innerHeight;
+        if(height>=width) return 'portrait';
+        if(width>=1100&&height>=600&&width/height>=1.55) return 'wide';
+        return 'compact-landscape';
+      }
+
+      function prepareStage(arena,layout) {
+        if(!arena) return null;
+        const stage=arena.querySelector(':scope > .position-stage');
+        if(!stage) return null;
+        arena.dataset.positionLayout=layout;
+        /* The reference height scales uniformly. Extra horizontal room stretches
+           only the spacing and rope, while sprites keep their aspect ratio. */
+        stage.style.removeProperty('width');
+        const referenceWidth=stage.offsetWidth,height=stage.offsetHeight;
+        if(!(referenceWidth>0&&height>0&&arena.clientWidth>0&&arena.clientHeight>0)) return null;
+        const scale=arena.clientHeight/height;
+        const width=arena.clientWidth/scale;
+        stage.style.width=`${px(width)}`;
+        stage.style.setProperty('--position-stage-scale',String(scale));
+        return {width,height,scale,referenceWidth};
+      }
+
+      function ropeAdjustment(profile) {
+        const legacy=profile.startsWith('solo|')?'solo'
+          :profile==='duo|portrait'?'duo-portrait':'duo-landscape';
+        return BATTLE_POSITION_CONFIG.layoutRopes[profile]||BATTLE_POSITION_CONFIG.profiles[legacy];
       }
 
       function calculatePixels(adjustment,arenaWidth,arenaHeight) {
@@ -523,7 +628,8 @@
 
       function applySoloPositions() {
         if(state.screen!=='battle'||state.mode!=='solo') return false;
-        const profile='solo';
+        const layout=layoutProfile();
+        const profile=`solo|${layout}`;
         const arena=$('arena');
         const rope=arena?.querySelector('.rope-track');
         const identities=soloIdentities();
@@ -536,8 +642,8 @@
           item.element.style.removeProperty('top');
           item.element.style.removeProperty('bottom');
         });
-        const arenaRect=arena.getBoundingClientRect();
-        if(!(arenaRect.width>0&&arenaRect.height>0)) return false;
+        const stageRect=prepareStage(arena,layout);
+        if(!stageRect) return false;
         const unresolved=[];
         const characterStates=[];
 
@@ -558,18 +664,18 @@
               key:adjustment.key,found:false,dx:0,dy:0,scale:1,appliedPx:{x:0,y:0,scale:1}});
             continue;
           }
-          const appliedPx=applyVisual(element,adjustment,arenaRect);
+          const appliedPx=applyVisual(element,adjustment,stageRect);
           characterStates.push({role:item.role,character:item.character,asset:item.asset,pose:item.pose,
             key:adjustment.key,found:true,dx:adjustment.dx,dy:adjustment.dy,scale:adjustment.scale,appliedPx});
         }
 
-        const ropeAdjustment=BATTLE_POSITION_CONFIG.profiles[profile];
-        const ropePx=applyVisual(rope,ropeAdjustment,arenaRect);
+        const ropeValue=ropeAdjustment(profile);
+        const ropePx=applyVisual(rope,ropeValue,stageRect);
         setIdentity(rope,{profile,role:'rope',character:'rope',asset:'rope',pose:'normal',key:`${profile}|rope`});
         applyCount++;
         lastState={
-          profile,arena:{width:arenaRect.width,height:arenaRect.height},
-          rope:{...ropeAdjustment,appliedPx:ropePx},characters:characterStates,
+          profile,layout,arena:{width:arena.clientWidth,height:arena.clientHeight},stage:stageRect,
+          rope:{...ropeValue,appliedPx:ropePx},characters:characterStates,
           generation,applyCount,unresolved,lastSkip:null
         };
         return true;
@@ -577,7 +683,8 @@
 
       function applyDuoPositions() {
         if(state.screen!=='duo'||state.mode!=='duo') return false;
-        const profile=resolveProfile('duo');
+        const layout=layoutProfile();
+        const profile=`duo|${layout}`;
         const arena=$('duo-arena');
         const rope=arena?.querySelector('.vertical-rope');
         const identities=['red','white'].map(role=>{
@@ -587,8 +694,8 @@
         if(!arena||!rope||identities.some(item=>!item.element)) return false;
         clearVisual(rope);
         identities.forEach(item=>clearVisual(item.element));
-        const arenaRect=arena.getBoundingClientRect();
-        if(!(arenaRect.width>0&&arenaRect.height>0)) return false;
+        const stageRect=prepareStage(arena,layout);
+        if(!stageRect) return false;
         const unresolved=[];
         const characterStates=[];
         for(const item of identities) {
@@ -599,19 +706,19 @@
             unresolved.push(adjustment.key);
           }
           const appliedPx=adjustment.found
-            ? applyVisual(item.element,adjustment,arenaRect)
+            ? applyVisual(item.element,adjustment,stageRect)
             : {x:0,y:0,scale:1};
           characterStates.push({role:item.role,character:item.character,asset:item.asset,pose:item.pose,
             key:adjustment.key,found:adjustment.found,dx:adjustment.found?adjustment.dx:0,
             dy:adjustment.found?adjustment.dy:0,scale:adjustment.found?adjustment.scale:1,appliedPx});
         }
-        const ropeAdjustment=BATTLE_POSITION_CONFIG.profiles[profile];
-        const ropePx=applyVisual(rope,ropeAdjustment,arenaRect);
+        const ropeValue=ropeAdjustment(profile);
+        const ropePx=applyVisual(rope,ropeValue,stageRect);
         setIdentity(rope,{profile,role:'rope',character:'rope',asset:'rope',pose:'normal',key:`${profile}|rope`});
         applyCount++;
         lastState={
-          profile,arena:{width:arenaRect.width,height:arenaRect.height},
-          rope:{...ropeAdjustment,appliedPx:ropePx},characters:characterStates,
+          profile,layout,arena:{width:arena.clientWidth,height:arena.clientHeight},stage:stageRect,
+          rope:{...ropeValue,appliedPx:ropePx},characters:characterStates,
           generation,applyCount,unresolved,lastSkip:null
         };
         return true;
@@ -660,26 +767,28 @@
         element.dataset.positionPose=currentPose;
         if(state.screen!=='battle'||state.mode!=='solo'||state.playType!=='official') return;
         const arena=$('arena');
-        const arenaRect=arena?.getBoundingClientRect();
-        if(!arenaRect||!(arenaRect.width>0&&arenaRect.height>0)) return;
+        const layout=layoutProfile();
+        const stageRect=prepareStage(arena,layout);
+        if(!stageRect) return;
         const asset=`lion_${currentPose}`;
-        const adjustment=resolveCharacterAdjustment('solo','official','lion',asset,currentPose);
-        setIdentity(element,{profile:'solo',role:'official',character:'lion',asset,pose:currentPose,key:adjustment.key});
+        const profile=`solo|${layout}`;
+        const adjustment=resolveCharacterAdjustment(profile,'official','lion',asset,currentPose);
+        setIdentity(element,{profile,role:'official',character:'lion',asset,pose:currentPose,key:adjustment.key});
         if(!adjustment.found) clearVisual(element);
         const appliedPx=adjustment.found
-          ? applyVisual(element,adjustment,arenaRect)
+          ? applyVisual(element,adjustment,stageRect)
           : {x:0,y:0,scale:1};
         applyCount++;
         const characterState={role:'official',character:'lion',asset,pose:currentPose,key:adjustment.key,
           found:adjustment.found,dx:adjustment.found?adjustment.dx:0,dy:adjustment.found?adjustment.dy:0,
           scale:adjustment.found?adjustment.scale:1,appliedPx};
-        const characters=lastState.profile==='solo'
+        const characters=lastState.profile===profile
           ? lastState.characters.filter(item=>item.role!=='official').concat(characterState)
           : [characterState];
         const unresolved=adjustment.found
           ? (lastState.unresolved||[]).filter(key=>!key.includes('|official|lion|'))
           : [...(lastState.unresolved||[]).filter(key=>!key.includes('|official|lion|')),adjustment.key];
-        lastState={...lastState,profile:'solo',arena:{width:arenaRect.width,height:arenaRect.height},
+        lastState={...lastState,profile,layout,arena:{width:arena.clientWidth,height:arena.clientHeight},stage:stageRect,
           characters,generation,applyCount,unresolved,lastSkip:null};
       }
 
@@ -2589,12 +2698,87 @@
       sourceIndexSha256:BATTLE_POSITION_CONFIG.sourceIndexSha256,
       profileCount:Object.keys(BATTLE_POSITION_CONFIG.profiles).length,
       characterCount:Object.keys(BATTLE_POSITION_CONFIG.characters).length,
+      layoutProfileCount:Object.keys(BATTLE_POSITION_CONFIG.layoutRopes).length,
+      layoutCharacterCount:Object.keys(BATTLE_POSITION_CONFIG.layoutCharacters).length,
       resolveProfile:(mode,portrait)=>BattlePositioning.resolveProfile(mode,portrait),
       resolveCharacterAdjustment:(profile,role,character,asset,pose='normal')=>
         BattlePositioning.resolveCharacterAdjustment(profile,role,character,asset,pose),
       calculatePixels:(adjustment,width,height)=>BattlePositioning.calculatePixels(adjustment,width,height),
       getState:()=>BattlePositioning.getState()
     });
+
+    /* 配置調整用の最小ブリッジ。専用URL以外では生成しません。 */
+    if(new URLSearchParams(window.location.search).get('positionEdit')==='1') {
+      const editorCharacters=new Set(['boy','girl','mole','rabbit','turtle']);
+      const editorLionPoses=new Set(['tug','roar','defeated']);
+      const notifyPositionEditor=()=>window.dispatchEvent(new CustomEvent('hkb-position-preview-change'));
+
+      function showPositionEditorSolo({left='boy',right='mole',pose='tug'}={}) {
+        const player=editorCharacters.has(left)?left:'boy';
+        const opponent=editorCharacters.has(right)?right:'mole';
+        const lionPose=editorLionPoses.has(pose)?pose:'tug';
+        const official=String(right).startsWith('lion');
+        const ghost=!official&&['boy','girl'].includes(opponent);
+        state.mode='solo';
+        state.playType=official?'official':ghost?'ghost':'free';
+        state.selectedCharacters.red=player;
+        state.selectedCpu=official?'lion':ghost?'mole':opponent;
+        state.ghost=ghost?{ghost:{characterId:opponent},champion:{characterId:opponent}}:null;
+        state.phase='editor-preview';
+        state.paused=true;
+        state.remaining=CONFIG.MATCH_SECONDS;
+        state.ropeTarget=0;
+        state.ropeDisplay=0;
+        state.sides.player=createSideState('human','赤ぐみ');
+        state.sides.opponent=createSideState(ghost?'ghost':'cpu',official?'王者ライオン':ghost?'王者ゴースト':CPU_DEFS[opponent].name);
+        UI.prepareBattle();
+        UI.resetFeedback();
+        UI.showScreen('battle');
+        $('countdown-overlay').classList.remove('active');
+        $('pause-overlay').classList.remove('active');
+        if(official) {
+          $('cpu-character').innerHTML=Art.lion(lionPose);
+          $('cpu-character').classList.add('lion');
+          BattlePositioning.setLionPose(lionPose);
+        }
+        BattlePositioning.syncToCurrentState();
+        requestAnimationFrame(notifyPositionEditor);
+      }
+
+      function showPositionEditorDuo({left='boy',right='girl'}={}) {
+        state.mode='duo';
+        state.playType='free';
+        /* 横画面で見た左＝白、右＝赤。縦画面では左を上、右を下として扱う。 */
+        state.selectedCharacters.white=editorCharacters.has(left)?left:'boy';
+        state.selectedCharacters.red=editorCharacters.has(right)?right:'girl';
+        state.duo.phase='editor-preview';
+        state.duo.paused=true;
+        state.duo.ropeTarget=0;
+        state.duo.ropeDisplay=0;
+        state.duo.sides={red:createDuoSide('赤ぐみ'),white:createDuoSide('白ぐみ')};
+        UI.prepareDuo();
+        UI.showScreen('duo');
+        $('duo-ready-overlay').style.display='none';
+        $('duo-countdown').classList.remove('active');
+        $('duo-pause-overlay').classList.remove('active');
+        BattlePositioning.syncToCurrentState();
+        requestAnimationFrame(notifyPositionEditor);
+      }
+
+      window.__HKB_POSITION_EDITOR_BRIDGE__=Object.freeze({
+        appVersion:CONFIG.APP_VERSION,
+        openPreview(options={}) {
+          if(options.scene==='duo') showPositionEditorDuo(options);
+          else showPositionEditorSolo(options);
+        },
+        getSnapshot:()=>({
+          screen:state.screen,mode:state.mode,playType:state.playType,
+          selectedCharacters:{...state.selectedCharacters},selectedCpu:state.selectedCpu,
+          viewport:ViewportManager.getSnapshot(),positioning:BattlePositioning.getState()
+        }),
+        sync:()=>BattlePositioning.syncToCurrentState()
+      });
+    }
 
     GameBGM.setStateReader(()=>state);
     document.addEventListener('click',()=>queueMicrotask(()=>GameBGM.syncToGameState()));

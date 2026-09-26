@@ -2273,3 +2273,82 @@
     @media (prefers-reduced-motion:reduce) {
       .orientation-message > span { animation:none; }
     }
+
+    /* Battle art shares one fixed reference stage per layout. The whole stage scales
+       uniformly, so the rope and both characters retain their approved spacing. */
+    .position-stage {
+      position:absolute;left:50%;top:50%;width:100%;height:100%;
+      transform:translate(-50%,-50%) scale(var(--position-stage-scale,1));
+      transform-origin:center;pointer-events:none;
+    }
+    .position-stage .character,.position-stage .rope-track,
+    .position-stage .duo-person,.position-stage .vertical-rope,
+    .position-stage .rope-marker,.position-stage .duo-rope-marker { pointer-events:auto; }
+
+    #arena[data-position-layout="wide"] .position-stage {
+      width:1338.6875px;height:280.21875px;--stage-character-width:204px;--stage-character-height:153.59375px;
+      --stage-lion-width:220px;--stage-lion-height:165.109375px;--stage-inset:27.32px;
+      --stage-rope-inset:160.64px;--stage-rope-height:25.34375px;
+      --stage-marker-width:130px;--stage-marker-height:61.44px;
+    }
+    #arena[data-position-layout="compact-landscape"] .position-stage {
+      width:1003.53125px;height:296.21875px;--stage-character-width:163.828125px;--stage-character-height:153.59375px;
+      --stage-lion-width:179.1875px;--stage-lion-height:165.109375px;--stage-inset:20.48px;
+      --stage-rope-inset:120.42px;--stage-rope-height:25.34375px;
+      --stage-marker-width:112.64px;--stage-marker-height:61.44px;
+    }
+    #arena[data-position-layout="portrait"] .position-stage {
+      width:380px;height:194.109375px;--stage-character-width:105.296875px;--stage-character-height:130px;
+      --stage-lion-width:113.09375px;--stage-lion-height:138px;--stage-inset:7.8px;
+      --stage-rope-inset:30.39px;--stage-rope-height:27.84375px;
+      --stage-marker-width:88px;--stage-marker-height:67.52px;
+    }
+    #arena[data-position-layout] .position-stage .character {
+      width:var(--stage-character-width);height:var(--stage-character-height);bottom:3%;
+    }
+    #arena[data-position-layout] .position-stage .character.player {left:var(--stage-inset);}
+    #arena[data-position-layout] .position-stage .character.cpu {right:var(--stage-inset);}
+    #arena[data-position-layout] .position-stage .character.cpu.lion {
+      width:var(--stage-lion-width);height:var(--stage-lion-height);
+    }
+    #arena[data-position-layout] .position-stage .rope-track {
+      left:var(--stage-rope-inset);right:var(--stage-rope-inset);top:78%;height:var(--stage-rope-height);
+    }
+    #arena[data-position-layout] .position-stage .rope-marker {
+      width:var(--stage-marker-width);height:var(--stage-marker-height);
+    }
+
+    #duo-arena[data-position-layout="wide"] .position-stage {
+      width:533.609375px;height:756px;--stage-person-width:214px;--stage-person-offset:32.78px;
+      --stage-duo-rope-width:522.94px;--stage-duo-rope-height:31px;--stage-duo-marker-width:132px;--stage-duo-marker-height:53.75px;
+    }
+    #duo-arena[data-position-layout="compact-landscape"] .position-stage {
+      width:397.484375px;height:756px;--stage-person-width:174.078125px;--stage-person-offset:24.58px;
+      --stage-duo-rope-width:389.53px;--stage-duo-rope-height:24.5625px;--stage-duo-marker-width:112.625px;--stage-duo-marker-height:53.75px;
+    }
+    #duo-arena[data-position-layout="portrait"] .position-stage {
+      width:382px;height:115.734375px;--stage-person-width:130px;--stage-person-offset:3%;
+      --stage-duo-rope-height:21.9375px;--stage-duo-marker-width:96px;--stage-duo-marker-height:59.078125px;
+    }
+    #duo-arena[data-position-layout] .position-stage .duo-person {
+      width:var(--stage-person-width);left:calc(50% - var(--stage-person-offset));right:auto;
+    }
+    #duo-arena[data-position-layout] .position-stage .vertical-rope {
+      width:var(--stage-duo-rope-width,98%);height:var(--stage-duo-rope-height);
+    }
+    #duo-arena[data-position-layout] .position-stage .duo-rope-marker {
+      width:var(--stage-duo-marker-width);height:var(--stage-duo-marker-height);
+    }
+    #duo-arena[data-position-layout="portrait"] .position-stage .duo-person {
+      height:92.84px;top:50% !important;bottom:auto !important;
+    }
+    #duo-arena[data-position-layout="portrait"] .position-stage .duo-person.white {
+      left:3% !important;right:auto !important;
+    }
+    #duo-arena[data-position-layout="portrait"] .position-stage .duo-person.red {
+      left:auto !important;right:3% !important;
+    }
+    #duo-arena[data-position-layout="portrait"] .position-stage .vertical-rope {
+      left:7%;right:7%;top:50%;bottom:auto;width:auto;
+      transform:translateY(-50%);
+    }

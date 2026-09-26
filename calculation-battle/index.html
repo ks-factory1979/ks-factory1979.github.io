@@ -34,7 +34,7 @@
   <link rel="preload" as="image" href="assets/backgrounds/e389370fdc51a34da9b8.png">
   <link rel="preload" as="image" href="assets/backgrounds/c7fcae6f3938fd48f7bc.png">
   <link rel="preload" as="image" href="assets/backgrounds/ec51f5e86693a3ab5447.png">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=position-stage-1">
 </head>
 
 <body>
@@ -174,13 +174,15 @@
 
       <section id="arena" class="arena" aria-label="綱引きのようす">
         <div class="flags arena-flags" aria-hidden="true"></div>
-        <div id="player-character" class="character player"></div>
-        <div id="cpu-character" class="character cpu"></div>
-        <div id="lion-special-aura" class="lion-special-aura" aria-hidden="true"><img alt=""></div>
-        <div id="lion-shockwave" class="lion-shockwave" aria-hidden="true"><img alt=""></div>
-        <div class="rope-track">
-          <div class="rope-line"></div>
-          <div id="rope-marker" class="rope-marker" aria-label="綱の位置"><span></span><span></span></div>
+        <div class="position-stage" data-scene="solo">
+          <div id="player-character" class="character player"></div>
+          <div id="cpu-character" class="character cpu"></div>
+          <div id="lion-special-aura" class="lion-special-aura" aria-hidden="true"><img alt=""></div>
+          <div id="lion-shockwave" class="lion-shockwave" aria-hidden="true"><img alt=""></div>
+          <div class="rope-track">
+            <div class="rope-line"></div>
+            <div id="rope-marker" class="rope-marker" aria-label="綱の位置"><span></span><span></span></div>
+          </div>
         </div>
       </section>
 
@@ -256,10 +258,12 @@
           <div class="duo-fx-content"><div><strong id="duo-red-power-title">ぜんりょくびき！</strong><small id="duo-red-power-subtitle">MAX POWER</small></div></div>
           <div class="duo-pixels"></div>
         </div>
-        <div class="vertical-rope"></div>
-        <div id="duo-rope-marker" class="duo-rope-marker" aria-label="綱の位置"><span></span><span></span></div>
-        <div id="duo-white-person" class="duo-person white"></div>
-        <div id="duo-red-person" class="duo-person red"></div>
+        <div class="position-stage" data-scene="duo">
+          <div class="vertical-rope"></div>
+          <div id="duo-rope-marker" class="duo-rope-marker" aria-label="綱の位置"><span></span><span></span></div>
+          <div id="duo-white-person" class="duo-person white"></div>
+          <div id="duo-red-person" class="duo-person red"></div>
+        </div>
         <button id="duo-pause-button" class="duo-pause-button" type="button" aria-label="1秒長押しで一時停止" title="1びょう ながおし">Ⅱ</button>
       </section>
 
@@ -423,6 +427,18 @@
   <script src="bgm.js"></script>
   <script src="gas-bridge-client.js"></script>
   <script src="competition-service.js"></script>
-  <script src="game.js"></script>
+  <script src="game.js?v=position-stage-1"></script>
+  <script>
+    (() => {
+      if (new URLSearchParams(window.location.search).get('positionEdit') !== '1') return;
+      const stylesheet = document.createElement('link');
+      stylesheet.rel = 'stylesheet';
+      stylesheet.href = 'position-editor.css?v=position-stage-1';
+      document.head.appendChild(stylesheet);
+      const editor = document.createElement('script');
+      editor.src = 'position-editor.js?v=position-stage-1';
+      document.body.appendChild(editor);
+    })();
+  </script>
 </body>
 </html>
