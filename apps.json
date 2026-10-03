@@ -38,7 +38,24 @@
       "logo": "hiragana-logo.webp",
       "note": "町の記録はこの端末・ブラウザに保存。「せんせい」メニューからセーブを書き出したり、GAS版の記録を読み込んだりできます。"
     },
-    {"id":"tower-of-ten","title":"10の塔","status":"coming-soon"},
+    {
+      "id": "tower-of-ten",
+      "title": "10の塔",
+      "category": "算数・10の合成",
+      "status": "published",
+      "lead": "10をつくって、塔を育てよう。",
+      "description": "数字をつないで10をつくり、れんがを集めて塔を育てよう。じっくり考えるモード、おちてくる数字やペアで遊ぶ3分チャレンジ、2〜4人のオンライン対戦を楽しめます。",
+      "tags": [
+        "10の合成",
+        "塔づくり・連鎖",
+        "2〜4人のオンライン対戦"
+      ],
+      "requirements": "タッチ・マウス・キーボード対応・Googleログイン不要",
+      "url": "https://ks-factory1979.github.io/tower-of-ten/",
+      "cover": "tower-of-ten/portal-cover.webp",
+      "coverAlt": "れんがを持つ青い小鳥と、色とりどりの塔。10の塔のタイトル背景。",
+      "note": "自己ベストはこの端末・ブラウザに保存。おちてくる3分とペアおち3分の共有記録・オンライン対戦には通信が必要です。氏名・メールアドレスは保存しません。"
+    },
     {"id":"coloring-logic","title":"ぬりえロジック","status":"coming-soon"},
     {
       "id": "calculation-battle",

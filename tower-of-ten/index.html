@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#46b8e9">
+  <title>10の塔（10のとう）</title>
+  <script src="config.js"></script>
+  <script src="gas-bridge-client.js"></script>
+<script src="battle-bridge-client.js"></script>
+  <script src="storage.js"></script>
+  <script src="assets.js"></script>
+  <script src="audio-assets.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="battle-style.css">
+  <link rel="stylesheet" href="mobile-layout.css">
+</head>
+<body>
+  <main id="app">
+    <!-- タイトル画面 -->
+    <section id="title-screen" class="screen active screen-bg title-bg" aria-label="タイトル画面">
+      <div class="title-panel paper-panel">
+        <div class="title-kicker">10の なかまを みつけよう！</div>
+        <h1 class="game-logo"><span class="ten">10</span><span class="small-no">の</span><span class="tower-word">塔</span></h1>
+        <p class="title-copy">すうじを つないで<br>とうを そだてよう！</p>
+        <div class="title-actions">
+          <button class="paper-btn orange big" type="button" onclick="showScreen('mode')">あそぶ</button>
+          <button class="tutorial-entry-btn" type="button" onclick="startBasicTutorial()">
+            <strong>はじめてあそぶ</strong><span>あそびながら れんしゅうしよう！</span>
+          </button>
+          <div class="title-small-actions">
+            <button class="paper-btn green compact" type="button" onclick="showScreen('howto')">あそびかた</button>
+            <button class="paper-btn blue compact" type="button" onclick="showScreen('settings')">せってい</button>
+          </div>
+        </div>
+        <div class="quick-toggles">
+          <label class="mini-toggle">
+            <img id="title-sound-icon" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/speaker_on.png" alt="">
+            <span>おと</span>
+            <input type="checkbox" id="title-sound" checked onchange="toggleSound(this.checked)">
+          </label>
+          <label class="mini-toggle">
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/bulb.png" alt="">
+            <span>ヒント</span>
+            <input type="checkbox" id="title-hint" checked onchange="toggleHint(this.checked)">
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- あそびかた画面 -->
+    <section id="howto-screen" class="screen screen-bg howto-bg" aria-label="あそびかた">
+      <div class="screen-header">
+        <button class="icon-btn" type="button" onclick="showScreen('title')" aria-label="もどる"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/back.png" alt=""></button>
+        <h2>あそびかた</h2>
+      </div>
+      <div class="howto-card paper-panel">
+        <img class="guide-mascot" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/mascot/mascot_guide.png" alt="案内する青い小鳥">
+        <div class="steps">
+          <article class="step-card step-one">
+            <span class="step-num">1</span>
+            <strong>すうじを おく</strong>
+            <div class="mini-demo"><span class="demo-block pink">4</span><span class="demo-arrow">↓</span></div>
+          </article>
+          <article class="step-card step-two">
+            <span class="step-num">2</span>
+            <strong>10に なると きえる</strong>
+            <div class="mini-demo"><span class="demo-block blue">4</span><span class="plus">＋</span><span class="demo-block yellow">6</span><span class="equals">＝10！</span></div>
+          </article>
+          <article class="step-card step-three">
+            <span class="step-num">3</span>
+            <strong>れんが25こで<br>とうが できる</strong>
+            <div class="mini-demo"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/brick.png" alt="れんが"><span class="demo-arrow">→</span><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/towers/tower_3.png" alt="塔"></div>
+          </article>
+        </div>
+        <div class="pair-examples">10の なかま： <b>1と9</b>・<b>2と8</b>・<b>3と7</b>・<b>4と6</b>・<b>5と5</b><br><span class="next-tower-note">とうが できたら、つぎの とうを つくろう！</span></div>
+      </div>
+    </section>
+
+    <!-- モード選択画面 -->
+    <section id="mode-screen" class="screen screen-bg howto-bg" aria-label="モード選択">
+      <div class="mode-panel paper-panel">
+        <img class="mode-mascot" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/mascot/mascot_title.png" alt="れんがを持つ青い小鳥">
+        <h2>どれで あそぶ？</h2>
+        <button class="mode-card free" type="button" onclick="startGame('free')">
+          <strong>じっくりモード</strong><span>じぶんの ペースで かんがえよう</span>
+        </button>
+        <button class="mode-card timed" type="button" onclick="startGame('timed')">
+          <strong><span id="mode-time-label">３</span>ぷん チャレンジ</strong><span>３ぷんで とうを いくつ つくれるかな？</span>
+        </button>
+        <button class="mode-card falling" type="button" onclick="openFallingIntro()">
+          <span class="difficulty-badge">むずかしい！</span>
+          <strong>おちてくるモード</strong><span>3ぷんで どこまで とうを のばせるかな？</span>
+        </button>
+        <button class="mode-card pair-falling" type="button" onclick="startGame('pairFalling')">
+          <span class="pair-trial-badge">ためし版</span>
+          <span class="pair-card-blocks" aria-hidden="true"><i>3</i><i>6</i></span>
+          <strong>ペアおち3分</strong><span>2こをまわして れんさをねらえ！</span>
+        </button>
+        <button class="mode-card battle" type="button" onclick="openBattleMenu()">
+          <span class="battle-new-badge">みんなで！</span>
+          <strong>たいせんモード</strong><span>みんなで 10を つくろう！</span>
+        </button>
+        <button class="paper-btn blue compact" type="button" onclick="showScreen('title')">もどる</button>
+      </div>
+    </section>
+
+
+    <!-- 対戦モード入口 -->
+    <section id="battle-menu-screen" class="screen screen-bg howto-bg" aria-label="たいせんモード">
+      <div class="battle-menu-panel paper-panel">
+        <div class="battle-menu-cast" aria-hidden="true">
+          <img data-battle-asset="pipi_normal" alt="">
+          <img data-battle-asset="rabi_normal" alt="">
+          <img data-battle-asset="moko_normal" alt="">
+          <img data-battle-asset="kon_normal" alt="">
+        </div>
+        <div class="battle-menu-copy">
+          <span class="battle-label">2〜4にんで あそべるよ！</span>
+          <h2>たいせんモード</h2>
+          <p>みんなで 10を つくろう！</p>
+          <div class="battle-menu-actions">
+            <button class="paper-btn green battle-large-btn" type="button" onclick="battleCreateRoom()">へやを つくる</button>
+            <button class="paper-btn blue battle-large-btn" type="button" onclick="openBattlePin()">へやに はいる</button>
+          </div>
+          <p id="battle-menu-message" class="battle-error battle-menu-message" aria-live="polite"></p>
+          <button class="paper-btn orange compact" type="button" onclick="battleBackToModes()">もどる</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PIN入力 -->
+    <section id="battle-pin-screen" class="screen screen-bg howto-bg" aria-label="PIN入力">
+      <div class="battle-pin-panel paper-panel">
+        <h2>へやの PINを いれてね</h2>
+        <div id="battle-pin-boxes" class="battle-pin-boxes" aria-live="polite">
+          <span>−</span><span>−</span><span>−</span><span>−</span>
+        </div>
+        <div class="battle-keypad" aria-label="数字キー">
+          <button type="button" onclick="battlePinInput('1')">1</button><button type="button" onclick="battlePinInput('2')">2</button><button type="button" onclick="battlePinInput('3')">3</button>
+          <button type="button" onclick="battlePinInput('4')">4</button><button type="button" onclick="battlePinInput('5')">5</button><button type="button" onclick="battlePinInput('6')">6</button>
+          <button type="button" onclick="battlePinInput('7')">7</button><button type="button" onclick="battlePinInput('8')">8</button><button type="button" onclick="battlePinInput('9')">9</button>
+          <button type="button" class="small-key" onclick="battlePinBackspace()">1もじ<br>けす</button><button type="button" onclick="battlePinInput('0')">0</button><button type="button" class="small-key" onclick="battlePinClear()">ぜんぶ<br>けす</button>
+        </div>
+        <p id="battle-pin-error" class="battle-error" aria-live="polite"></p>
+        <div class="battle-pin-actions">
+          <button id="battle-join-btn" class="paper-btn green" type="button" onclick="battleJoinRoom()" disabled>へやに はいる</button>
+          <button class="paper-btn orange compact" type="button" onclick="openBattleMenu()">もどる</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 対戦待機・キャラクター選択 -->
+    <section id="battle-room-screen" class="screen screen-bg howto-bg" aria-label="対戦待機画面">
+      <div class="battle-room-panel paper-panel">
+        <header class="battle-room-header">
+          <div><span>へやの PIN</span><strong id="battle-room-pin">0000</strong><small>PINを みんなに つたえてね！</small></div>
+          <div class="battle-room-count"><span>さんか</span><strong id="battle-room-count">1 / 4</strong></div>
+        </header>
+        <div class="battle-room-main">
+          <section class="battle-character-section">
+            <h3>キャラクターを えらぼう！</h3>
+            <div id="battle-character-grid" class="battle-character-grid"></div>
+            <button id="battle-ready-btn" class="paper-btn green battle-ready-btn" type="button" onclick="battleToggleReady()" disabled>じゅんびOK！</button>
+          </section>
+          <section class="battle-members-section">
+            <h3>へやの なかま</h3>
+            <div id="battle-member-slots" class="battle-member-slots"></div>
+            <p id="battle-room-message" class="battle-room-message">あいてを まっているよ</p>
+            <div class="battle-room-actions">
+              <button id="battle-start-btn" class="paper-btn green battle-start-btn" type="button" onclick="battleStartMatch()" hidden disabled>たいせんスタート！</button>
+              <button class="paper-btn orange compact battle-leave-btn" type="button" onclick="battleLeaveToModes()">へやを でる</button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <!-- 対戦観戦 -->
+    <section id="battle-spectator-screen" class="screen screen-bg result-bg" aria-label="対戦観戦画面">
+      <div class="battle-spectator-panel paper-panel">
+        <img id="battle-spectator-character" data-battle-asset="pipi_cheer" alt="応援するキャラクター">
+        <div class="battle-spectator-copy"><h2>いっぱいになったよ！</h2><p>みんなを<br>おうえんしよう！</p></div>
+        <div class="battle-spectator-time">のこり <strong id="battle-spectator-time">0:00</strong></div>
+        <div id="battle-spectator-list" class="battle-spectator-list"></div>
+      </div>
+    </section>
+
+    <!-- 対戦結果 -->
+    <section id="battle-result-screen" class="screen screen-bg result-bg" aria-label="対戦結果画面">
+      <div class="battle-result-panel paper-panel">
+        <h2 id="battle-result-title">いい たいせんだったね！</h2>
+        <p id="battle-result-network-note" class="battle-result-network-note" hidden>つうしんが ふあんていだったため、けっかが ずれることがあります</p>
+        <div id="battle-result-list" class="battle-result-list"></div>
+        <div class="battle-result-actions">
+          <button class="paper-btn blue" type="button" onclick="battleRequestRematch()">もういちど たいせん</button>
+          <button class="paper-btn orange" type="button" onclick="battleLeaveToModes()">モードを えらぶ</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 対戦モード 通信中表示 -->
+    <div id="battle-loading-overlay" class="battle-loading-overlay" hidden role="status" aria-live="polite" aria-busy="true">
+      <div class="battle-loading-card paper-panel">
+        <span class="battle-loading-hourglass" aria-hidden="true">⏳</span>
+        <strong id="battle-loading-label">つうしんちゅう…</strong>
+        <small>ちょっと まってね</small>
+      </div>
+    </div>
+
+    <!-- 対戦モード 小さな通信状態表示（ゲームを止めない） -->
+    <div id="battle-network-status" class="battle-network-status reconnecting" hidden role="status" aria-live="polite">
+      <span id="battle-network-status-icon" class="battle-network-status-icon" aria-hidden="true">⏳</span>
+      <strong id="battle-network-status-label">つうしんを つなぎなおしているよ</strong>
+    </div>
+
+    <!-- おちてくるモード 練習選択 -->
+    <section id="falling-intro-screen" class="screen screen-bg howto-bg" aria-label="おちてくるモードの練習選択">
+      <div class="falling-intro-panel paper-panel">
+        <img class="falling-intro-mascot" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/mascot/mascot_guide.png" alt="操作を案内する青い小鳥">
+        <div class="falling-intro-content">
+          <span class="difficulty-badge intro-badge">むずかしい！</span>
+          <h2>おちてくるモード</h2>
+          <p class="falling-intro-lead">3ぷんで きろくに ちょうせん！<br><span>れんさで とうが ぐんとのびるよ</span></p>
+          <div class="falling-key-guide" aria-label="操作方法">
+            <div><span class="keycap">◀</span><span class="keycap">▶</span><b>で うごかそう</b></div>
+            <div><span class="keycap down">▼</span><b>で いっきに おとそう</b></div>
+          </div>
+          <p class="falling-board-note">7れつ × 8だんの おおきな ばんめんだよ</p>
+          <div class="falling-choice-actions">
+            <button class="choice-card practice" type="button" onclick="startFallingTutorial()"><strong>れんしゅうする</strong><span>ゆっくり そうさを おぼえよう</span></button>
+            <button class="choice-card direct" type="button" onclick="startGame('falling')"><strong>すぐにはじめる</strong><span>ほんばんに ちょうせん！</span></button>
+          </div>
+          <button class="paper-btn blue compact" type="button" onclick="showScreen('mode')">もどる</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 基本チュートリアル完了 -->
+    <section id="tutorial-complete-screen" class="screen screen-bg result-bg" aria-label="基本チュートリアル完了">
+      <div class="tutorial-complete-panel paper-panel">
+        <img class="tutorial-complete-bird" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/mascot/mascot_cheer.png" alt="よろこぶ青い小鳥">
+        <div class="tutorial-complete-copy"><h2>れんしゅう できた！</h2><p>10の とうを<br>つくってみよう！</p></div>
+        <div class="tutorial-complete-actions">
+          <button class="paper-btn green" type="button" onclick="startGame('free')">じっくりモードではじめる</button>
+          <button class="paper-btn orange compact" type="button" onclick="showScreen('mode')">モードをえらぶ</button>
+          <button class="paper-btn blue compact" type="button" onclick="startBasicTutorial()">もういちど れんしゅう</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- おちてくる操作練習完了 -->
+    <section id="falling-tutorial-complete-screen" class="screen screen-bg result-bg" aria-label="おちてくる操作練習完了">
+      <div class="tutorial-complete-panel paper-panel falling-complete">
+        <img class="tutorial-complete-bird" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/mascot/mascot_cheer.png" alt="よろこぶ青い小鳥">
+        <div class="tutorial-complete-copy"><h2>ばっちり！</h2><p>おちてくるモードに<br>ちょうせんしよう！</p></div>
+        <div class="tutorial-complete-actions">
+          <button class="paper-btn green" type="button" onclick="startGame('falling')">おちてくるモードをはじめる</button>
+          <button class="paper-btn orange compact" type="button" onclick="showScreen('mode')">モードをえらぶ</button>
+          <button class="paper-btn blue compact" type="button" onclick="startFallingTutorial()">もういちど れんしゅう</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ゲーム画面 -->
+    <section id="game-screen" class="screen screen-bg game-bg" aria-label="ゲーム画面">
+      <div class="game-shell">
+        <header id="info-bar" class="info-bar">
+          <div id="hold-card" class="info-card hold-card hold-display" aria-label="あとで使うブロック：なし">
+            <span class="info-label">あとで</span>
+            <strong id="hold-block" class="number-tile hold-tile">－</strong>
+          </div>
+          <div id="hold-exchange-indicator" class="hold-exchange-indicator" aria-hidden="true"><span>⇄</span></div>
+          <div class="info-card current-card">
+            <span class="info-label">いまの すうじ</span>
+            <strong id="current-number" class="number-tile current">?</strong>
+          </div>
+          <div class="info-card next-card">
+            <span class="info-label">つぎ</span>
+            <strong id="next1" class="number-tile small">?</strong>
+          </div>
+          <div class="info-card next-card">
+            <span class="info-label">そのつぎ</span>
+            <strong id="next2" class="number-tile small alt">?</strong>
+          </div>
+          <div class="info-card time-card" id="timer-item" style="display:none;">
+            <span class="info-label"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/clock.png" alt="">のこり</span>
+            <strong id="time-left" class="time-value">0:00</strong>
+          </div>
+        </header>
+        <div id="battle-hud" class="battle-hud" hidden>
+          <div class="battle-self-card"><img id="battle-self-icon" alt=""><div><span>じぶん</span><strong id="battle-self-name">ぴぴ</strong></div></div>
+          <div class="battle-target-card"><span>つぎの おくりさき</span><strong id="battle-target-name">−</strong></div>
+          <div class="battle-garbage-card"><span>おじゃま</span><strong id="battle-garbage-waiting">0こ</strong></div>
+        </div>
+
+        <div id="play-area" class="play-area">
+          <section class="board-section">
+            <div id="board-caption" class="board-caption">おきたい れつを タップ！</div><div id="tutorial-step-badge" class="tutorial-step-badge" hidden>れんしゅう 1 / 7</div>
+            <div class="board-stage">
+              <div id="board" class="game-board" aria-label="数字を置く盤面"></div>
+            </div>
+            <div id="falling-controls" class="falling-controls" hidden aria-label="ゲームの操作ボタン">
+              <button id="rotate-left-btn" class="falling-control rotate rotate-left" type="button" onclick="rotatePair(-1)" aria-label="ペアを左へ90度回転" hidden><span aria-hidden="true">↶</span><b>ひだり<br>かいてん</b></button>
+              <button id="hold-swap-btn" class="falling-control hold-swap" type="button" onclick="holdCurrentBlock()" aria-label="あとで使うブロックと今のブロックを入れ替える">
+                <span aria-hidden="true">⇄</span><b>あとで<br>入れかえ</b><i id="hold-button-lock" class="hold-button-lock" hidden aria-hidden="true">🔒</i>
+              </button>
+              <button id="rotate-right-btn" class="falling-control rotate rotate-right" type="button" onclick="rotatePair(1)" aria-label="ペアを右へ90度回転" hidden><span aria-hidden="true">↷</span><b>みぎ<br>かいてん</b></button>
+              <button id="move-left-btn" class="falling-control left" type="button" onclick="moveFalling(-1)"><span aria-hidden="true">◀</span><b>ひだり</b></button>
+              <button id="hard-drop-btn" class="falling-control drop" type="button" onclick="hardDropPiece()"><span aria-hidden="true">▼</span><b>おとす</b></button>
+              <button id="move-right-btn" class="falling-control right" type="button" onclick="moveFalling(1)"><span aria-hidden="true">▶</span><b>みぎ</b></button>
+            </div>
+          </section>
+
+          <aside class="tower-side">
+            <div class="tower-card">
+              <div class="tower-title">とうの せいちょう</div>
+              <div id="tower-container" class="tower-container">
+                <img id="tower-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/towers/tower_0.png" alt="成長する塔">
+                <div id="tower-growth" class="tower-growth" aria-live="polite">とうが そだった！</div>
+              </div>
+              <div id="chain-power-panel" class="chain-power-panel" aria-label="れんさパワー 0 / 10">
+                <div class="chain-power-heading"><span>れんさパワー</span><strong id="chain-power-value">0 / 10</strong></div>
+                <div id="chain-power-segments" class="chain-power-segments" aria-hidden="true"></div>
+              </div>
+              <div id="stats" class="stats-grid">
+                <div class="stat-chip tower-count-chip"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/towers/tower_5.png" alt=""><span>できた とう</span><strong id="tower-count">0こ</strong></div>
+                <div class="stat-chip brick-progress-chip"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/brick.png" alt=""><span>いまの れんが</span><strong id="brick-count">0 / 25</strong></div>
+                <div class="stat-chip"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/star.png" alt=""><span>できた10</span><strong id="ten-count">0</strong></div>
+                <div class="stat-chip"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/crown.png" alt=""><span>ベスト</span><strong id="best-chain">0</strong></div>
+              </div>
+            </div>
+            <div id="battle-opponents" class="battle-opponents" hidden></div>
+          </aside>
+        </div>
+
+        <footer class="game-footer">
+          <div id="hint-message" class="hint-strip">
+            <img class="hint-bird" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/mascot/mascot_hint.png" alt="ヒントを教える青い小鳥">
+            <div class="hint-bubble">
+              <img id="hint-icon" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/bulb.png" alt="" style="display:none;">
+              <span id="hint-text">おきたい れつを えらぼう！</span>
+            </div>
+          </div>
+          <div id="controls" class="game-controls">
+            <button id="pause-btn" class="control-btn pause" type="button" onclick="pauseGame()"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/pause.png" alt="">いちじていし</button>
+            <button id="home-btn" class="control-btn home" type="button" onclick="returnToTitle()"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/home.png" alt="">タイトルへ</button>
+          </div>
+        </footer>
+      </div>
+      <div id="battle-attack-toast" class="battle-attack-toast" hidden aria-live="polite"><img id="battle-attack-character" alt=""><div><strong id="battle-attack-sender">もこから</strong><span id="battle-attack-message">おじゃま 3こ！</span><small id="battle-garbage-tip" hidden>10を つくれば きえるよ！</small></div></div>
+      <div id="battle-garbage-warning" class="battle-garbage-warning" hidden aria-live="polite">
+        <strong id="battle-garbage-warning-text">おじゃま 1こ くるよ！</strong>
+        <div class="battle-garbage-warning-track"><span id="battle-garbage-warning-bar"></span></div>
+      </div>
+      <div id="star-award-toast" class="star-award-toast" hidden aria-live="polite"><img data-asset="assets/ui/blocks/star_block.png" alt=""><strong>星ブロック ゲット！</strong></div>
+      <div id="battle-connection-overlay" class="pause-overlay battle-connection-overlay" hidden><div class="pause-card paper-panel"><img data-battle-asset="pipi_cheer" alt=""><strong id="battle-connection-label">つうしんを まっているよ</strong><span id="battle-connection-count"></span></div></div>
+      <div id="chain-toast" class="chain-toast" aria-live="polite"></div>
+      <div id="falling-chain-bonus-toast" class="falling-chain-bonus-toast" hidden aria-live="polite"></div>
+      <div id="falling-time-toast" class="falling-time-toast" hidden aria-live="polite">あと10びょう！</div>
+      <div id="speed-toast" class="speed-toast" aria-live="polite">スピードアップ！</div>
+      <div id="pause-overlay" class="pause-overlay" hidden>
+        <div class="pause-card paper-panel"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/mascot/mascot_support.png" alt=""><strong id="pause-label">いちじていし ちゅう</strong><button id="resume-btn" class="paper-btn green compact" type="button" onclick="pauseGame()">つづける</button></div>
+      </div>
+      <div id="countdown-overlay" class="pause-overlay countdown-overlay" hidden>
+        <div class="countdown-card paper-panel"><strong id="countdown-text">3</strong></div>
+      </div>
+    </section>
+
+    <!-- 結果画面 -->
+    <section id="result-screen" class="screen screen-bg result-bg" aria-label="結果画面">
+      <div id="result-card" class="result-card paper-panel">
+        <img class="confetti confetti-left" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/effects/confetti.png" alt="">
+        <img class="confetti confetti-right" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/effects/confetti.png" alt="">
+        <h2 id="result-title">おつかれさま！</h2>
+        <p id="result-message" class="result-message">よく がんばったね！<span id="falling-best-note" class="falling-best-note" hidden></span></p>
+        <div class="result-main">
+          <div class="result-visual">
+            <img id="result-tower-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/towers/tower_0.png" alt="今回育った塔">
+            <div id="result-tower-badge" class="result-tower-badge" hidden>× 0</div>
+            <img class="result-bird" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/mascot/mascot_cheer.png" alt="喜ぶ青い小鳥">
+          </div>
+          <div id="standard-result-numbers" class="result-numbers">
+            <div class="result-stat"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/towers/tower_5.png" alt=""><span>できた とう</span><strong id="result-towers">0こ</strong></div>
+            <div class="result-stat"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/brick.png" alt=""><span>つぎの とう</span><strong id="result-bricks">0 / 25</strong></div>
+            <div class="result-stat"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/check.png" alt=""><span>できた10</span><strong id="result-ten">0</strong></div>
+            <div class="result-stat"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/crown.png" alt=""><span>ベストれんさ</span><strong id="result-best-chain">0</strong></div>
+          </div>
+          <div id="falling-result-panel" class="falling-result-panel" hidden>
+            <div class="falling-record-hero result-pop-item" style="--result-delay:0ms">
+              <span>🏰 とうのきろく</span>
+              <strong id="falling-result-record">0とう ＋ 0れんが</strong>
+              <small id="falling-result-best">はじめての きろく！</small>
+            </div>
+            <div class="falling-result-mini-grid">
+              <div class="falling-result-mini result-pop-item" style="--result-delay:90ms"><span>🔥 さいだいれんさ</span><strong id="falling-result-max-chain">0れんさ</strong></div>
+              <div class="falling-result-mini result-pop-item" style="--result-delay:160ms"><span>✨ れんさボーナス</span><strong id="falling-result-chain-bonus">＋0れんが</strong></div>
+            </div>
+            <div id="falling-community-card" class="falling-result-card community result-pop-item" style="--result-delay:240ms">
+              <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/community_record.webp" alt="みんなの記録">
+              <div><span>みんなのきろくとくらべると</span><strong id="falling-community-value">みんなのきろくを みています…</strong><small id="falling-community-note"></small></div>
+            </div>
+            <div class="falling-result-card goal result-pop-item" style="--result-delay:330ms">
+              <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/goal_flag.webp" alt="つぎの目標">
+              <div><span>つぎのもくひょう</span><strong id="falling-next-goal">つぎも ちょうせんしよう！</strong></div>
+            </div>
+          </div>
+          <div id="pair-result-panel" class="falling-result-panel pair-result-panel" hidden>
+            <div class="falling-record-hero result-pop-item" style="--result-delay:0ms">
+              <span>🏰 ペアおちの とうのきろく</span>
+              <strong id="pair-result-record">0とう ＋ 0れんが</strong>
+              <small><span class="pair-best-label">このたんまつのベスト</span><span id="pair-result-best">はじめての きろく！</span></small>
+            </div>
+            <div class="falling-result-mini-grid">
+              <div class="falling-result-mini result-pop-item" style="--result-delay:90ms"><span>🔥 さいだいれんさ</span><strong id="pair-result-max-chain">0れんさ</strong></div>
+              <div class="falling-result-mini result-pop-item" style="--result-delay:160ms"><span>✨ れんさボーナス</span><strong id="pair-result-chain-bonus">＋0れんが</strong></div>
+              <div class="pair-placement-note result-pop-item" style="--result-delay:160ms">おいたペア <strong id="pair-result-placements">0かい</strong></div>
+            </div>
+            <div id="pair-community-card" class="falling-result-card community result-pop-item" style="--result-delay:240ms" aria-live="polite">
+              <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/community_record.webp" alt="みんなの記録">
+              <div><span>ペアおちの みんなのきろくとくらべると</span><strong id="pair-community-value">みんなのきろくを みています…</strong><small id="pair-community-note"></small></div>
+            </div>
+            <div class="falling-result-card goal result-pop-item" style="--result-delay:330ms">
+              <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/goal_flag.webp" alt="つぎの目標">
+              <div><span>つぎのもくひょう</span><strong id="pair-next-goal">つぎも ちょうせんしよう！</strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="result-actions">
+          <button id="result-retry-btn" class="paper-btn green" type="button" onclick="startGame(currentMode)">もういちど</button>
+          <button id="result-mode-btn" class="paper-btn orange" type="button" onclick="returnToModes()">モードをえらぶ</button>
+          <button id="result-title-btn" class="paper-btn blue" type="button" onclick="showScreen('title')">タイトルへ</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 設定画面 -->
+    <section id="settings-screen" class="screen screen-bg howto-bg" aria-label="先生向け設定画面">
+      <div class="settings-card paper-panel">
+        <div class="settings-heading"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/gear.png" alt=""><div><h2>せってい</h2><span>せんせい むけ</span></div></div>
+        <div class="settings-grid">
+          <label class="setting-row"><span><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/speaker_on.png" alt="">おと</span><input type="checkbox" id="setting-sound"></label>
+          <label class="setting-row"><span><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/bulb.png" alt="">ヒント</span><input type="checkbox" id="setting-hint"></label>
+          <label class="setting-row"><span><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/clock.png" alt="">チャレンジじかん</span><select id="setting-time"><option value="1">１ぷん</option><option value="2">２ふん</option><option value="3">３ぷん</option><option value="4">４ふん</option><option value="5">５ふん</option></select></label>
+          <label class="setting-row"><span>ばんめんの れつ</span><input type="number" id="setting-cols" min="3" max="7" value="5"></label>
+          <label class="setting-row"><span>ばんめんの だん</span><input type="number" id="setting-rows" min="4" max="8" value="6"></label>
+          <label class="setting-row"><span>でる すうじ</span><select id="setting-range" onchange="updateRangeVisibility()"><option value="all">1〜9 すべて</option><option value="low">1〜5</option><option value="high">6〜9</option><option value="custom">せんせい してい</option></select></label>
+          <label id="custom-range-container" class="setting-row custom-row"><span>すうじを カンマで</span><input type="text" id="setting-custom" placeholder="1,3,5,7"></label>
+        </div>
+        <div class="falling-settings-note">※おちてくるモードは 7れつ×8だんです</div>
+        <div class="settings-default-box">
+          <button class="paper-btn orange compact default-settings-btn" type="button" onclick="restoreDefaultSettings()">標準の設定にもどす</button>
+          <span>※ゲームの記録は消えません</span>
+        </div>
+        <div class="settings-actions">
+          <button class="paper-btn green compact" type="button" onclick="applySettings()">ほぞん</button>
+          <button class="paper-btn red compact" type="button" onclick="resetData()">データ初期化</button>
+          <button class="paper-btn blue compact" type="button" onclick="showScreen('title')">もどる</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="game.js"></script>
+  <script src="battle.js"></script>
+  <script src="mobile-layout.js"></script>
+  <script>
+    if (new URLSearchParams(location.search).get('layout') === 'edit') {
+      const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = 'layout-editor.css'; document.head.appendChild(css);
+      const js = document.createElement('script'); js.src = 'layout-editor.js'; document.body.appendChild(js);
+    }
+  </script>
+</body>
+</html>

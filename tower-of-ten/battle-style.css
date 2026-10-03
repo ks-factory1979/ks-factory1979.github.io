@@ -1,0 +1,215 @@
+/* =========================================================
+   10の塔 v2.0.12 ホールドUI操作性改善
+   ========================================================= */
+.mode-card.battle{--card-main:#d65380;--card-light:#ef79a2;--card-dark:#93395d;background:linear-gradient(145deg,var(--card-light),var(--card-main));border:5px solid #fff;overflow:hidden}
+.mode-card.battle .battle-new-badge{position:absolute;right:14px;top:8px;background:#fff3a7;color:#7d4d13;border:2px solid #dcad34;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:900}
+
+.battle-menu-panel,.battle-pin-panel,.battle-room-panel,.battle-spectator-panel,.battle-result-panel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(900px,92vw);height:min(590px,90vh);padding:22px;overflow:hidden}
+.battle-menu-panel{display:grid;grid-template-columns:1.08fr .92fr;align-items:center;gap:18px}
+.battle-menu-cast{display:grid;grid-template-columns:repeat(2,1fr);gap:0;align-items:end;height:100%}
+.battle-menu-cast img{width:100%;height:240px;object-fit:contain;object-position:center bottom;align-self:end;filter:drop-shadow(0 8px 4px rgba(61,45,28,.18))}
+.battle-menu-cast img:nth-child(2),.battle-menu-cast img:nth-child(4){transform:none}
+.battle-menu-copy{text-align:center;position:relative;z-index:2}.battle-menu-copy h2{font-size:48px;margin:8px 0 2px;color:#5a3c2c}.battle-menu-copy p{font-size:24px;font-weight:900;margin:0 0 22px}.battle-label{display:inline-block;background:#fff1a8;border:3px solid #e3ad36;border-radius:999px;padding:6px 16px;font-weight:900;color:#84511e}.battle-menu-actions{display:grid;gap:14px;margin-bottom:14px}.battle-large-btn{min-height:76px;font-size:27px}
+.battle-menu-message{min-height:26px;margin:0 0 6px;text-align:center}
+
+.battle-pin-panel{width:min(620px,92vw);height:min(610px,92vh);text-align:center;display:flex;flex-direction:column;align-items:center}.battle-pin-panel h2{font-size:34px;margin:0 0 12px}.battle-pin-boxes{display:flex;gap:12px;margin:4px 0 12px}.battle-pin-boxes span{width:68px;height:76px;display:grid;place-items:center;background:#fff;border:4px solid #d9a95d;border-radius:16px;box-shadow:inset 0 0 0 3px #fff1c8,0 5px 0 rgba(85,61,34,.16);font-size:43px;font-weight:900;color:#5c3b2a}.battle-keypad{display:grid;grid-template-columns:repeat(3,82px);gap:8px}.battle-keypad button{height:54px;border:3px solid #fff;border-radius:16px;background:#63b8e8;color:#fff;font-size:27px;font-weight:900;box-shadow:0 5px 0 #347aa5;cursor:pointer}.battle-keypad button:active{transform:translateY(3px);box-shadow:0 2px 0 #347aa5}.battle-keypad .small-key{font-size:14px;line-height:1.05;background:#eea74c;box-shadow:0 5px 0 #a55f22}.battle-error{min-height:36px;color:#a73f35;font-size:18px;font-weight:900;margin:8px 0 2px}.battle-pin-actions{display:flex;gap:12px;align-items:center}.battle-pin-actions .paper-btn{min-width:180px}
+
+.battle-room-panel{height:min(620px,94vh);display:flex;flex-direction:column}.battle-room-header{display:flex;justify-content:space-between;align-items:center;background:#fff4c9;border:3px solid #d5ad63;border-radius:20px;padding:9px 18px;box-shadow:0 5px 0 rgba(72,50,28,.13)}.battle-room-header>div:first-child{display:grid;grid-template-columns:auto auto;column-gap:12px;align-items:center}.battle-room-header span{font-size:15px;font-weight:900}.battle-room-header strong{font-size:42px;letter-spacing:8px;color:#5a3b2b}.battle-room-header small{grid-column:1/3;font-weight:800}.battle-room-count{text-align:center}.battle-room-count strong{display:block;font-size:28px;letter-spacing:0}.battle-room-main{display:grid;grid-template-columns:1.08fr .92fr;gap:14px;min-height:0;flex:1;margin-top:12px}.battle-room-main section{background:rgba(255,255,255,.68);border:3px solid #e1c487;border-radius:20px;padding:10px;min-height:0}.battle-room-main h3{font-size:22px;margin:0 0 7px;text-align:center}.battle-character-section{display:flex;flex-direction:column}.battle-character-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;min-height:0;flex:1}.battle-character-card{position:relative;border:4px solid #d8bd82;border-radius:18px;background:#fff9e8;display:grid;grid-template-columns:86px 1fr;align-items:center;padding:4px 8px;cursor:pointer;overflow:hidden;box-shadow:0 4px 0 rgba(83,59,34,.13)}.battle-character-card img{width:86px;height:86px;object-fit:contain}.battle-character-card strong{font-size:25px}.battle-character-card small{display:block;font-weight:900;color:#76614e}.battle-character-card.selected{border-color:#50ad4c;background:#efffe7;box-shadow:0 0 0 4px #b9ee9c inset,0 5px 0 rgba(58,103,43,.22)}.battle-character-card.selected::after{content:"✓";position:absolute;right:8px;top:5px;width:30px;height:30px;border-radius:50%;background:#57b34f;color:#fff;display:grid;place-items:center;font-weight:900}.battle-character-card.taken{filter:grayscale(.65);opacity:.55;cursor:not-allowed}.battle-character-card.taken::after{content:"えらばれています";position:absolute;inset:auto 5px 5px 5px;background:rgba(76,64,51,.85);color:#fff;border-radius:8px;font-size:11px;padding:3px;text-align:center;font-weight:900}.battle-ready-btn{margin:8px auto 0;min-width:230px}.battle-ready-btn.ready{background:linear-gradient(#67c35a,#3d9637)}
+.battle-members-section{display:flex;flex-direction:column}.battle-member-slots{display:grid;gap:7px;flex:1}.battle-member-slot{display:grid;grid-template-columns:64px 1fr auto;align-items:center;gap:8px;background:#fffaf0;border:2px solid #dfc18a;border-radius:15px;padding:4px 8px}.battle-member-slot img{width:58px;height:58px;object-fit:contain}.battle-member-slot strong{font-size:20px}.battle-member-slot span{font-size:12px;font-weight:900}.battle-member-slot .member-ready{background:#68ba55;color:#fff;border-radius:999px;padding:4px 8px}.battle-member-slot.empty{opacity:.55;border-style:dashed}.battle-member-slot.empty::before{content:"?";width:50px;height:50px;border-radius:50%;background:#e7dcc8;display:grid;place-items:center;font-weight:900;font-size:26px}.battle-room-message{text-align:center;font-weight:900;margin:4px 0;min-height:20px;flex:0 0 auto}.battle-room-actions{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(112px,.85fr);align-items:stretch;gap:7px;margin-top:2px;width:100%;flex:0 0 auto}.battle-room-actions .paper-btn{width:100%;min-width:0;min-height:50px;height:50px;padding:7px 10px;font-size:19px;line-height:1.05;white-space:nowrap;margin:0}.battle-start-btn{margin:0}.battle-leave-btn{position:static;margin:0}
+
+.battle-hud{height:38px;display:none;gap:7px;align-items:center;justify-content:center;margin-top:-4px}#game-screen.battle-mode .battle-hud:not([hidden]){display:flex}.battle-hud[hidden]{display:none!important}.battle-hud>div{height:36px;background:#fff8db;border:2px solid #d7ab5a;border-radius:12px;display:flex;align-items:center;gap:6px;padding:2px 10px;font-weight:900;box-shadow:0 3px 0 rgba(64,46,29,.12)}.battle-self-card img{width:34px;height:34px;object-fit:contain}.battle-self-card div{display:flex;gap:4px;align-items:baseline}.battle-self-card span,.battle-target-card span,.battle-garbage-card span{font-size:11px}.battle-self-card strong,.battle-target-card strong,.battle-garbage-card strong{font-size:17px}.battle-opponents{display:none;gap:5px;margin-top:0;width:100%;min-width:0;flex:0 0 auto}#game-screen.battle-mode .battle-opponents:not([hidden]){display:grid}.battle-opponents[hidden]{display:none!important}#game-screen:not(.battle-mode) .battle-hud,#game-screen:not(.battle-mode) .battle-opponents{display:none!important}.battle-opponent-card{width:100%;min-width:0;height:46px;display:grid;grid-template-columns:42px minmax(0,1fr) max-content;align-items:center;gap:6px;background:#fffaf0;border:2px solid #ddbd82;border-radius:12px;padding:2px 7px;box-sizing:border-box}.battle-opponent-card img{width:40px;height:40px;object-fit:contain}.battle-opponent-card>div{min-width:0;line-height:1.08}.battle-opponent-card strong{display:block;font-size:15px;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.battle-opponent-card small{display:block;font-weight:900;font-size:10px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.battle-opponent-card .op-status{font-size:10px;font-weight:900;line-height:1;border-radius:999px;background:#5fb957;color:#fff;padding:4px 6px;white-space:nowrap;text-align:center}.battle-opponent-card.eliminated{filter:grayscale(.55);opacity:.72}.battle-opponent-card.eliminated .op-status{background:#8c8177}.battle-opponent-card.waiting .op-status{background:#e99a37}
+
+#game-screen.battle-mode .game-shell{grid-template-rows:76px 38px minmax(0,1fr) 58px;gap:4px}
+#game-screen.battle-mode .play-area{grid-template-columns:minmax(430px,1fr) minmax(230px,270px);gap:7px}
+#game-screen.battle-mode .tower-side{display:flex;flex-direction:column;gap:5px;min-width:0}#game-screen.battle-mode .tower-card{width:100%;min-height:0;flex:1 1 auto;grid-template-rows:22px minmax(100px,1fr) auto}.battle-mode .tower-title{font-size:14px}.battle-mode .tower-container{max-height:160px}.battle-mode .stats-grid{grid-template-columns:repeat(2,1fr)}
+#game-screen.battle-mode .hint-strip{display:none}.battle-mode .game-footer{justify-content:flex-end}.battle-mode #pause-btn{display:none}.battle-mode .control-btn.home{font-size:12px;height:42px}.battle-mode .board-section{padding-top:18px;padding-bottom:2px}.battle-mode .board-caption{font-size:12px;padding:1px 12px}.battle-mode .falling-controls{margin-top:3px}.battle-mode .falling-control{height:42px;min-width:88px}.battle-mode .falling-control span{font-size:20px}.battle-mode .falling-control b{font-size:11px}
+
+.battle-attack-toast{position:absolute;left:50%;top:88px;transform:translateX(-50%);z-index:40;display:flex;align-items:center;gap:8px;background:#fff4b9;border:4px solid #e8a833;border-radius:22px;padding:7px 14px;box-shadow:0 7px 0 rgba(73,50,27,.22);animation:battleToastIn .32s ease}.battle-attack-toast[hidden]{display:none}.battle-attack-toast img{width:65px;height:65px;object-fit:contain}.battle-attack-toast div{display:grid;min-width:0}.battle-attack-toast strong{font-size:18px}.battle-attack-toast span{font-size:16px;font-weight:900}.battle-attack-toast small{font-size:13px;font-weight:900;color:#74428f;line-height:1.15;margin-top:2px}.battle-attack-toast small[hidden]{display:none!important}.battle-connection-overlay .pause-card span{font-size:18px;font-weight:900}.battle-connection-overlay .pause-card img{width:120px;height:120px;object-fit:contain}
+
+.battle-spectator-panel{display:grid;grid-template-columns:220px 1fr;grid-template-rows:auto auto 1fr;gap:8px 18px;align-items:center}.battle-spectator-panel>img{grid-row:1/4;width:220px;height:360px;object-fit:contain}.battle-spectator-copy h2{font-size:36px;margin:0;color:#5f3e2d}.battle-spectator-copy p{font-size:27px;font-weight:900;margin:5px 0}.battle-spectator-time{font-size:20px;font-weight:900}.battle-spectator-time strong{font-size:34px;color:#c05b27}.battle-spectator-list{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;align-self:stretch}.battle-watch-card{display:grid;grid-template-columns:60px 1fr;align-items:center;background:#fffaf0;border:3px solid #ddbd82;border-radius:16px;padding:5px}.battle-watch-card img{width:58px;height:58px;object-fit:contain}.battle-watch-card strong{font-size:19px}.battle-watch-card small{display:block;font-weight:900}
+
+.battle-result-panel{height:min(610px,94vh);text-align:center}.battle-result-panel h2{font-size:38px;margin:0 0 10px;color:#5b3d2e}.battle-result-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;height:430px}.battle-result-card{position:relative;display:grid;grid-template-columns:125px 1fr;align-items:center;background:#fffaf0;border:4px solid #d8b878;border-radius:22px;padding:8px;text-align:left;box-shadow:0 5px 0 rgba(64,46,30,.14)}.battle-result-card.first{border-color:#e7b530;background:#fff7c8}.battle-result-card.me{box-shadow:0 0 0 5px #7ac9ef inset,0 5px 0 rgba(64,46,30,.14)}.battle-result-card img{width:120px;height:150px;object-fit:contain}.battle-result-rank{font-size:30px;font-weight:900;color:#c15c29}.battle-result-name{font-size:23px;font-weight:900}.battle-result-stats{font-size:13px;font-weight:900;line-height:1.55}.battle-you-badge{position:absolute;right:8px;top:7px;background:#5db9e8;color:#fff;border-radius:999px;padding:3px 9px;font-size:12px;font-weight:900}.battle-result-actions{display:flex;justify-content:center;gap:12px;margin-top:10px}
+
+@keyframes battleToastIn{0%{opacity:0;transform:translate(-50%,-18px) scale(.75)}30%{opacity:1;transform:translate(-50%,0) scale(1.05)}100%{opacity:1;transform:translate(-50%,0) scale(1)}}
+
+
+.battle-member-slot.waiting{opacity:.76;border-color:#69a9c9;background:#eef9ff}
+.battle-member-slot .member-waiting{background:#5a9fc4;color:#fff;border-radius:999px;padding:4px 8px}
+.battle-result-panel h2{line-height:1.15;overflow-wrap:anywhere}
+@media (max-height:700px) and (min-width:700px){
+  .mode-panel{padding-top:9px!important;padding-bottom:8px!important}.mode-panel h2{font-size:25px!important;margin-bottom:2px!important}.mode-card{min-height:58px!important;margin:2px 0!important;padding:4px 13px!important}.mode-card strong{font-size:21px!important}.mode-card>span{font-size:12px!important}.mode-panel .compact{min-height:35px!important}
+  .battle-menu-panel,.battle-pin-panel,.battle-room-panel,.battle-spectator-panel,.battle-result-panel{height:620px;max-height:96vh;padding:12px 16px}.battle-menu-cast img{height:205px}.battle-menu-copy h2{font-size:39px}.battle-menu-copy p{font-size:20px}.battle-large-btn{min-height:60px;font-size:22px}
+  .battle-pin-panel h2{font-size:28px}.battle-pin-boxes span{width:58px;height:60px;font-size:35px}.battle-keypad{grid-template-columns:repeat(3,72px);gap:5px}.battle-keypad button{height:45px}.battle-error{min-height:28px;margin:3px 0}
+  .battle-room-header{padding:4px 12px}.battle-room-header strong{font-size:32px}.battle-room-main{margin-top:6px;gap:8px}.battle-room-main section{padding:6px}.battle-room-main h3{font-size:18px;margin-bottom:3px}.battle-character-grid{gap:4px}.battle-character-card{grid-template-columns:67px 1fr;padding:2px 5px}.battle-character-card img{width:65px;height:65px}.battle-character-card strong{font-size:20px}.battle-member-slot{grid-template-columns:52px 1fr auto;height:55px}.battle-member-slot img{width:48px;height:48px}.battle-ready-btn{margin-top:4px;min-height:42px}.battle-room-actions{grid-template-columns:minmax(0,1.55fr) minmax(102px,.85fr);gap:5px}.battle-room-actions .paper-btn{height:44px;min-height:44px;padding:5px 8px;font-size:16px}.battle-leave-btn{min-width:0}
+  #game-screen.battle-mode .game-shell{grid-template-rows:68px 34px minmax(0,1fr) 50px}.battle-hud{height:34px}.battle-hud>div{height:31px}.battle-mode .tower-container{max-height:105px}.battle-opponent-card{height:40px;grid-template-columns:34px minmax(0,1fr) max-content;gap:4px;padding:1px 5px}.battle-opponent-card img{width:32px;height:32px}.battle-opponent-card strong{font-size:13px}.battle-opponent-card small{font-size:9px}.battle-opponent-card .op-status{font-size:9px;padding:3px 5px}.battle-mode .stat-chip strong{font-size:15px}.battle-mode .stat-chip span{font-size:8px}.battle-mode .falling-control{height:36px}
+  .battle-spectator-panel>img{height:290px}.battle-spectator-copy h2{font-size:29px}.battle-spectator-copy p{font-size:22px}.battle-result-list{height:430px}.battle-result-card img{height:125px;width:105px}.battle-result-card{grid-template-columns:110px 1fr;padding:4px}.battle-result-panel h2{font-size:30px;margin-bottom:4px}
+}
+
+@media (max-width:699px){
+  .battle-menu-panel,.battle-pin-panel,.battle-room-panel,.battle-spectator-panel,.battle-result-panel{position:relative;left:auto;top:auto;transform:none;width:92%;height:auto;margin:4vh auto;overflow:visible}.battle-menu-panel{grid-template-columns:1fr}.battle-menu-cast{height:220px}.battle-menu-cast img{height:120px}.battle-room-main{grid-template-columns:1fr}.battle-spectator-panel{grid-template-columns:1fr}.battle-spectator-panel>img{grid-row:auto;width:180px;height:180px;margin:auto}.battle-result-list{grid-template-columns:1fr;height:auto}.battle-result-card{min-height:170px}
+}
+
+/* v2.0.7: 全画面UI監査と、おじゃま数字の一時マーク */
+.battle-menu-copy,.battle-menu-actions,.battle-pin-actions,.battle-room-main,.battle-room-main section,.battle-character-grid,.battle-members-section,.battle-member-slots,.battle-room-actions,.battle-spectator-copy,.battle-spectator-list,.battle-result-list,.battle-result-actions{min-width:0;max-width:100%}
+.battle-menu-actions>*,.battle-pin-actions>*,.battle-room-actions>*,.battle-result-actions>*{min-width:0;max-width:100%}
+.battle-character-card>div,.battle-member-slot>div,.battle-watch-card>div,.battle-result-card>div{min-width:0}
+.battle-character-card strong,.battle-character-card small,.battle-member-slot strong,.battle-member-slot span,.battle-room-message,.battle-result-actions .paper-btn{overflow-wrap:anywhere}
+#game-screen.battle-mode .block.recent-garbage{
+  z-index:3;
+  border-radius:10px;
+  box-shadow:inset 0 0 0 4px #8e5ac7,0 0 0 2px rgba(255,255,255,.82),0 0 13px rgba(126,72,185,.72);
+  animation:garbagePaperPop .34s cubic-bezier(.18,.8,.28,1.28),garbageSoftGlow .78s ease-in-out 1;
+}
+#game-screen.battle-mode .block.recent-garbage::after{
+  content:"!";
+  position:absolute;
+  right:-5px;
+  top:-7px;
+  width:22px;
+  height:22px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:#8e5ac7;
+  border:2px solid #fff2c5;
+  color:#fff;
+  font-size:15px;
+  line-height:1;
+  font-weight:900;
+  text-shadow:none;
+  box-shadow:0 2px 0 rgba(74,43,94,.25);
+  transform:rotate(7deg);
+  animation:garbageMarkWiggle .6s ease-in-out 1;
+}
+@keyframes garbagePaperPop{0%{transform:scale(.72);opacity:.35}65%{transform:scale(1.09);opacity:1}100%{transform:scale(1)}}
+@keyframes garbageSoftGlow{0%,100%{filter:brightness(1)}45%{filter:brightness(1.18)}}
+@keyframes garbageMarkWiggle{0%,100%{transform:rotate(7deg)}35%{transform:rotate(-11deg) scale(1.08)}70%{transform:rotate(12deg)}}
+@media (prefers-reduced-motion:reduce){#game-screen.battle-mode .block.recent-garbage,#game-screen.battle-mode .block.recent-garbage::after{animation:none}}
+@media (max-height:700px) and (min-width:700px){
+  .battle-menu-actions{gap:7px;margin-bottom:7px}
+  .battle-menu-copy .compact{min-height:38px!important;font-size:16px!important;padding:5px 12px!important}
+  .battle-pin-actions .paper-btn{min-width:0;padding-left:12px;padding-right:12px;font-size:17px}
+  .battle-result-actions{gap:6px;margin-top:5px}
+  .battle-result-actions .paper-btn{min-width:0;min-height:44px;padding:6px 10px;font-size:16px}
+  .battle-attack-toast{top:72px;max-width:min(80vw,420px);padding:5px 10px}
+  .battle-attack-toast img{width:52px;height:52px}
+  .battle-attack-toast strong{font-size:16px}.battle-attack-toast span{font-size:14px}.battle-attack-toast small{font-size:11px}
+}
+
+/* v2.0.6: 対戦モードの手動通信中表示（定期同期には表示しない） */
+.battle-loading-overlay{
+  position:fixed;
+  inset:0;
+  z-index:1200;
+  display:grid;
+  place-items:center;
+  padding:20px;
+  background:rgba(35,78,105,.34);
+  backdrop-filter:blur(1.5px);
+}
+.battle-loading-overlay[hidden]{display:none!important}
+.battle-loading-card{
+  width:min(84vw,360px);
+  min-height:190px;
+  padding:24px 28px 22px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  text-align:center;
+  color:#4a3427;
+}
+.battle-loading-card::after{inset:8px}
+.battle-loading-hourglass{
+  display:block;
+  font-size:64px;
+  line-height:1;
+  transform-origin:center;
+  animation:battleHourglass 1.05s ease-in-out infinite;
+  filter:drop-shadow(0 4px 2px rgba(74,52,39,.18));
+}
+.battle-loading-card strong{
+  position:relative;
+  z-index:1;
+  font-size:clamp(23px,3vw,32px);
+  line-height:1.25;
+}
+.battle-loading-card small{
+  position:relative;
+  z-index:1;
+  font-size:clamp(15px,1.8vw,20px);
+  font-weight:900;
+  color:#76543e;
+}
+@keyframes battleHourglass{
+  0%,100%{transform:translateY(0) rotate(0deg)}
+  45%{transform:translateY(-5px) rotate(0deg)}
+  55%{transform:translateY(-5px) rotate(180deg)}
+}
+@media (max-height:680px){
+  .battle-loading-card{min-height:155px;padding:18px 24px 16px}
+  .battle-loading-hourglass{font-size:52px}
+  .battle-loading-card strong{font-size:24px}
+  .battle-loading-card small{font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){
+  .battle-loading-hourglass{animation:none}
+}
+
+
+/* UI監査で検出した待機・対戦ボタンの収まり微調整 */
+.battle-room-actions .battle-leave-btn{font-size:18px;padding-left:6px;padding-right:6px}
+#game-screen.battle-mode .control-btn.home{padding:3px 8px;line-height:1;white-space:nowrap}
+#game-screen.battle-mode .control-btn.home img{width:28px;height:28px;flex:none}
+
+
+/* v2.0.10: 対戦を止めない小さな通信状態表示 */
+.battle-network-status{
+  position:fixed;
+  top:max(10px,env(safe-area-inset-top));
+  right:max(10px,env(safe-area-inset-right));
+  z-index:1150;
+  width:min(330px,calc(100vw - 20px));
+  min-height:48px;
+  padding:8px 14px;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  box-sizing:border-box;
+  border:3px solid #d19a35;
+  border-radius:16px;
+  background:#fff3c5;
+  color:#5b3d2e;
+  box-shadow:0 5px 0 rgba(74,52,39,.2);
+  font-weight:900;
+  pointer-events:none;
+}
+.battle-network-status[hidden]{display:none!important}
+#app:has(#game-screen.active) .battle-network-status{top:auto;right:auto;bottom:max(10px,env(safe-area-inset-bottom));left:max(10px,env(safe-area-inset-left))}
+@media (max-height:700px) and (min-width:700px){#app:has(#game-screen.active) .battle-network-status{top:auto;right:auto;bottom:6px;left:6px}}
+
+.battle-network-status-icon{font-size:25px;line-height:1;flex:none}
+.battle-network-status strong{min-width:0;font-size:15px;line-height:1.25;overflow-wrap:anywhere}
+.battle-network-status.connected{border-color:#54a95b;background:#eaffdf;color:#315b35}
+.battle-network-status.offline{border-color:#5594be;background:#e5f5ff;color:#31546b}
+.battle-network-status.unstable{border-color:#c46a58;background:#fff0e7;color:#713c34}
+.battle-network-status.reconnecting .battle-network-status-icon{animation:battleHourglass 1.05s ease-in-out infinite}
+@media (max-height:700px) and (min-width:700px){
+  .battle-network-status{top:6px;right:6px;min-height:42px;padding:5px 10px;width:min(300px,calc(100vw - 12px))}
+  .battle-network-status-icon{font-size:21px}.battle-network-status strong{font-size:13px}
+}
+@media (prefers-reduced-motion:reduce){.battle-network-status.reconnecting .battle-network-status-icon{animation:none}}
+
+
+.battle-result-network-note{margin:-5px auto 6px;max-width:640px;padding:5px 10px;border:2px solid #c87855;border-radius:12px;background:#fff0e6;color:#724335;font-size:13px;font-weight:900;line-height:1.25}
+.battle-result-network-note[hidden]{display:none!important}
+
+/* v2.0.12：対戦画面でも4ボタンを同じ操作列へ収める */
+#game-screen.battle-mode .falling-controls{gap:6px}
+#game-screen.battle-mode .falling-control.hold-swap{min-width:118px}
+#game-screen.battle-mode .falling-control.hold-swap>b{font-size:11px}
+@media (max-height:720px) and (orientation:landscape){
+  #game-screen.battle-mode .falling-control.hold-swap{min-width:96px}
+  #game-screen.battle-mode .falling-control.hold-swap>b{font-size:10px}
+}

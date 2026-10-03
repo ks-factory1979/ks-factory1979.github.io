@@ -1,0 +1,779 @@
+:root{
+  --ink:#4a3427;
+  --cream:#fff8e7;
+  --blue:#43a8dc;
+  --green:#77bf56;
+  --orange:#f6a623;
+  --red:#e95f5f;
+  --cell-size:68px;
+}
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;height:100dvh;margin:0;overflow:hidden}
+body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color:var(--ink);background:#79c9ef;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button,input,select{font:inherit}
+button{touch-action:manipulation;max-width:100%;box-sizing:border-box}
+#app,.screen{width:100%;height:100%;height:100dvh;min-height:0}
+.screen{display:none;position:relative;overflow:hidden}
+.screen.active{display:block}
+.screen-bg{background-size:cover;background-position:center;background-repeat:no-repeat}
+.title-bg{background-image:var(--asset-assets-backgrounds-title-bg-jpg);background-position:center center}
+.game-bg{background-image:var(--asset-assets-backgrounds-game-bg-jpg)}
+.result-bg{background-image:var(--asset-assets-backgrounds-result-bg-jpg)}
+.howto-bg{background-image:var(--asset-assets-backgrounds-howto-bg-jpg)}
+.paper-panel{background:rgba(255,249,228,.95);border:4px solid rgba(149,105,56,.45);border-radius:28px;box-shadow:0 10px 0 rgba(91,63,34,.16),0 16px 34px rgba(53,72,83,.18);position:relative}
+.paper-panel::after{content:"";position:absolute;inset:7px;border:2px dashed rgba(160,114,65,.28);border-radius:20px;pointer-events:none}
+
+/* Buttons */
+.paper-btn{border:0;min-width:190px;min-height:62px;max-width:100%;padding:12px 28px;background-color:transparent;background-position:center;background-size:cover;background-repeat:no-repeat;font-weight:900;font-size:clamp(19px,2.5vw,30px);line-height:1.12;overflow-wrap:anywhere;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.18);cursor:pointer;filter:drop-shadow(0 5px 3px rgba(74,52,39,.22));transition:transform .12s ease,filter .12s ease}
+.paper-btn:hover{transform:translateY(-2px)}
+.paper-btn:active{transform:translateY(3px);filter:drop-shadow(0 2px 2px rgba(74,52,39,.2))}
+.paper-btn.orange{background-color:#f6a623;background-image:var(--asset-assets-ui-buttons-button-orange-png)}
+.paper-btn.green{background-color:#68b94e;background-image:var(--asset-assets-ui-buttons-button-green-png)}
+.paper-btn.blue{background-color:#4a9fd2;background-image:var(--asset-assets-ui-buttons-button-blue-png)}
+.paper-btn.red{background-color:#e95f5f;background-image:var(--asset-assets-ui-buttons-button-red-png)}
+.paper-btn.big{min-width:260px;min-height:86px;font-size:36px}
+.paper-btn.compact{min-width:145px;min-height:52px;font-size:20px}
+.icon-btn{width:62px;height:62px;border:0;background:rgba(255,255,255,.9);border-radius:18px;box-shadow:0 5px 0 rgba(58,89,107,.2);padding:7px;cursor:pointer}
+.icon-btn img{width:100%;height:100%;object-fit:contain}
+
+/* Title */
+.title-panel{position:absolute;left:6.5%;top:50%;transform:translateY(-50%);width:min(44vw,470px);padding:28px 34px 24px;text-align:center;background:rgba(255,250,232,.93)}
+.title-kicker{display:inline-block;background:#fff3bd;border-radius:999px;padding:7px 18px;font-weight:900;color:#80522a;font-size:clamp(14px,1.8vw,22px)}
+.game-logo{margin:2px 0 0;line-height:.95;white-space:nowrap;font-size:clamp(68px,9vw,118px);letter-spacing:-.08em;text-shadow:0 6px 0 #fff,0 9px 0 rgba(99,61,38,.25)}
+.game-logo .ten{color:#ef654b}.game-logo .small-no{font-size:.42em;color:#5f4b3e;margin:0 .09em}.game-logo .tower-word{color:#3b9ed2}
+.title-copy{margin:8px 0 14px;font-size:clamp(18px,2.2vw,27px);font-weight:900;line-height:1.45}
+.title-actions{display:grid;justify-items:center;gap:4px}
+.quick-toggles{display:flex;justify-content:center;gap:14px;margin-top:11px;position:relative;z-index:2}
+.mini-toggle{display:flex;align-items:center;gap:6px;padding:5px 12px;background:#fff;border:2px solid #ebc777;border-radius:999px;font-weight:900;font-size:17px}
+.mini-toggle img{width:32px;height:32px;object-fit:contain}.mini-toggle input{width:25px;height:25px;accent-color:#55b75c}
+
+/* Header */
+.screen-header{height:84px;display:flex;align-items:center;gap:18px;padding:12px 24px;position:relative;z-index:2}.screen-header h2{margin:0;font-size:40px;color:#49392d;text-shadow:0 3px 0 #fff}
+
+/* How-to */
+.howto-card{height:calc(100% - 108px);margin:5px auto 18px;width:min(94%,1160px);padding:25px 32px 24px 210px;display:flex;flex-direction:column;justify-content:center}
+.guide-mascot{position:absolute;left:5px;bottom:10px;width:220px;height:260px;object-fit:contain;z-index:2}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;position:relative;z-index:2}
+.step-card{min-height:250px;border-radius:24px;padding:62px 13px 14px;text-align:center;box-shadow:0 6px 0 rgba(75,57,39,.15);border:4px solid #fff;position:relative}
+.step-one{background:#dff2ff}.step-two{background:#fff3c3}.step-three{background:#e5f4d4}
+.step-card strong{display:block;font-size:clamp(20px,2.2vw,29px);line-height:1.35;margin:8px 0 15px}.step-num{position:absolute;left:50%;top:9px;transform:translateX(-50%);width:42px;height:42px;border-radius:50%;background:#f27867;color:#fff;font-weight:900;font-size:28px;display:grid;place-items:center}
+.mini-demo{min-height:105px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:28px;font-weight:900}.mini-demo img{width:90px;height:90px;object-fit:contain}.demo-block{width:74px;height:74px;display:grid;place-items:center;background-size:100% 100%;font-size:42px;color:#fff;text-shadow:0 2px 2px rgba(0,0,0,.25)}.demo-block.pink{background-image:var(--asset-assets-ui-blocks-block-1-png)}.demo-block.blue{background-image:var(--asset-assets-ui-blocks-block-5-png)}.demo-block.yellow{background-image:var(--asset-assets-ui-blocks-block-3-png)}.demo-arrow{font-size:42px;color:#e88437}.equals,.plus{font-weight:900;color:#79593c}
+.pair-examples{margin:18px auto 0;padding:10px 18px;background:#fff;border-radius:16px;border:3px solid #e8bd63;font-size:clamp(18px,2vw,26px);font-weight:800;position:relative;z-index:2}
+
+/* Mode */
+.mode-panel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(760px,88vw);padding:34px 36px 30px 230px;text-align:center}.mode-panel h2{font-size:38px;margin:0 0 18px;position:relative;z-index:2}.mode-mascot{position:absolute;left:6px;bottom:8px;width:230px;height:290px;object-fit:contain;z-index:2}.mode-card{width:100%;min-height:112px;margin:8px 0;border:0;border-radius:24px;cursor:pointer;padding:14px 22px;color:#fff;box-shadow:0 7px 0 rgba(77,59,40,.2);text-align:left;position:relative;z-index:2}.mode-card strong{display:block;font-size:34px}.mode-card>span{font-size:18px;font-weight:800}.mode-card strong #mode-time-label{font-size:1em;font-weight:inherit;line-height:inherit;letter-spacing:0}.mode-card.free{background:linear-gradient(#7fd063,#55ad42);border:5px solid #fff}.mode-card.timed{background:linear-gradient(#ffb84e,#f08d2f);border:5px solid #fff}.mode-panel .compact{position:relative;z-index:2;margin-top:10px}
+
+/* Game */
+/* v2.0.12 ホールドUI操作性改善 */
+.game-shell{height:100%;display:grid;grid-template-rows:108px minmax(0,1fr) 94px;padding:8px 12px 10px;gap:7px}
+.info-bar{display:flex;justify-content:center;gap:9px;align-items:stretch;min-width:0}
+.info-card{height:100%;min-width:132px;padding:8px 10px 7px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,250,226,.96);border:3px solid #d7ab57;border-radius:20px;box-shadow:0 5px 0 rgba(79,60,42,.14);position:relative}.current-card{min-width:210px;border-color:#f48363}.next-card{min-width:140px;border-color:#82c468;background:#f1ffe8}.time-card{min-width:145px;border-color:#efb84f}.hold-card{min-width:116px;border-color:#d293e7;background:#fff0ff;font:inherit;color:inherit;cursor:pointer}.hold-card:not(:disabled):hover{transform:translateY(-1px)}.hold-card:disabled{cursor:not-allowed;opacity:.58;filter:grayscale(.22)}.hold-card.star-held{box-shadow:0 0 0 4px rgba(255,224,75,.45),0 5px 0 rgba(79,60,42,.14);animation:holdStarGlow 1s ease-in-out infinite alternate}.hold-tile{width:58px;height:58px;font-size:38px}.hold-lock-label{position:absolute;bottom:2px;font-size:10px;font-weight:900;color:#684c70;white-space:nowrap}.info-label{font-size:16px;font-weight:900;line-height:1.1}.info-label img{width:24px;height:24px;object-fit:contain;vertical-align:middle;margin-right:3px}.number-tile{display:grid;place-items:center;width:64px;height:64px;margin-top:3px;background-size:100% 100%;background-repeat:no-repeat;font-size:43px;color:#fff;text-shadow:0 3px 0 rgba(76,49,34,.28)}.number-tile.current{width:82px;height:82px;font-size:58px;background-image:var(--asset-assets-ui-blocks-block-1-png)}.number-tile.star-tile{background-image:var(--asset-assets-ui-blocks-star-block-png)!important;background-size:contain!important;background-position:center;background-repeat:no-repeat;color:transparent!important;text-shadow:none!important}.number-tile.small{background-image:var(--asset-assets-ui-blocks-block-2-png)}.number-tile.small.alt{background-image:var(--asset-assets-ui-blocks-block-4-png)}.time-value{font-size:36px;color:#2385ae;line-height:1.2;margin-top:4px}
+.play-area{display:grid;grid-template-columns:minmax(420px,1fr) minmax(245px,315px);gap:12px;min-height:0;align-items:stretch;justify-content:center}.board-section{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(240,250,255,.38);border-radius:26px;padding:30px 14px 12px;position:relative}.board-caption{position:absolute;top:5px;background:#fff4c6;border:2px solid #deaa4d;border-radius:999px;padding:4px 24px;font-weight:900;font-size:17px;z-index:4}.game-board{display:flex;align-items:flex-end;justify-content:center;background:#8c603b;border:12px solid #c79154;border-radius:22px;padding:8px;box-shadow:inset 0 0 0 4px #f3d49b,0 8px 0 rgba(66,48,35,.22);overflow:visible;position:relative}.column{display:flex;flex-direction:column;justify-content:flex-end;position:relative;cursor:pointer;transition:filter .15s}.column.full{filter:grayscale(.55) brightness(.72);cursor:not-allowed}.column.hint::before{content:"";position:absolute;left:50%;top:-52px;transform:translateX(-50%);width:52px;height:52px;background:var(--asset-assets-ui-icons-hint-arrow-png) center/contain no-repeat;z-index:5;animation:hintBounce .75s ease-in-out infinite alternate}.column.hint::after{content:"";position:absolute;inset:-4px;border:5px solid #ffe160;border-radius:14px;box-shadow:0 0 18px #fff36c;pointer-events:none;animation:hintGlow 1s ease-in-out infinite alternate}.cell{width:var(--cell-size);height:var(--cell-size);margin:2px;background:#f2d7aa;border:2px solid #d1a56c;border-radius:9px;box-shadow:inset 0 2px 5px rgba(84,54,31,.15);display:grid;place-items:center;overflow:visible;position:relative}.block{width:100%;height:100%;display:grid;place-items:center;background-size:100% 100%;background-repeat:no-repeat;font-size:calc(var(--cell-size) * .56);font-weight:900;color:#fff;text-shadow:0 3px 0 rgba(79,51,35,.3);position:relative}.block.star-block,.falling-piece.star-block{background-image:var(--asset-assets-ui-blocks-star-block-png)!important;background-size:contain!important;background-position:center;color:transparent!important;text-shadow:none!important;filter:drop-shadow(0 0 8px rgba(255,226,65,.88))}.ghost-piece.star-block{color:#ffe356;border-color:#ffcf38;text-shadow:0 0 8px #fff;background:rgba(255,239,120,.28)}.block.star-charging{z-index:18;animation:starCharge .48s ease both}.block.star-target{z-index:16;animation:starTargetBurst .52s ease forwards}.block.star-garbage-crack::after{content:"";position:absolute;inset:0;background:linear-gradient(42deg,transparent 46%,#fff 47% 51%,transparent 52%),linear-gradient(-53deg,transparent 47%,#7b4f36 48% 51%,transparent 52%);animation:starCrack .5s ease forwards}.block.dropping{z-index:12;will-change:transform;animation:blockDropFromTop .34s cubic-bezier(.22,.72,.3,1)}.block.matching{animation:matchFlash .25s ease-in-out 2}.block.removing{animation:removeBlock .3s forwards}
+.tower-side{min-width:0;display:flex;align-items:stretch}.tower-card{width:100%;background:rgba(255,249,225,.94);border:4px solid #e2b55e;border-radius:25px;box-shadow:0 8px 0 rgba(83,63,40,.16);padding:8px 10px;display:grid;grid-template-rows:30px minmax(0,1fr) auto auto;min-height:0}.chain-power-panel{margin:3px 0 6px;padding:5px 7px;background:#fff8c9;border:2px solid #e4ad35;border-radius:13px;box-shadow:inset 0 2px 0 rgba(255,255,255,.8)}.chain-power-heading{display:flex;justify-content:space-between;gap:6px;align-items:center;font-size:11px;font-weight:900;color:#7b4b20}.chain-power-heading strong{font-size:13px;color:#d56a28}.chain-power-segments{display:grid;grid-template-columns:repeat(10,1fr);gap:2px;margin-top:3px}.chain-power-segment{height:10px;border-radius:3px;background:#ead9a9;border:1px solid #caa767;transition:transform .18s,background .18s,box-shadow .18s}.chain-power-segment.filled{background:linear-gradient(#fff36b,#f5a92e);box-shadow:0 0 7px #ffd94a;transform:translateY(-1px)}.chain-power-panel.full{animation:powerFullPulse .65s ease 2}.tower-title{text-align:center;font-size:20px;font-weight:900}.tower-container{position:relative;min-height:0;display:grid;place-items:center}.tower-container>img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 7px 3px rgba(68,48,30,.22));transition:transform .25s ease}.tower-container.grow>img{animation:towerGrow .6s ease}.tower-growth{position:absolute;left:50%;top:8%;transform:translateX(-50%) scale(.4);opacity:0;background:#fff4a8;border:3px solid #f0a925;border-radius:999px;padding:8px 15px;font-weight:900;white-space:nowrap;color:#914b20}.tower-growth.show{animation:growthPop 1.15s ease forwards}.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.stat-chip{background:#fff;border:2px solid #e0c37d;border-radius:13px;padding:4px 3px;text-align:center;display:grid;grid-template-columns:26px 1fr;grid-template-rows:auto auto;align-items:center}.stat-chip img{grid-row:1/3;width:26px;height:26px;object-fit:contain}.stat-chip span{font-size:11px;font-weight:800}.stat-chip strong{font-size:22px;line-height:1}
+.game-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}.hint-strip{height:100%;display:flex;align-items:flex-end;flex:1;min-width:0}.hint-bird{width:95px;height:94px;object-fit:contain;flex:none;margin-right:-14px;z-index:2}.hint-bubble{height:74px;min-width:280px;max-width:660px;flex:1;background:#fff8dc;display:flex;align-items:center;justify-content:center;padding:13px 35px 15px 45px;font-size:clamp(16px,2vw,24px);font-weight:900;text-align:center}.hint-bubble>img{width:36px;height:36px;object-fit:contain;margin-right:7px}.game-controls{display:flex;gap:7px;align-items:center}.control-btn{height:62px;border:4px solid #fff;border-radius:18px;padding:6px 12px;display:flex;align-items:center;gap:6px;font-size:17px;font-weight:900;color:#fff;box-shadow:0 5px 0 rgba(67,48,34,.24);cursor:pointer}.control-btn img{width:40px;height:40px;object-fit:contain}.control-btn.pause{background:#7554c8}.control-btn.home{background:#e85f72}.chain-toast{position:absolute;left:48%;top:48%;transform:translate(-50%,-50%) scale(.3);opacity:0;pointer-events:none;background:#fff4a2;border:5px solid #ef9b27;border-radius:28px;padding:15px 34px;font-size:48px;font-weight:900;color:#e85a36;text-shadow:0 3px #fff;z-index:20}.chain-toast.show{animation:toastPop .85s ease forwards}.pause-overlay{position:absolute;inset:0;background:rgba(33,73,91,.45);z-index:30;display:grid;place-items:center}.pause-overlay[hidden]{display:none}.pause-card{width:min(420px,80vw);padding:25px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}.pause-card img{width:170px;height:150px;object-fit:contain}.pause-card strong{font-size:30px;position:relative;z-index:2}.pause-card .paper-btn{position:relative;z-index:2}
+
+/* Results */
+.result-card{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(900px,90vw);height:min(660px,88vh);padding:24px 38px;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;text-align:center}.result-card h2{font-size:46px;margin:0;position:relative;z-index:2;color:#e86449;text-shadow:0 3px #fff}.result-message{font-size:24px;font-weight:900;margin:2px 0 8px;position:relative;z-index:2}.result-main{display:grid;grid-template-columns:1.05fr .95fr;min-height:0;position:relative;z-index:2}.result-visual{position:relative;min-height:0}.result-visual #result-tower-img{width:82%;height:100%;object-fit:contain;filter:drop-shadow(0 7px 3px rgba(61,44,29,.2))}.result-bird{position:absolute;width:170px;height:170px;object-fit:contain;right:-10px;bottom:0}.result-numbers{display:grid;gap:8px;align-content:center}.result-stat{display:grid;grid-template-columns:55px 1fr 55px;align-items:center;background:#fff;border:3px solid #e7bf67;border-radius:19px;padding:7px 13px;text-align:left}.result-stat img{width:48px;height:48px;object-fit:contain}.result-stat span{font-size:20px;font-weight:900}.result-stat strong{font-size:34px;color:#e4653d;text-align:center}.result-actions{display:flex;justify-content:center;gap:16px;position:relative;z-index:2}.confetti{position:absolute;width:190px;height:190px;object-fit:contain;opacity:.75;z-index:1}.confetti-left{left:-60px;top:-45px}.confetti-right{right:-60px;top:-45px;transform:scaleX(-1)}
+
+/* Settings */
+.settings-card{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(790px,92vw);height:min(700px,92vh);padding:20px 32px;display:flex;flex-direction:column}.settings-heading{display:flex;align-items:center;justify-content:center;gap:12px;position:relative;z-index:2}.settings-heading>img{width:70px;height:70px;object-fit:contain}.settings-heading h2{font-size:38px;margin:0;line-height:1}.settings-heading span{font-size:15px;font-weight:800}.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin:12px 0;position:relative;z-index:2;min-height:0}.setting-row{min-height:67px;background:#fff;border:3px solid #e3c178;border-radius:17px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:18px;font-weight:900}.setting-row>span{display:flex;align-items:center;gap:6px}.setting-row img{width:38px;height:38px;object-fit:contain}.setting-row input[type=checkbox]{width:30px;height:30px;accent-color:#68b956}.setting-row input[type=number],.setting-row input[type=text],.setting-row select{min-height:40px;max-width:155px;border:2px solid #c9a763;border-radius:10px;padding:5px 8px;background:#fffdf4;font-weight:800}.custom-row{grid-column:1/-1}.settings-default-box{display:flex;align-items:center;justify-content:center;gap:12px;position:relative;z-index:2;margin:2px 0 8px;flex-wrap:wrap}.settings-default-box span{font-size:14px;font-weight:800;color:#765c35}.default-settings-btn{min-width:230px}.settings-actions{margin-top:auto;display:flex;justify-content:center;gap:10px;position:relative;z-index:2;flex-wrap:wrap}
+
+@keyframes blockDropFromTop{0%{transform:translateY(var(--drop-distance,-260px)) scale(.94);filter:brightness(1.08)}72%{transform:translateY(6px) scaleX(1.03) scaleY(.92)}86%{transform:translateY(-4px) scaleX(.98) scaleY(1.06)}100%{transform:translateY(0) scale(1);filter:brightness(1)}}
+@keyframes removeBlock{0%{transform:scale(1);filter:brightness(1)}45%{transform:scale(1.14);filter:brightness(1.5);opacity:1}100%{transform:scale(.08) rotate(12deg);opacity:0}}
+@keyframes matchFlash{0%,100%{filter:brightness(1)}50%{filter:brightness(1.7);transform:scale(1.08)}}
+@keyframes hintBounce{from{transform:translate(-50%,0)}to{transform:translate(-50%,8px)}}
+@keyframes hintGlow{from{opacity:.45}to{opacity:1}}
+@keyframes towerGrow{0%{transform:scale(.75);opacity:.3}55%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+@keyframes growthPop{0%{opacity:0;transform:translateX(-50%) scale(.3)}25%,70%{opacity:1;transform:translateX(-50%) scale(1)}100%{opacity:0;transform:translateX(-50%) scale(.9) translateY(-25px)}}
+@keyframes toastPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}25%,65%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-75%) scale(.9)}}
+
+/* Compact landscape, e.g. 1024x768 */
+@media (max-width:1100px){
+ .title-panel{left:4%;width:45vw;padding:20px 24px 18px}.paper-btn.big{min-height:75px}.quick-toggles{margin-top:6px}
+ .howto-card{padding-left:175px}.guide-mascot{width:185px;height:230px}.step-card{min-height:220px}
+ .game-shell{grid-template-rows:100px minmax(0,1fr) 88px;padding:7px 8px}.info-card{min-width:120px}.current-card{min-width:205px}.next-card{min-width:145px}.time-card{min-width:145px}.play-area{grid-template-columns:minmax(390px,1fr) 255px}.game-board{border-width:9px;padding:5px}.hint-bird{width:82px}.hint-bubble{min-width:250px;padding-left:37px}.control-btn{font-size:14px;padding:5px 8px}.control-btn img{width:34px;height:34px}
+}
+
+@media (max-height:720px) and (orientation:landscape){
+ :root{--cell-size:58px}
+ .title-panel{top:49%;padding:15px 23px 14px}.game-logo{font-size:clamp(58px,8vw,92px)}.title-copy{margin:4px 0 7px}.paper-btn{min-height:50px}.paper-btn.big{min-height:62px;font-size:30px}.quick-toggles{margin-top:3px}
+ .mode-panel{padding:20px 28px 18px 205px;width:min(700px,86vw)}.mode-panel h2{font-size:32px;margin-bottom:10px}.mode-mascot{width:205px;height:245px}.mode-card{min-height:88px;margin:5px 0;padding:9px 18px}.mode-card strong{font-size:30px}.mode-card>span{font-size:16px}.mode-panel .compact{margin-top:5px}
+ .game-shell{grid-template-rows:82px minmax(0,1fr) 70px;padding:5px 7px 6px;gap:5px}.info-bar{gap:6px}.info-card{min-width:104px;padding:4px 7px;border-radius:16px}.current-card{min-width:178px}.next-card{min-width:126px}.time-card{min-width:132px}.info-label{font-size:13px}.number-tile{width:48px;height:48px;font-size:31px}.number-tile.current{width:64px;height:64px;font-size:45px}.time-value{font-size:29px}
+ .play-area{grid-template-columns:minmax(340px,1fr) minmax(210px,250px);gap:8px}.board-section{padding:24px 8px 7px;border-radius:20px}.board-caption{top:2px;padding:2px 18px;font-size:14px}.game-board{border-width:7px;padding:4px;border-radius:18px}.tower-card{padding:5px 7px;border-radius:20px;grid-template-rows:26px minmax(0,1fr) auto}.tower-title{font-size:16px}.stat-chip{grid-template-columns:22px 1fr;padding:2px}.stat-chip img{width:22px;height:22px}.stat-chip span{font-size:9px}.stat-chip strong{font-size:18px}
+ .hint-bird{width:67px;height:66px}.hint-bubble{height:58px;min-width:215px;padding:9px 24px 10px 32px;font-size:15px}.hint-bubble>img{width:28px;height:28px}.control-btn{height:51px;border-width:3px;font-size:13px;padding:4px 7px}.control-btn img{width:30px;height:30px}.chain-toast{font-size:36px;padding:11px 25px}
+ .screen-header{height:64px;padding:7px 16px}.screen-header h2{font-size:32px}.icon-btn{width:50px;height:50px}.howto-card{height:calc(100% - 76px);margin:2px auto 8px;padding:15px 22px 14px 165px}.guide-mascot{width:170px;height:200px}.step-card{min-height:180px;padding-top:47px}.step-card strong{font-size:20px;margin:4px 0 7px}.mini-demo{min-height:76px}.mini-demo img{width:65px;height:65px}.demo-block{width:58px;height:58px;font-size:33px}.pair-examples{margin-top:9px;padding:6px 12px;font-size:17px}
+ .result-card{height:min(570px,94vh);padding:16px 28px}.result-card h2{font-size:38px}.result-message{font-size:20px}.result-stat{padding:4px 10px}.result-stat img{width:40px;height:40px}.result-stat span{font-size:17px}.result-stat strong{font-size:28px}.result-bird{width:140px;height:140px}
+ .settings-card{height:min(610px,94vh);padding:14px 24px}.settings-heading>img{width:55px;height:55px}.settings-heading h2{font-size:31px}.settings-grid{gap:7px 10px;margin:7px 0}.setting-row{min-height:54px;font-size:15px;padding:5px 9px}.setting-row img{width:30px;height:30px}.settings-default-box{margin:0 0 6px}.settings-default-box span{font-size:12px}.paper-btn.compact{min-height:45px;font-size:17px}
+}
+
+@media (max-width:850px) and (orientation:portrait){
+ html,body{overflow:auto}.screen{min-height:100vh;height:auto;overflow:visible}.title-bg{background-position:66% center}.title-panel{position:relative;left:auto;top:auto;transform:none;width:88%;margin:8vh auto 0}.howto-card{height:auto;margin:0 auto 20px;padding:20px}.guide-mascot{position:relative;left:auto;bottom:auto;width:150px;height:150px;margin:auto}.steps{grid-template-columns:1fr}.mode-panel{position:relative;left:auto;top:auto;transform:none;margin:8vh auto;width:90%;padding:25px}.mode-mascot{position:relative;left:auto;bottom:auto;width:150px;height:150px}.game-shell{height:auto;min-height:100vh;grid-template-rows:auto auto auto}.info-bar{flex-wrap:wrap}.play-area{grid-template-columns:1fr}.tower-side{height:330px}.game-footer{flex-direction:column}.result-card,.settings-card{position:relative;left:auto;top:auto;transform:none;margin:4vh auto;height:auto}.result-main{grid-template-columns:1fr}.settings-grid{grid-template-columns:1fr}.custom-row{grid-column:auto}
+}
+
+/* v2.3: 複数の塔を建てる表示 */
+.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.stat-chip{grid-template-columns:30px minmax(0,1fr);min-width:0;padding:5px 4px}
+.stat-chip img{width:29px;height:29px}
+.stat-chip span{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat-chip strong{font-size:19px;white-space:nowrap}
+.tower-count-chip img{filter:drop-shadow(0 2px 1px rgba(61,44,29,.18))}
+.brick-progress-chip strong{font-size:16px;letter-spacing:-.04em}
+.tower-container.complete>img{animation:towerComplete 1.02s ease both}
+.tower-growth.complete-show{animation:completionPop 1.05s ease forwards;background:#fff0a8;border-color:#ef8f2f;color:#cf4f25;font-size:18px;z-index:3}
+.result-tower-badge{position:absolute;left:65%;top:14%;min-width:86px;padding:7px 14px;border:4px solid #fff;background:#f58f3f;color:#fff;border-radius:999px;box-shadow:0 5px 0 rgba(92,57,30,.18);font-size:28px;font-weight:900;z-index:4;transform:rotate(4deg)}
+.result-tower-badge[hidden]{display:none}
+.result-stat:first-child img{filter:drop-shadow(0 3px 2px rgba(61,44,29,.18))}
+
+@keyframes towerComplete{
+  0%{transform:scale(.78);opacity:.25;filter:brightness(1)}
+  35%{transform:scale(1.12) rotate(-2deg);opacity:1;filter:brightness(1.35)}
+  55%{transform:scale(.98) rotate(2deg)}
+  72%{transform:scale(1.05) rotate(-1deg)}
+  100%{transform:scale(1);filter:brightness(1)}
+}
+@keyframes completionPop{
+  0%{opacity:0;transform:translateX(-50%) scale(.2) rotate(-8deg)}
+  24%,72%{opacity:1;transform:translateX(-50%) scale(1.06) rotate(2deg)}
+  100%{opacity:0;transform:translateX(-50%) scale(.9) translateY(-30px)}
+}
+
+@media (max-height:720px) and (orientation:landscape){
+  .stats-grid{gap:3px}
+  .stat-chip{grid-template-columns:22px minmax(0,1fr);padding:2px}
+  .stat-chip img{width:22px;height:22px}
+  .stat-chip span{font-size:8px}
+  .stat-chip strong{font-size:15px}
+  .brick-progress-chip strong{font-size:13px}
+  .tower-growth.complete-show{font-size:14px;padding:6px 10px}
+  .result-tower-badge{font-size:23px;min-width:72px;padding:5px 10px}
+}
+/* 結果画面の「8 / 25」などを1行で表示 */
+.result-stat{grid-template-columns:55px minmax(0,1fr) 92px}
+.result-stat strong{white-space:nowrap}
+@media (max-height:720px) and (orientation:landscape){
+  .result-stat{grid-template-columns:48px minmax(0,1fr) 82px}
+  .result-stat strong{font-size:26px}
+}
+.next-tower-note{display:inline-block;margin-top:4px;color:#d65d36;font-weight:900}
+
+/* v2.4: ゲーム上部の「10のなかま」を削除し、ヒント時のみ表示 */
+
+/* =========================================================
+   v2.6 おちてくるモード
+   ========================================================= */
+.mode-panel{width:min(820px,90vw);padding-top:24px;padding-bottom:20px}
+.mode-panel h2{margin-bottom:10px}
+.mode-card{min-height:94px;margin:6px 0;padding:11px 22px}
+.mode-card strong{font-size:31px}
+.mode-card.falling{background:linear-gradient(145deg,#7657d7,#4e86d6);border:5px solid #fff;overflow:hidden}
+.difficulty-badge{display:inline-block;background:#fff06f;color:#a34a22;border:3px solid #fff;border-radius:999px;padding:3px 12px;font-size:15px;font-weight:900;box-shadow:0 3px 0 rgba(72,47,31,.18);transform:rotate(-2deg)}
+.mode-card .difficulty-badge{position:absolute;right:16px;top:10px;z-index:3}
+
+/* 操作説明 */
+.falling-intro-panel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(760px,90vw);min-height:500px;padding:34px 38px 28px 245px;display:flex;align-items:center}
+.falling-intro-mascot{position:absolute;left:12px;bottom:12px;width:235px;height:310px;object-fit:contain;z-index:2}
+.falling-intro-content{position:relative;z-index:2;width:100%;text-align:center}
+.falling-intro-content h2{font-size:42px;margin:8px 0 7px;color:#5b46b4;text-shadow:0 3px #fff}
+.intro-badge{font-size:17px}
+.falling-intro-lead{font-size:25px;font-weight:900;margin:5px 0 18px}
+.falling-key-guide{display:grid;gap:12px;background:#fff;border:4px solid #e1bd66;border-radius:24px;padding:17px 20px;margin:0 auto 13px}
+.falling-key-guide>div{display:flex;align-items:center;justify-content:center;gap:9px;font-size:23px}
+.keycap{width:58px;height:58px;display:grid;place-items:center;background:linear-gradient(#70b7ea,#438fd0);color:#fff;border:4px solid #fff;border-radius:16px;box-shadow:0 5px 0 #2f6fa5;font-size:29px;font-weight:900}
+.keycap.down{background:linear-gradient(#ffb94f,#ed8d30);box-shadow:0 5px 0 #be671c}
+.falling-board-note{display:inline-block;margin:0 0 12px;padding:7px 16px;background:#eef8ff;border:3px solid #80b9de;border-radius:999px;font-size:17px;font-weight:900}
+.falling-intro-actions{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+
+/* ゲーム盤面と落下中ブロック */
+.board-stage{position:relative;display:grid;place-items:center;min-height:0;overflow:visible}
+#game-screen.falling-mode .board-section{padding-bottom:5px}
+#game-screen.falling-mode .board-stage{padding-top:calc(var(--cell-size) * .82)}
+#game-screen.falling-mode .board-caption{background:#ece8ff;border-color:#7657d7;color:#4d3aa2}
+#game-screen.falling-mode .column{cursor:default}
+#game-screen.falling-mode .column.full{filter:none;cursor:default}
+.falling-piece,.ghost-piece{position:absolute;display:grid;place-items:center;background-size:100% 100%;background-repeat:no-repeat;border-radius:9px;font-size:calc(var(--cell-size) * .56);font-weight:900;color:#fff;text-shadow:0 3px 0 rgba(79,51,35,.3);pointer-events:none;z-index:16;will-change:transform,top,left}
+.falling-piece{filter:drop-shadow(0 0 8px #fff6a3) drop-shadow(0 5px 3px rgba(63,43,28,.28));animation:fallingGlow .9s ease-in-out infinite alternate}
+.falling-piece.locking{animation:lockWiggle .38s ease-in-out infinite alternate}
+.falling-piece.hard-dropping{animation:hardDropTravel .15s cubic-bezier(.18,.75,.32,1) forwards}
+.ghost-piece{z-index:9;opacity:.36;background-image:none!important;background:rgba(255,255,255,.28);border:4px dashed rgba(255,244,103,.95);color:rgba(91,67,41,.65);text-shadow:none;box-shadow:0 0 10px rgba(255,244,103,.68)}
+.ghost-piece.danger{border-color:#ff8b77;background:rgba(255,125,106,.22);box-shadow:0 0 10px rgba(255,99,76,.62)}
+.block.just-landed{animation:landBounce .24s ease}
+
+/* 画面内の矢印ボタン */
+.falling-controls{display:flex;justify-content:center;align-items:center;gap:10px;width:100%;margin-top:5px;position:relative;z-index:5}
+.falling-controls[hidden]{display:none}
+.falling-control{min-width:112px;height:58px;border:4px solid #fff;border-radius:18px;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 5px 0 rgba(68,49,35,.25);font-weight:900;cursor:pointer;transition:transform .08s ease,filter .12s ease,opacity .12s ease}
+.falling-control span{font-size:27px;line-height:1}
+.falling-control b{font-size:17px}
+.falling-control.left,.falling-control.right{background:linear-gradient(#67b5e7,#3f8dcc)}
+.falling-control.drop{background:linear-gradient(#ffb84d,#ef8830);min-width:132px}
+.falling-control:active:not(:disabled){transform:translateY(4px);box-shadow:0 1px 0 rgba(68,49,35,.25)}
+.falling-control:disabled{opacity:.42;filter:grayscale(.65);cursor:not-allowed}
+
+/* 一時停止と再開カウント */
+.countdown-overlay{background:rgba(33,73,91,.55)}
+.countdown-card{width:250px;height:220px;display:grid;place-items:center;text-align:center}
+.countdown-card strong{position:relative;z-index:2;font-size:82px;color:#6650c5;text-shadow:0 5px #fff;line-height:1}.countdown-card strong.start-label{font-size:48px;white-space:nowrap;letter-spacing:.02em}
+
+/* 結果・設定 */
+.falling-best-note{display:block;margin-top:4px;font-size:15px;color:#5b46b4}
+.falling-settings-note{position:relative;z-index:2;align-self:center;background:#eef1ff;border:2px solid #8977d7;border-radius:999px;padding:5px 14px;font-size:14px;font-weight:900;color:#51409d;margin:0 0 3px}
+.result-actions .paper-btn{min-width:175px}
+
+@keyframes fallingGlow{from{filter:drop-shadow(0 0 4px #fff6a3) drop-shadow(0 5px 3px rgba(63,43,28,.25));transform:scale(.98)}to{filter:drop-shadow(0 0 12px #fff6a3) drop-shadow(0 6px 3px rgba(63,43,28,.3));transform:scale(1.035)}}
+@keyframes lockWiggle{from{transform:translateY(0) scale(1.01)}to{transform:translateY(3px) scaleX(1.035) scaleY(.965)}}
+@keyframes hardDropTravel{from{transform:translateY(0)}to{transform:translateY(var(--hard-distance,0px))}}
+@keyframes landBounce{0%{transform:translateY(-5px) scale(.98)}55%{transform:translateY(4px) scaleX(1.04) scaleY(.93)}100%{transform:translateY(0) scale(1)}}
+
+@media (max-width:1100px){
+  .mode-panel{width:min(790px,91vw);padding-left:205px;padding-right:25px}
+  .mode-mascot{width:205px;height:260px}
+  .mode-card{min-height:84px;padding:8px 17px}
+  .mode-card strong{font-size:28px}
+  .falling-intro-panel{width:min(730px,92vw);padding-left:215px}
+  .falling-intro-mascot{width:210px;height:280px}
+  .falling-control{min-width:96px}
+  .falling-control.drop{min-width:116px}
+  .result-actions .paper-btn{min-width:155px}
+}
+
+@media (max-height:720px) and (orientation:landscape){
+  .mode-panel{width:min(760px,91vw);padding:13px 24px 12px 185px}
+  .mode-panel h2{font-size:28px;margin-bottom:4px}
+  .mode-mascot{width:185px;height:220px}
+  .mode-card{min-height:68px;margin:3px 0;padding:5px 15px;border-width:4px;border-radius:18px}
+  .mode-card strong{font-size:24px;line-height:1.05}
+  .mode-card>span{font-size:14px}
+  .mode-card .difficulty-badge{top:4px;right:10px;font-size:11px;padding:2px 8px}
+  .mode-panel .compact{margin-top:3px;min-height:40px}
+
+  .falling-intro-panel{width:min(690px,90vw);min-height:430px;padding:18px 24px 16px 185px}
+  .falling-intro-mascot{width:180px;height:225px}
+  .falling-intro-content h2{font-size:32px;margin:4px 0}
+  .intro-badge{font-size:13px;padding:2px 9px}
+  .falling-intro-lead{font-size:20px;margin:2px 0 9px}
+  .falling-key-guide{gap:7px;padding:9px 14px;margin-bottom:7px}
+  .falling-key-guide>div{font-size:18px}
+  .keycap{width:44px;height:44px;font-size:22px;border-width:3px;border-radius:12px;box-shadow:0 3px 0 #2f6fa5}
+  .keycap.down{box-shadow:0 3px 0 #be671c}
+  .falling-board-note{font-size:14px;padding:4px 11px;margin-bottom:7px}
+  .falling-intro-actions .paper-btn.big{min-width:210px;min-height:54px;font-size:27px}
+
+  #game-screen.falling-mode .game-shell{grid-template-rows:72px minmax(0,1fr) 62px}
+  #game-screen.falling-mode .info-card{height:72px}
+  #game-screen.falling-mode .number-tile{width:43px;height:43px;font-size:29px}
+  #game-screen.falling-mode .number-tile.current{width:55px;height:55px;font-size:39px}
+  #game-screen.falling-mode .board-section{padding-top:19px;padding-bottom:3px}
+  #game-screen.falling-mode .board-stage{padding-top:calc(var(--cell-size) * .74)}
+  #game-screen.falling-mode .board-caption{font-size:12px;padding:1px 14px}
+  .falling-controls{gap:7px;margin-top:2px}
+  .falling-control{min-width:82px;height:47px;border-width:3px;border-radius:14px;box-shadow:0 3px 0 rgba(68,49,35,.25)}
+  .falling-control.drop{min-width:100px}
+  .falling-control span{font-size:22px}
+  .falling-control b{font-size:13px}
+  #game-screen.falling-mode .hint-bubble{height:50px;font-size:13px}
+  #game-screen.falling-mode .hint-bird{width:57px;height:57px}
+  #game-screen.falling-mode .control-btn{height:46px}
+
+  .falling-settings-note{font-size:11px;padding:3px 10px}
+  .result-actions{gap:7px}
+  .result-actions .paper-btn{min-width:142px;padding-left:14px;padding-right:14px;font-size:17px}
+  .falling-best-note{font-size:12px}
+  .countdown-card{width:210px;height:175px}
+  .countdown-card strong{font-size:66px}
+}
+#game-screen.falling-mode .board-caption{left:14px;right:auto}
+
+
+
+/* =========================================================
+   GAS版 v1.1 ヒント調整・段階加速・チュートリアル
+   ========================================================= */
+.title-small-actions{display:flex;justify-content:center;gap:7px;width:100%}
+.title-small-actions .paper-btn{min-width:0;flex:1;max-width:205px}
+.tutorial-entry-btn{width:min(100%,380px);min-height:66px;border:4px solid #fff;border-radius:20px;background:linear-gradient(145deg,#a578df,#7557c8);color:#fff;box-shadow:0 6px 0 rgba(73,50,111,.24);cursor:pointer;padding:7px 15px;text-shadow:0 2px rgba(0,0,0,.15)}
+.tutorial-entry-btn strong{display:block;font-size:24px;line-height:1.05}.tutorial-entry-btn span{font-size:13px;font-weight:900}
+.tutorial-entry-btn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(73,50,111,.24)}
+
+/* 通常ゲームでは正解の列・ラインを光らせない */
+#game-screen:not(.tutorial-mode) .column.hint::before,#game-screen:not(.tutorial-mode) .column.hint::after{display:none!important}
+
+.falling-choice-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 10px}
+.choice-card{min-height:84px;border:4px solid #fff;border-radius:20px;color:#fff;text-align:center;cursor:pointer;box-shadow:0 5px 0 rgba(67,48,34,.2);padding:9px 10px}
+.choice-card strong{display:block;font-size:24px}.choice-card span{display:block;font-size:13px;font-weight:900;margin-top:3px}
+.choice-card.practice{background:linear-gradient(#8d72dd,#674fc0)}.choice-card.direct{background:linear-gradient(#ffb54d,#ed8730)}
+
+.tutorial-step-badge{position:absolute;right:13px;top:5px;z-index:8;padding:4px 13px;border:3px solid #fff;border-radius:999px;background:#7657d7;color:#fff;font-size:14px;font-weight:900;box-shadow:0 3px 0 rgba(66,43,96,.2)}
+.tutorial-step-badge[hidden]{display:none}
+#game-screen.tutorial-mode .board-caption{background:#f1e9ff;border-color:#8b6cda;color:#5c43a3}
+#game-screen.tutorial-mode.falling-mode .board-caption{left:12px!important;right:auto!important;transform:none!important;max-width:230px}
+
+#game-screen.tutorial-mode .hint-bubble{background:#fff8d4;border-radius:22px;border:3px solid #e7bd61;background-image:none;min-height:70px;line-height:1.35}
+#game-screen.tutorial-mode .hint-bird{filter:drop-shadow(0 4px 3px rgba(45,57,68,.22))}
+#game-screen.tutorial-mode #pause-btn{display:none}
+#game-screen.tutorial-mode #home-btn{background:#e85f72}
+#game-screen.tutorial-mode .tower-side{opacity:.96}
+.column.tutorial-target::after{content:"";position:absolute;inset:-5px;border:6px solid #fff36b;border-radius:15px;box-shadow:0 0 20px #fff36b;pointer-events:none;z-index:7;animation:tutorialGlow .7s ease-in-out infinite alternate}
+.column.tutorial-target::before{display:none}
+.falling-control.tutorial-control-target{opacity:1!important;filter:none!important;animation:controlGuide .65s ease-in-out infinite alternate;outline:5px solid #fff36b;outline-offset:2px}
+
+.speed-toast{position:absolute;left:50%;top:22%;z-index:26;transform:translate(-50%,-50%) scale(.6);opacity:0;pointer-events:none;padding:12px 28px;border:5px solid #fff;background:linear-gradient(#ffcc55,#f07d2f);color:#fff;border-radius:999px;font-size:34px;font-weight:900;text-shadow:0 3px rgba(99,53,28,.25);box-shadow:0 8px 0 rgba(102,59,29,.18)}
+.speed-toast.show{animation:speedToast .8s ease forwards}
+
+.tutorial-complete-panel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(790px,91vw);min-height:480px;padding:42px 35px 30px 300px;text-align:center;display:flex;flex-direction:column;justify-content:center}
+.tutorial-complete-bird{position:absolute;left:15px;bottom:15px;width:285px;height:340px;object-fit:contain;z-index:2}
+.tutorial-complete-copy{position:relative;z-index:2}.tutorial-complete-copy h2{font-size:50px;color:#5b46b4;margin:0 0 8px;text-shadow:0 4px #fff}.tutorial-complete-copy p{font-size:28px;font-weight:900;line-height:1.35;margin:0 0 18px}
+.tutorial-complete-actions{display:grid;gap:8px;justify-items:center;position:relative;z-index:2}.tutorial-complete-actions .paper-btn{width:min(100%,420px)}
+
+@keyframes tutorialGlow{from{opacity:.55;transform:scale(.99)}to{opacity:1;transform:scale(1.025)}}
+@keyframes tutorialBounce{from{transform:translate(-50%,0)}to{transform:translate(-50%,6px)}}
+@keyframes controlGuide{from{transform:scale(.98)}to{transform:scale(1.05)}}
+@keyframes speedToast{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}22%,72%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-70%) scale(.92)}}
+
+@media (max-height:720px) and (orientation:landscape){
+  .title-panel{padding-top:10px;padding-bottom:9px}.title-copy{font-size:17px}.title-actions{gap:2px}.tutorial-entry-btn{min-height:49px}.tutorial-entry-btn strong{font-size:19px}.tutorial-entry-btn span{font-size:10px}.title-small-actions .paper-btn{min-height:42px;font-size:16px}.quick-toggles{margin-top:2px}
+  .falling-choice-actions{gap:7px;margin-bottom:6px}.choice-card{min-height:62px;padding:5px}.choice-card strong{font-size:19px}.choice-card span{font-size:10px}
+  .tutorial-step-badge{top:2px;font-size:11px;padding:2px 9px}
+  #game-screen.tutorial-mode .hint-bubble{min-height:52px;height:52px;font-size:14px}
+  .speed-toast{top:18%;font-size:27px;padding:8px 22px}
+  .tutorial-complete-panel{width:min(700px,90vw);min-height:420px;padding:24px 25px 20px 235px}.tutorial-complete-bird{width:225px;height:270px}.tutorial-complete-copy h2{font-size:39px}.tutorial-complete-copy p{font-size:22px;margin-bottom:10px}.tutorial-complete-actions{gap:4px}.tutorial-complete-actions .paper-btn{min-height:47px;font-size:17px}
+}
+
+
+/* =========================================================
+   GAS版 v1.2 世界観統一リファイン
+   画像の無理な引き伸ばしをやめ、紙・フェルト・厚紙の
+   質感、縁、ステッチ、影でUIを統一する。
+   ========================================================= */
+:root{
+  --craft-texture:var(--asset-assets-ui-textures-paper-fiber-png);
+  --paper-edge:#d8b878;
+  --paper-shadow:rgba(73,51,31,.22);
+}
+
+/* 共通の紙地。既存の背景・キャラクター・塔はそのまま活用 */
+.paper-panel{
+  background-color:rgba(255,249,228,.97);
+  background-image:var(--craft-texture),linear-gradient(145deg,rgba(255,255,255,.48),rgba(244,226,181,.22));
+  background-size:96px 96px,auto;
+  border-color:rgba(159,112,58,.5);
+}
+
+/* 可変長ボタンは画像を引き伸ばさず、CSSの厚紙ボタンに再構成 */
+.paper-btn{
+  --btn-main:#f4a227;--btn-light:#ffc65d;--btn-dark:#bd6818;--btn-ink:#fff;
+  position:relative;isolation:isolate;overflow:hidden;
+  min-height:58px;padding:10px 26px;
+  border:4px solid rgba(255,255,255,.94);
+  border-radius:22px;
+  background-color:var(--btn-main);
+  background-image:var(--craft-texture),linear-gradient(180deg,var(--btn-light),var(--btn-main));
+  background-size:96px 96px,auto;
+  color:var(--btn-ink);
+  box-shadow:inset 0 0 0 3px rgba(108,67,27,.16),inset 0 3px 0 rgba(255,255,255,.28),0 6px 0 var(--btn-dark),0 10px 16px rgba(67,47,30,.2);
+  filter:none;
+}
+.paper-btn::before{
+  content:"";position:absolute;inset:7px;border:2px dashed rgba(255,255,255,.48);border-radius:14px;pointer-events:none;z-index:-1;
+}
+.paper-btn:hover{transform:translateY(-2px);filter:brightness(1.03)}
+.paper-btn:active{transform:translateY(4px);box-shadow:inset 0 0 0 3px rgba(108,67,27,.16),inset 0 2px 0 rgba(255,255,255,.2),0 2px 0 var(--btn-dark),0 5px 9px rgba(67,47,30,.16)}
+.paper-btn.green{--btn-main:#69b849;--btn-light:#9ad86e;--btn-dark:#3f872d;background-image:var(--craft-texture),linear-gradient(180deg,var(--btn-light),var(--btn-main))}
+.paper-btn.orange{--btn-main:#f29a24;--btn-light:#ffc25c;--btn-dark:#bc6018;background-image:var(--craft-texture),linear-gradient(180deg,var(--btn-light),var(--btn-main))}
+.paper-btn.blue{--btn-main:#4c9fd0;--btn-light:#80c5ea;--btn-dark:#2c6fa3;background-image:var(--craft-texture),linear-gradient(180deg,var(--btn-light),var(--btn-main))}
+.paper-btn.red{--btn-main:#e65d6f;--btn-light:#f58a98;--btn-dark:#a73749;background-image:var(--craft-texture),linear-gradient(180deg,var(--btn-light),var(--btn-main))}
+.paper-btn.big{min-height:78px}.paper-btn.compact{min-height:50px}
+
+/* 「はじめてあそぶ」を独立した紫のフラットUIから、縫い目のある紙札へ */
+.tutorial-entry-btn{
+  position:relative;overflow:hidden;isolation:isolate;
+  border:4px solid #fff9e8;border-radius:21px;
+  background-color:#8064c9;
+  background-image:var(--craft-texture),linear-gradient(180deg,#a58ae2,#7355bc);
+  background-size:96px 96px,auto;
+  box-shadow:inset 0 0 0 3px rgba(76,51,125,.25),0 6px 0 #553995,0 10px 16px rgba(58,39,88,.18);
+}
+.tutorial-entry-btn::before{content:"";position:absolute;inset:7px;border:2px dashed rgba(255,247,211,.58);border-radius:13px;pointer-events:none}
+.tutorial-entry-btn::after{content:"★";position:absolute;left:16px;top:50%;transform:translateY(-50%) rotate(-8deg);font-size:25px;color:#ffe36e;text-shadow:0 2px rgba(90,56,35,.2)}
+.tutorial-entry-btn strong,.tutorial-entry-btn span{position:relative;z-index:1}
+
+/* モードカード・練習選択カードもフェルト札として統一 */
+.mode-card,.choice-card{
+  --card-main:#68b94b;--card-light:#91d472;--card-dark:#3f852e;
+  overflow:hidden;isolation:isolate;
+  border:4px solid rgba(255,255,255,.96)!important;
+  background-color:var(--card-main)!important;
+  background-image:var(--craft-texture),linear-gradient(180deg,var(--card-light),var(--card-main))!important;
+  background-size:96px 96px,auto!important;
+  box-shadow:inset 0 0 0 3px rgba(61,53,34,.12),0 6px 0 var(--card-dark),0 10px 15px rgba(58,43,28,.16);
+}
+.mode-card::after,.choice-card::after{content:"";position:absolute;inset:7px;border:2px dashed rgba(255,255,255,.5);border-radius:15px;pointer-events:none;z-index:-1}
+.mode-card.free{--card-main:#68b94b;--card-light:#91d472;--card-dark:#3f852e}
+.mode-card.timed{--card-main:#f49a27;--card-light:#ffc05a;--card-dark:#b95d19}
+.mode-card.falling{--card-main:#6674d5;--card-light:#8994e9;--card-dark:#4048a1}
+.choice-card.practice{--card-main:#7660ca;--card-light:#9c87df;--card-dark:#4e3898}
+.choice-card.direct{--card-main:#f19329;--card-light:#ffc05d;--card-dark:#b85b18}
+
+/* カード類の紙質とステッチを揃える */
+.info-card,.step-card,.result-stat,.setting-row,.falling-key-guide,.falling-board-note,.pair-examples,.mini-toggle,.tower-card{
+  background-image:var(--craft-texture),linear-gradient(145deg,rgba(255,255,255,.5),rgba(239,214,160,.12));
+  background-size:96px 96px,auto;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.28),0 5px 0 rgba(83,61,39,.13);
+}
+.step-one{background-color:#dff2ff}.step-two{background-color:#fff3c3}.step-three{background-color:#e5f4d4}
+.info-card,.result-stat,.setting-row,.falling-key-guide,.pair-examples,.mini-toggle{position:relative}
+.info-card::after,.result-stat::after,.setting-row::after,.falling-key-guide::after,.pair-examples::after{
+  content:"";position:absolute;inset:5px;border:1.5px dashed rgba(144,105,57,.22);border-radius:12px;pointer-events:none;
+}
+
+/* ヒント吹き出しは320×262画像の横伸ばしを廃止し、紙の吹き出しで再構成 */
+.hint-bubble{
+  position:relative;isolation:isolate;
+  height:74px;min-width:280px;max-width:660px;
+  background-color:#fff8dc;
+  background-image:var(--craft-texture),linear-gradient(145deg,#fffdf1,#f6e5b8);
+  background-size:96px 96px,auto;
+  border:3px solid #ddb45e;border-radius:23px;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.5),0 5px 0 rgba(112,79,40,.13);
+  padding:12px 28px 13px 34px;
+}
+.hint-bubble::before{
+  content:"";position:absolute;left:-14px;top:50%;width:25px;height:25px;transform:translateY(-50%) rotate(45deg);
+  background:#faedc8;border-left:3px solid #ddb45e;border-bottom:3px solid #ddb45e;z-index:-1;
+}
+.hint-bubble::after{content:"";position:absolute;inset:6px;border:1.5px dashed rgba(151,105,54,.28);border-radius:15px;pointer-events:none}
+#game-screen.tutorial-mode .hint-bubble{background-color:#fff8d4;background-image:var(--craft-texture),linear-gradient(145deg,#fffce8,#f5df9f);border-color:#d9aa4c}
+
+/* 小さなバッジ・説明札も紙片らしく */
+.difficulty-badge,.tutorial-step-badge,.board-caption,.speed-toast,.falling-board-note{
+  background-image:var(--craft-texture),linear-gradient(180deg,rgba(255,255,255,.2),rgba(0,0,0,.04));
+  background-size:96px 96px,auto;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.3),0 4px 0 rgba(73,51,31,.14);
+}
+
+/* キー・操作ボタンを厚紙パーツへ統一 */
+.keycap,.falling-control,.control-btn{
+  position:relative;overflow:hidden;isolation:isolate;
+  background-image:var(--craft-texture),linear-gradient(180deg,rgba(255,255,255,.2),rgba(0,0,0,.05));
+  background-size:96px 96px,auto;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.24),0 5px 0 rgba(68,49,35,.25);
+}
+.falling-control::after,.control-btn::after{content:"";position:absolute;inset:5px;border:1.5px dashed rgba(255,255,255,.38);border-radius:11px;pointer-events:none;z-index:-1}
+
+/* 完了画面：画像を縦横に伸ばさず、比率固定・均一なボタン寸法 */
+.tutorial-complete-panel{
+  width:min(760px,90vw);min-height:450px;padding:34px 34px 28px 270px;
+}
+.tutorial-complete-bird{
+  left:20px;bottom:34px;width:235px;height:auto;aspect-ratio:1/1;object-fit:contain;
+}
+.tutorial-complete-actions{gap:10px;width:100%}
+.tutorial-complete-actions .paper-btn{
+  width:min(100%,410px);height:auto;min-height:58px;max-height:none;aspect-ratio:auto;
+  padding:9px 22px;font-size:20px;line-height:1.15;
+}
+.falling-complete .tutorial-complete-copy h2{color:#5b46b4}
+
+/* 画像比率保護：主要画像は intrinsic ratio を維持 */
+.guide-mascot,.mode-mascot,.falling-intro-mascot,.hint-bird,.pause-card img,.result-bird,.settings-heading>img,.stat-chip img,.result-stat img,.mini-demo img,.icon-btn img,.control-btn img,.info-label img,.hint-bubble>img{
+  object-fit:contain;object-position:center;
+}
+.tower-container>img,.result-visual #result-tower-img{object-fit:contain;object-position:center}
+
+/* 低い画面でも完成画面の比率・押しやすさを保つ */
+@media (max-height:720px) and (orientation:landscape){
+  .tutorial-entry-btn{min-height:51px;padding:5px 14px 5px 42px}
+  .tutorial-entry-btn::after{left:13px;font-size:21px}
+  .tutorial-complete-panel{width:min(700px,90vw);min-height:408px;padding:22px 24px 18px 222px}
+  .tutorial-complete-bird{left:14px;bottom:54px;width:205px;height:auto}
+  .tutorial-complete-copy h2{font-size:39px}.tutorial-complete-copy p{font-size:22px;margin-bottom:9px}
+  .tutorial-complete-actions{gap:7px}
+  .tutorial-complete-actions .paper-btn{min-height:51px;font-size:17px;padding:7px 18px}
+  .hint-bubble{height:56px;min-height:56px;padding:8px 23px 9px 29px}
+  #game-screen.tutorial-mode .hint-bubble{height:52px;min-height:52px}
+}
+
+
+/* v1.2.1: 選択ボタンのステッチ擬似要素を各ボタン内に限定する。
+   position:relative がないと、::after が親コンテンツ基準で巨大化し、
+   右側全体を囲う不要なステッチ枠として表示される。 */
+#falling-intro-screen .choice-card{
+  position:relative;
+}
+
+
+/* v2.0.10 全画面UI監査：可変レイアウト内で文字・ボタンが親枠を押し広げない */
+.title-actions,.title-small-actions,.mode-panel,.howto-card,.steps,.step-card,.play-area,.board-section,.tower-side,.tower-card,.game-footer,.game-controls,.result-actions,.settings-actions,.settings-default-box,.tutorial-actions,.falling-intro-actions{min-width:0;max-width:100%}
+.title-actions>*,.title-small-actions>*,.result-actions>*,.settings-actions>*,.tutorial-actions>*,.falling-intro-actions>*{min-width:0;max-width:100%}
+.mode-card,.control-btn,.falling-control,.tutorial-entry-btn{box-sizing:border-box;max-width:100%}
+.mode-card strong,.mode-card>span,.control-btn,.falling-control b,.tutorial-entry-btn strong,.tutorial-entry-btn span{overflow-wrap:anywhere}
+@media (max-height:700px) and (min-width:700px){
+  .paper-btn{line-height:1.05}
+  .result-actions .paper-btn,.settings-actions .paper-btn{padding-left:12px;padding-right:12px}
+  .countdown-card strong.start-label{font-size:40px}
+}
+
+.star-award-toast{position:absolute;left:50%;top:39%;transform:translate(-50%,-50%) scale(.6);z-index:42;display:flex;align-items:center;gap:12px;padding:12px 22px;border:5px solid #f4aa29;border-radius:24px;background:#fff7b8;box-shadow:0 8px 0 rgba(109,72,30,.24),0 0 35px #ffe85b;font-size:30px;font-weight:900;color:#d46028;pointer-events:none}.star-award-toast[hidden]{display:none}.star-award-toast.show{animation:starAwardPop 1.05s ease forwards}.star-award-toast img{width:74px;height:74px;object-fit:contain}.star-effect-layer{position:absolute;inset:0;z-index:35;pointer-events:none;overflow:visible}.star-effect-core{position:absolute;width:calc(var(--cell-size) * 1.35);height:calc(var(--cell-size) * 1.35);transform:translate(-50%,-50%) scale(.3);border-radius:50%;background:radial-gradient(circle,#fff 0 12%,#fff46c 25%,rgba(255,191,32,.55) 52%,transparent 72%);animation:starCoreBurst .7s ease forwards}.star-beam{position:absolute;transform-origin:center;background:linear-gradient(90deg,transparent,#fff 12%,#ffe53d 35%,#fff 50%,#ffe53d 65%,#fff 88%,transparent);filter:drop-shadow(0 0 7px #ffd525);opacity:0;animation:starBeam .55s ease .12s forwards}.star-beam.horizontal{height:18px;left:0;right:0;transform:translateY(-50%) scaleX(.05)}.star-beam.vertical{width:18px;top:0;bottom:0;transform:translateX(-50%) scaleY(.05);background:linear-gradient(180deg,transparent,#fff 12%,#ffe53d 35%,#fff 50%,#ffe53d 65%,#fff 88%,transparent)}.star-particle{position:absolute;width:13px;height:13px;background:#ffe84b;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 94%,50% 72%,21% 94%,32% 57%,2% 35%,39% 35%);animation:starParticleFly .72s ease-out forwards;filter:drop-shadow(0 0 4px #fff)}#game-screen.star-screen-shake .game-shell{animation:starScreenShake .34s ease}.battle-garbage-warning{position:absolute;left:50%;top:122px;transform:translateX(-50%);z-index:24;width:min(390px,72vw);padding:8px 14px 10px;border:4px solid #c66b52;border-radius:18px;background:#fff0d5;box-shadow:0 6px 0 rgba(87,51,39,.2);text-align:center;pointer-events:none}.battle-garbage-warning[hidden]{display:none}.battle-garbage-warning strong{display:block;font-size:22px;color:#ad462f}.battle-garbage-warning.urgent strong{animation:garbageUrgent .35s ease infinite alternate}.battle-garbage-warning-track{height:12px;margin-top:6px;border-radius:999px;background:#e6c7a7;overflow:hidden;border:2px solid #b57a58}.battle-garbage-warning-track span{display:block;height:100%;width:100%;transform-origin:left;background:linear-gradient(90deg,#f6c34a,#ee6a4d);will-change:transform}.star-block-direct-label{position:absolute;left:50%;top:30%;transform:translate(-50%,-50%);z-index:39;padding:8px 18px;border-radius:999px;background:#fff5a5;border:4px solid #efa228;color:#d35928;font-size:clamp(24px,4vw,42px);font-weight:900;text-shadow:0 2px #fff;pointer-events:none;animation:starLabelPop .9s ease forwards}
+@keyframes holdStarGlow{from{filter:brightness(1)}to{filter:brightness(1.12) drop-shadow(0 0 8px #ffd93d)}}@keyframes powerFullPulse{50%{transform:scale(1.04);box-shadow:0 0 18px #ffd83c}}@keyframes starCharge{0%{transform:scale(1)}45%{transform:scale(1.22);filter:brightness(1.7) drop-shadow(0 0 14px #fff63b)}100%{transform:scale(1.05);filter:brightness(1.25) drop-shadow(0 0 18px #ffd72d)}}@keyframes starTargetBurst{0%{transform:scale(1);opacity:1}55%{transform:scale(1.18) rotate(5deg);filter:brightness(1.8)}100%{transform:scale(.2) rotate(24deg);opacity:0;filter:brightness(2)}}@keyframes starCrack{0%{opacity:0}45%{opacity:1}100%{opacity:0;transform:scale(1.12)}}@keyframes starAwardPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.35) rotate(-7deg)}24%,70%{opacity:1;transform:translate(-50%,-50%) scale(1.05) rotate(2deg)}100%{opacity:0;transform:translate(-50%,-65%) scale(.88)}}@keyframes starCoreBurst{0%{opacity:0;transform:translate(-50%,-50%) scale(.25)}35%{opacity:1;transform:translate(-50%,-50%) scale(1.25)}100%{opacity:0;transform:translate(-50%,-50%) scale(2)}}@keyframes starBeam{0%{opacity:0}20%,75%{opacity:1;transform:var(--beam-transform)}100%{opacity:0;transform:var(--beam-transform)}}@keyframes starParticleFly{0%{opacity:1;transform:translate(-50%,-50%) scale(.5) rotate(0)}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.15) rotate(var(--rot))}}@keyframes starScreenShake{0%,100%{transform:translate(0)}20%{transform:translate(-4px,2px)}40%{transform:translate(4px,-2px)}60%{transform:translate(-3px,-1px)}80%{transform:translate(3px,1px)}}@keyframes garbageUrgent{from{transform:scale(1)}to{transform:scale(1.06)}}@keyframes starLabelPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}25%,70%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}100%{opacity:0;transform:translate(-50%,-75%) scale(.85)}}
+@media (max-height:720px) and (orientation:landscape){.hold-card{min-width:96px}.hold-tile{width:45px;height:45px}.battle-garbage-warning{top:91px;width:min(330px,60vw);padding:5px 10px}.battle-garbage-warning strong{font-size:17px}.chain-power-segment{height:7px}.chain-power-panel{margin:2px 0 3px;padding:3px 5px}.star-award-toast{font-size:23px;padding:8px 14px}.star-award-toast img{width:56px;height:56px}}
+@media (prefers-reduced-motion:reduce){.hold-card.star-held,.chain-power-panel.full,.block.star-charging,.block.star-target,#game-screen.star-screen-shake .game-shell{animation:none!important}.star-particle{display:none}.star-effect-core,.star-beam{animation-duration:.28s!important}.star-block-direct-label,.star-award-toast.show{animation-duration:.55s!important}}
+
+/* =========================================================
+   v2.0.12 ホールドUI操作性改善
+   上部は表示専用、下部は操作専用
+   ========================================================= */
+.hold-display{min-width:116px;border-color:#d293e7;background:#fff0ff;font:inherit;color:inherit;cursor:default;user-select:none;pointer-events:none}
+.hold-display:hover{transform:none!important}
+.hold-display.star-held{box-shadow:0 0 0 4px rgba(255,224,75,.45),0 5px 0 rgba(79,60,42,.14);animation:holdStarGlow 1s ease-in-out infinite alternate}
+.hold-display.hold-used{filter:saturate(.92)}
+.hold-exchange-indicator{width:44px;min-width:44px;height:44px;align-self:center;display:grid;place-items:center;border:3px solid #b38ad0;border-radius:15px;background:linear-gradient(145deg,#fff6ff,#ead8f4);box-shadow:0 4px 0 rgba(86,57,102,.16);color:#7550a8;font-size:27px;font-weight:900;line-height:1;user-select:none;pointer-events:none;transition:filter .15s,opacity .15s,box-shadow .15s,transform .15s}
+.hold-exchange-indicator.available{box-shadow:0 0 0 3px rgba(208,157,232,.22),0 4px 0 rgba(86,57,102,.16);filter:brightness(1.04)}
+.hold-exchange-indicator.locked{opacity:.48;filter:grayscale(.45)}
+.falling-control{position:relative}
+.falling-control[hidden]{display:none!important}
+.falling-control.hold-swap{min-width:128px;background:linear-gradient(#b987dd,#8656bd);padding-left:10px;padding-right:10px;gap:7px}
+.falling-control.hold-swap>b{font-size:15px;line-height:1.08;white-space:nowrap}
+.falling-control.hold-swap>span{font-size:25px}
+.hold-button-lock{position:absolute;right:5px;top:3px;font-style:normal;font-size:13px;line-height:1;filter:drop-shadow(0 1px 0 rgba(255,255,255,.7))}
+.falling-control.hold-swap.hold-used:disabled{opacity:.45;filter:grayscale(.58)}
+.falling-controls.hold-only .hold-swap{min-width:172px}
+.falling-control:focus-visible{outline:5px solid #fff36b;outline-offset:3px}
+@media (max-width:1100px){
+  .hold-exchange-indicator{width:38px;min-width:38px;height:38px;font-size:23px;border-radius:13px}
+  .falling-control.hold-swap{min-width:112px}
+  .falling-control.hold-swap>b{font-size:14px}
+}
+@media (max-height:720px) and (orientation:landscape){
+  .hold-display{min-width:92px}
+  .hold-exchange-indicator{width:32px;min-width:32px;height:32px;font-size:20px;border-width:2px;border-radius:10px}
+  .falling-control.hold-swap{min-width:94px}
+  .falling-control.hold-swap>b{font-size:11px}
+  .falling-control.hold-swap>span{font-size:20px}
+  .hold-button-lock{font-size:10px;right:3px;top:2px}
+}
+@media (prefers-reduced-motion:reduce){
+  .hold-display.star-held{animation:none!important}
+  .hold-exchange-indicator{transition:none}
+}
+
+/* =========================================================
+   v2.0.14 おちてくる3分・リザルト強化
+   ========================================================= */
+.falling-intro-lead span{display:inline-block;margin-top:4px;color:#e06b35;font-size:.82em}
+#game-screen.falling-mode .time-card.falling-last10{animation:fallingTimerPulse .7s ease-in-out infinite alternate;border-color:#ff8c45;background:#fff5cf}
+#game-screen.falling-mode .time-card.falling-last10 .time-value{color:#e75635}
+.falling-time-toast,.falling-chain-bonus-toast{position:fixed;left:50%;z-index:70;transform:translateX(-50%);border:4px solid #fff;border-radius:999px;box-shadow:0 7px 0 rgba(72,47,31,.18);font-weight:900;pointer-events:none}
+.falling-time-toast{top:18%;padding:10px 24px;background:#ff9b4b;color:#fff;font-size:clamp(25px,3.3vw,42px)}
+.falling-time-toast.show{display:block!important;animation:fallingTimePop .85s ease both}
+.falling-chain-bonus-toast{top:29%;padding:9px 22px;background:#fff06f;color:#9b4d27;font-size:clamp(22px,2.7vw,34px)}
+.falling-chain-bonus-toast.show{display:block!important;animation:fallingBonusFly .68s ease both}
+
+.result-card.falling-result-active{width:min(930px,94vw);height:min(650px,94vh);padding:18px 28px;grid-template-rows:auto auto minmax(0,1fr) auto}
+.result-card.falling-result-active .result-message{margin-bottom:4px}
+.result-card.falling-result-active .result-main{grid-template-columns:minmax(220px,.76fr) minmax(440px,1.24fr);gap:14px;align-items:stretch}
+.result-card.falling-result-active .result-visual #result-tower-img{width:88%}
+.result-card.falling-result-active .result-bird{width:125px;height:125px;right:-2px}
+.result-card.falling-result-active .confetti{opacity:.48}
+.falling-result-panel{display:grid;grid-template-rows:auto auto auto auto;gap:7px;align-content:center;min-width:0}
+.falling-result-panel[hidden]{display:none!important}
+#standard-result-numbers[hidden]{display:none!important}
+.falling-record-hero{background:linear-gradient(145deg,#fffdf4,#fff3c8);border:4px solid #e6b954;border-radius:22px;padding:8px 14px;box-shadow:0 5px 0 rgba(95,65,35,.14)}
+.falling-record-hero>span{display:block;font-size:17px;font-weight:900;color:#715238}
+.falling-record-hero>strong{display:block;font-size:clamp(31px,4vw,48px);line-height:1.04;color:#df6338;text-shadow:0 2px #fff;white-space:nowrap}
+.falling-record-hero>small{display:inline-block;margin-top:3px;padding:3px 10px;border-radius:999px;background:#fff;color:#6a51b5;font-size:15px;font-weight:900}
+.falling-record-hero.new-record{background:linear-gradient(145deg,#fff9ba,#ffe78a);border-color:#f2a72a}
+.falling-record-hero.new-record>small{background:#f26f47;color:#fff;animation:newRecordPulse .8s ease-in-out infinite alternate}
+.falling-result-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.falling-result-mini{display:grid;gap:1px;background:#fff;border:3px solid #dcc675;border-radius:17px;padding:6px 10px;box-shadow:0 4px 0 rgba(95,65,35,.12)}
+.falling-result-mini span{font-size:13px;font-weight:900;color:#68513d}
+.falling-result-mini strong{font-size:25px;color:#6250bb;line-height:1.08}
+.falling-result-card{display:grid;grid-template-columns:64px minmax(0,1fr);align-items:center;gap:9px;border-radius:18px;padding:5px 11px;text-align:left;box-shadow:0 4px 0 rgba(95,65,35,.12)}
+.falling-result-card img{width:58px;height:58px;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(62,43,28,.13))}
+.falling-result-card div{min-width:0}.falling-result-card span{display:block;font-size:13px;font-weight:900;color:#5f4c39}.falling-result-card strong{display:block;font-size:22px;line-height:1.08;color:#4c43a6;overflow-wrap:anywhere}.falling-result-card small{display:block;font-size:11px;color:#6e6255;font-weight:800;margin-top:2px}
+.falling-result-card.community{background:#eefbff;border:3px solid #7cc9db}
+.falling-result-card.community.community-high{background:#fff8c7;border-color:#efb743}.falling-result-card.community.community-high strong{color:#df6338;font-size:25px}
+.falling-result-card.community.community-soft strong{font-size:18px;color:#5d5794}
+.falling-result-card.goal{background:#fff0e6;border:3px solid #ef9d68}.falling-result-card.goal strong{color:#d75d36}
+.result-card.falling-result-active .result-actions{gap:10px}.result-card.falling-result-active .result-actions .paper-btn{min-width:160px}.result-card.falling-result-active #result-retry-btn{min-width:230px;font-size:25px;transform:scale(1.03)}
+.result-pop-item{animation:resultItemPop .42s ease both;animation-delay:var(--result-delay,0ms)}
+
+@keyframes fallingTimerPulse{from{transform:scale(1)}to{transform:scale(1.055)}}
+@keyframes fallingTimePop{0%{opacity:0;transform:translateX(-50%) scale(.4) rotate(-3deg)}35%,75%{opacity:1;transform:translateX(-50%) scale(1.05) rotate(1deg)}100%{opacity:0;transform:translateX(-50%) translateY(-14px) scale(.96)}}
+@keyframes fallingBonusFly{0%{opacity:0;transform:translateX(-50%) translateY(20px) scale(.55)}28%,70%{opacity:1;transform:translateX(-50%) translateY(0) scale(1.04)}100%{opacity:0;transform:translateX(-50%) translateY(-38px) scale(.92)}}
+@keyframes resultItemPop{0%{opacity:0;transform:translateY(10px) scale(.96)}100%{opacity:1;transform:none}}
+@keyframes newRecordPulse{from{transform:scale(1)}to{transform:scale(1.05)}}
+
+@media (max-height:720px) and (orientation:landscape){
+  .result-card.falling-result-active{height:min(610px,96vh);padding:11px 20px}.result-card.falling-result-active h2{font-size:32px}.result-card.falling-result-active .result-message{font-size:17px}
+  .result-card.falling-result-active .result-main{grid-template-columns:minmax(190px,.7fr) minmax(430px,1.3fr);gap:8px}.result-card.falling-result-active .result-bird{width:100px;height:100px}
+  .falling-result-panel{gap:4px}.falling-record-hero{padding:5px 10px;border-width:3px}.falling-record-hero>span{font-size:13px}.falling-record-hero>strong{font-size:32px}.falling-record-hero>small{font-size:11px;padding:2px 8px}
+  .falling-result-mini-grid{gap:4px}.falling-result-mini{padding:4px 8px;border-width:2px}.falling-result-mini span{font-size:10px}.falling-result-mini strong{font-size:20px}
+  .falling-result-card{grid-template-columns:49px minmax(0,1fr);gap:6px;padding:3px 8px;border-width:2px}.falling-result-card img{width:45px;height:45px}.falling-result-card span{font-size:10px}.falling-result-card strong{font-size:17px}.falling-result-card.community.community-high strong{font-size:20px}.falling-result-card small{font-size:9px}
+  .result-card.falling-result-active .result-actions .paper-btn{min-width:140px;min-height:44px;font-size:16px}.result-card.falling-result-active #result-retry-btn{min-width:190px;font-size:20px}
+}
+@media (max-width:850px) and (orientation:portrait){
+  .result-card.falling-result-active{height:auto}.result-card.falling-result-active .result-main{grid-template-columns:1fr}.result-card.falling-result-active .result-visual{height:260px}.falling-result-panel{width:min(620px,94%);margin:0 auto}.result-card.falling-result-active .result-actions{flex-wrap:wrap}
+}
+@media (prefers-reduced-motion:reduce){.falling-time-toast.show,.falling-chain-bonus-toast.show,.result-pop-item,.falling-record-hero.new-record>small,#game-screen.falling-mode .time-card.falling-last10{animation:none!important}}
+
+
+/* =========================================================
+   v2.0.14 ペアおち3分 試作版
+   新規画像なし：既存数字ブロック＋CSSでペア表現
+   ========================================================= */
+.mode-card.pair-falling{
+  --card-main:#d9679e;--card-light:#ef91bd;--card-dark:#9e3f72;
+  background:linear-gradient(145deg,var(--card-light),var(--card-main));
+  border:5px solid #fff;overflow:hidden;padding-right:120px
+}
+.pair-trial-badge{
+  position:absolute;right:16px;top:10px;z-index:4;
+  display:inline-block;background:#fff7a6;color:#934d2b;border:3px solid #fff;border-radius:999px;
+  padding:3px 11px;font-size:14px;font-weight:900;box-shadow:0 3px 0 rgba(72,47,31,.18);transform:rotate(2deg)
+}
+.pair-card-blocks{position:absolute;right:28px;bottom:13px;display:flex;gap:2px;align-items:center;z-index:3}
+.pair-card-blocks i{
+  width:42px;height:42px;display:grid;place-items:center;font-style:normal;font-size:27px;font-weight:900;color:#fff;
+  background-image:var(--asset-assets-ui-blocks-block-2-png);background-size:100% 100%;background-repeat:no-repeat;
+  text-shadow:0 2px 0 rgba(75,45,33,.28);filter:drop-shadow(0 3px 2px rgba(68,43,31,.18))
+}
+.pair-card-blocks i+ i{background-image:var(--asset-assets-ui-blocks-block-5-png);margin-left:-3px}
+
+/* v2.0.14 上部4枠プレビュー重なり解消：盤面とは独立した共通寸法。
+   向きごとのGrid配置で、ブロック寸法と移動間隔の食い違いを防ぐ。 */
+#game-screen.pair-falling-mode #info-bar{
+  --pair-mini-size:32px;--pair-mini-gap:5px;--pair-mini-font:23px;
+  --pair-preview-extent:calc(var(--pair-mini-size) * 2 + var(--pair-mini-gap))
+}
+#game-screen.pair-falling-mode #info-bar .info-card:not(.time-card){padding:4px 10px}
+#game-screen.pair-falling-mode #info-bar .info-label{flex-shrink:0}
+#game-screen.pair-falling-mode #info-bar .number-tile{
+  width:var(--pair-preview-extent);min-width:var(--pair-preview-extent);
+  height:var(--pair-preview-extent);flex-shrink:0;margin:3px 0 0;position:relative;
+  display:grid;place-items:center;transform:none;font-size:var(--pair-mini-font);
+  background-position:center;background-repeat:no-repeat
+}
+#game-screen.pair-falling-mode #info-bar .number-tile:not(.pair-tile){
+  background-size:var(--pair-mini-size) auto!important
+}
+#game-screen.pair-falling-mode #info-bar .number-tile.pair-tile{
+  background-image:none!important;overflow:visible;text-shadow:none;color:inherit
+}
+#game-screen.pair-falling-mode #info-bar .pair-mini-wrap{
+  position:relative;display:grid;grid-template-columns:repeat(2,var(--pair-mini-size));
+  grid-template-rows:var(--pair-mini-size);gap:var(--pair-mini-gap);
+  width:max-content;height:max-content;isolation:isolate
+}
+#game-screen.pair-falling-mode #info-bar .pair-mini-wrap:is(.o0,.o2){
+  grid-template-columns:var(--pair-mini-size);grid-template-rows:repeat(2,var(--pair-mini-size))
+}
+#game-screen.pair-falling-mode #info-bar .pair-mini-block{
+  position:relative;z-index:1;width:var(--pair-mini-size);height:var(--pair-mini-size);
+  display:grid;place-items:center;background-size:contain;background-position:center;background-repeat:no-repeat;
+  color:#fff;font-size:var(--pair-mini-font);font-weight:900;line-height:1;
+  text-shadow:0 2px 0 rgba(76,49,34,.28);border-radius:7px
+}
+#game-screen.pair-falling-mode #info-bar .pair-mini-link{
+  position:absolute;left:50%;top:50%;width:calc(var(--pair-mini-gap) + 10px);height:6px;
+  transform:translate(-50%,-50%);border-radius:999px;background:#ffe589;
+  border:2px solid rgba(151,103,47,.5);z-index:0;box-shadow:0 2px 0 rgba(86,55,39,.12)
+}
+#game-screen.pair-falling-mode #info-bar .pair-mini-wrap:is(.o0,.o2) .pair-mini-link{transform:translate(-50%,-50%) rotate(90deg)}
+#game-screen.pair-falling-mode #info-bar .pair-mini-wrap.o0 .pair-mini-a{grid-column:1;grid-row:2}
+#game-screen.pair-falling-mode #info-bar .pair-mini-wrap.o0 .pair-mini-b{grid-column:1;grid-row:1}
+#game-screen.pair-falling-mode #info-bar .pair-mini-wrap.o1 .pair-mini-a{grid-column:1;grid-row:1}
+#game-screen.pair-falling-mode #info-bar .pair-mini-wrap.o1 .pair-mini-b{grid-column:2;grid-row:1}
+#game-screen.pair-falling-mode #info-bar .pair-mini-wrap.o2 .pair-mini-a{grid-column:1;grid-row:1}
+#game-screen.pair-falling-mode #info-bar .pair-mini-wrap.o2 .pair-mini-b{grid-column:1;grid-row:2}
+#game-screen.pair-falling-mode #info-bar .pair-mini-wrap.o3 .pair-mini-a{grid-column:2;grid-row:1}
+#game-screen.pair-falling-mode #info-bar .pair-mini-wrap.o3 .pair-mini-b{grid-column:1;grid-row:1}
+@media (max-width:1100px){
+  #game-screen.pair-falling-mode #info-bar{--pair-mini-size:30px;--pair-mini-font:22px}
+}
+#game-screen.pair-falling-mode .current-card{min-width:170px}
+#game-screen.pair-falling-mode .next-card{min-width:125px}
+#game-screen.pair-falling-mode .hold-display{min-width:125px}
+
+/* ペア落下盤面 */
+#game-screen.pair-falling-mode .board-caption{background:#fff0f7;border-color:#d9679e;color:#8f3565;left:14px;right:auto}
+#game-screen.pair-falling-mode .column{cursor:default}
+#game-screen.pair-falling-mode .board-stage{padding-top:calc(var(--cell-size) * 1.02)}
+.pair-falling-member{
+  position:absolute;display:grid;place-items:center;background-size:100% 100%;background-repeat:no-repeat;border-radius:9px;
+  font-size:calc(var(--cell-size) * .56);font-weight:900;color:#fff;text-shadow:0 3px 0 rgba(79,51,35,.3);
+  pointer-events:none;z-index:17;filter:drop-shadow(0 0 8px #fff6a3) drop-shadow(0 5px 3px rgba(63,43,28,.28));
+  will-change:transform,top,left
+}
+.pair-falling-member.locking{animation:lockWiggle .38s ease-in-out infinite alternate}
+.pair-falling-link{
+  position:absolute;z-index:15;height:12px;border-radius:999px;background:linear-gradient(#fff1aa,#f1c968);
+  border:2px solid rgba(141,91,42,.52);box-shadow:0 3px 0 rgba(77,50,31,.16);pointer-events:none;transform-origin:left center
+}
+.pair-ghost-member{
+  position:absolute;display:grid;place-items:center;border-radius:9px;z-index:9;opacity:.33;
+  background:rgba(255,255,255,.28);border:4px dashed rgba(255,219,239,.95);color:rgba(91,67,41,.62);
+  font-size:calc(var(--cell-size) * .5);font-weight:900;pointer-events:none
+}
+.pair-settle-piece{
+  position:absolute;display:grid;place-items:center;background-size:100% 100%;background-repeat:no-repeat;border-radius:9px;
+  color:#fff;font-size:calc(var(--cell-size) * .56);font-weight:900;text-shadow:0 3px 0 rgba(79,51,35,.3);
+  z-index:21;pointer-events:none;animation:pairSettleDrop var(--pair-settle-ms,220ms) cubic-bezier(.18,.72,.3,1) forwards
+}
+@keyframes pairSettleDrop{from{transform:translate(0,0) scale(1)}to{transform:translate(var(--pair-dx,0px),var(--pair-dy,0px)) scale(.99)}}
+
+/* ペア操作：上段 回転・あとで・回転 / 下段 左・落とす・右 */
+#game-screen.pair-falling-mode .falling-controls{
+  display:grid;grid-template-columns:repeat(3,minmax(0,142px));gap:7px 9px;justify-content:center;max-width:490px
+}
+.falling-control.rotate{background:linear-gradient(#e68aba,#bd4f8c);min-width:0}
+.falling-control.rotate>b{font-size:14px;line-height:1.02}
+#game-screen.pair-falling-mode .falling-control{width:100%;min-width:0}
+#game-screen.pair-falling-mode .falling-control.hold-swap{min-width:0}
+#game-screen.pair-falling-mode .rotate-left{grid-column:1;grid-row:1}
+#game-screen.pair-falling-mode .hold-swap{grid-column:2;grid-row:1}
+#game-screen.pair-falling-mode .rotate-right{grid-column:3;grid-row:1}
+#game-screen.pair-falling-mode .left{grid-column:1;grid-row:2}
+#game-screen.pair-falling-mode .drop{grid-column:2;grid-row:2}
+#game-screen.pair-falling-mode .right{grid-column:3;grid-row:2}
+
+/* ペアおちリザルト */
+/* ペアおちリザルトは falling-result-active と共通カードのレイアウトを継承する。 */
+.pair-result-panel[hidden]{display:none!important}
+.pair-placement-note{grid-column:1/-1;font-size:12px;font-weight:800;color:#6e6255;line-height:1.2;text-align:right}
+.pair-placement-note strong{font-size:14px;margin-left:5px;color:#6250bb}
+#pair-result-best{max-width:100%;overflow-wrap:anywhere}
+.pair-best-label{display:block;font-size:.8em}
+#pair-result-panel .falling-record-hero>strong{white-space:normal;overflow-wrap:anywhere}
+@media (max-width:850px) and (orientation:portrait){
+  .result-card.pair-result-active{height:94vh}
+  .result-card.pair-result-active .result-main{overflow-y:auto;align-content:start;padding:0 4px 8px}
+}
+
+/* 低い横画面でも6ボタンとヘッダを収める */
+@media (max-height:720px) and (orientation:landscape){
+  .mode-card.pair-falling{padding-right:102px}
+  .pair-trial-badge{top:3px;right:8px;font-size:10px;padding:2px 7px;border-width:2px}
+  .pair-card-blocks{right:17px;bottom:7px}.pair-card-blocks i{width:31px;height:31px;font-size:20px}
+  #game-screen.pair-falling-mode .game-shell{grid-template-rows:72px minmax(0,1fr) 62px}
+  #game-screen.pair-falling-mode .info-card{height:72px;min-width:92px}
+  #game-screen.pair-falling-mode .current-card{min-width:142px}
+  #game-screen.pair-falling-mode .next-card{min-width:105px}
+  #game-screen.pair-falling-mode .hold-display{min-width:104px}
+  #game-screen.pair-falling-mode #info-bar{--pair-mini-size:22px;--pair-mini-gap:4px;--pair-mini-font:17px}
+  #game-screen.pair-falling-mode #info-bar .info-card:not(.time-card){padding:1px 7px}
+  #game-screen.pair-falling-mode #info-bar .info-label{font-size:12px}
+  #game-screen.pair-falling-mode #info-bar .number-tile{margin-top:2px}
+  #game-screen.pair-falling-mode .falling-controls{grid-template-columns:repeat(3,minmax(0,108px));gap:4px 6px;max-width:360px}
+  #game-screen.pair-falling-mode .falling-control{height:38px;border-width:3px;border-radius:12px;box-shadow:0 3px 0 rgba(68,49,35,.25)}
+  #game-screen.pair-falling-mode .falling-control span{font-size:19px}
+  #game-screen.pair-falling-mode .falling-control b{font-size:11px}
+  #game-screen.pair-falling-mode .falling-control.rotate b{font-size:9.5px}
+  #game-screen.pair-falling-mode .board-section{padding-top:18px;padding-bottom:2px}
+  #game-screen.pair-falling-mode .board-stage{padding-top:calc(var(--cell-size) * .88)}
+  .pair-placement-note{font-size:10px}.pair-placement-note strong{font-size:12px}
+}
+@media (max-width:850px) and (orientation:portrait){
+  #game-screen.pair-falling-mode .falling-controls{grid-template-columns:repeat(3,minmax(0,1fr));width:min(96vw,500px)}
+}
+@media (prefers-reduced-motion:reduce){
+  .pair-settle-piece{animation-duration:.01ms!important}
+}
