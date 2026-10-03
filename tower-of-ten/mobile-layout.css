@@ -1,0 +1,249 @@
+/* Checkpoint 3: user-approved groups, laid out by Grid and Flexbox.
+   All approved draft offsets were 0 and scales were 1: no absolute coordinates
+   or localStorage draft values are needed by the normal page. */
+.mobile-game-layout { display:none; }
+.mobile-tower-celebration, .mobile-tower-celebration[hidden] { display:none; }
+html.tower-mobile {
+  --mobile-side-padding:clamp(6px,1.4vw,8px);
+  --mobile-control-height:clamp(44px,calc(8dvh - 3.2px),48px);
+  --mobile-control-area:calc(var(--mobile-control-height) * 2 + 6px);
+}
+html.tower-mobile, html.tower-mobile body { height:100%; overflow:hidden; }
+html.tower-mobile #app { width:100%; height:var(--tower-viewport-height,100dvh); overflow:hidden; }
+html.tower-mobile .screen { height:100%; min-height:0; overflow:auto; overscroll-behavior:contain; }
+html.tower-mobile #game-screen { overflow:hidden; touch-action:manipulation; }
+html.tower-mobile #game-screen .game-shell {
+  height:100%; min-height:0; padding:calc(4px + env(safe-area-inset-top)) var(--mobile-side-padding) calc(4px + env(safe-area-inset-bottom));
+  display:grid; grid-template-rows:minmax(0,1fr) 36px; gap:3px;
+}
+html.tower-mobile #game-screen .game-shell > .info-bar,
+html.tower-mobile #game-screen .game-shell > .play-area { display:none; }
+html.tower-mobile .mobile-game-layout {
+  display:grid; grid-row:1; min-height:0; grid-template-rows:64px 32px minmax(0,1fr) 23px var(--mobile-control-area); gap:4px;
+}
+html.tower-mobile #game-screen:not(.falling-mode) .mobile-game-layout { grid-template-rows:64px 32px minmax(0,1fr) 23px var(--mobile-control-height); }
+html.tower-mobile #game-screen #info-bar.mobile-preview { display:grid; grid-template-columns:1fr 18px 1.25fr 1fr 1fr; gap:3px; min-width:0; }
+html.tower-mobile #game-screen #info-bar.mobile-preview .info-card:not(.time-card) {
+  min-width:0; height:64px; padding:2px; border-width:2px; border-radius:13px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+}
+html.tower-mobile #game-screen #info-bar.mobile-preview .info-label { font-size:10px; line-height:1.15; white-space:nowrap; }
+html.tower-mobile #game-screen #info-bar.mobile-preview .number-tile { width:34px; height:34px; min-width:0; font-size:23px; margin:2px 0 0; }
+html.tower-mobile #game-screen #info-bar.mobile-preview .number-tile.current { width:38px; height:38px; }
+html.tower-mobile #game-screen #hold-exchange-indicator { width:18px; min-width:0; align-self:center; height:24px; font-size:16px; padding:0; border-width:1px; }
+html.tower-mobile #game-screen.pair-falling-mode #info-bar.mobile-preview { --pair-mini-size:17px; --pair-mini-gap:2px; --pair-mini-font:13px; --pair-preview-extent:36px; }
+html.tower-mobile #game-screen.pair-falling-mode #info-bar.mobile-preview .number-tile { width:36px; height:36px; min-width:36px; }
+html.tower-mobile .mobile-status-row { display:flex; gap:6px; justify-content:space-between; align-items:stretch; }
+html.tower-mobile .mobile-status { width:112px; min-width:0; }
+html.tower-mobile .mobile-status[data-free="true"]::after { content:'じっくり'; display:grid; height:100%; place-items:center; font-weight:800; font-size:13px; background:#fff9db; border-radius:10px; }
+html.tower-mobile #game-screen #timer-item { width:100%; min-width:0; height:32px; padding:2px 6px; border-width:2px; border-radius:10px; flex-direction:row; align-items:center; justify-content:center; gap:5px; }
+html.tower-mobile #game-screen #timer-item .info-label { font-size:10px; }
+html.tower-mobile #game-screen #timer-item .info-label img { width:15px; height:15px; }
+html.tower-mobile #game-screen #time-left { font-size:21px; margin:0; }
+html.tower-mobile .mobile-tower { display:flex; align-items:center; gap:5px; padding:1px 9px 1px 3px; background:#fff8dc; border:2px solid #e2b55e; border-radius:12px; min-width:0; }
+html.tower-mobile .mobile-tower img { width:28px; height:28px; object-fit:contain; }
+html.tower-mobile .mobile-tower strong { font-size:15px; white-space:nowrap; }
+html.tower-mobile .mobile-tower span { font-size:12px; font-weight:800; white-space:nowrap; }
+html.tower-mobile #game-screen .board-stage { width:100%; min-height:0; padding:0; position:relative; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; overflow:visible; }
+html.tower-mobile #game-screen:not(.falling-mode) .board-stage { justify-content:center; }
+html.tower-mobile #game-screen .board-caption { left:50%; right:auto; top:0; transform:translateX(-50%); padding:1px 10px; max-width:98%; white-space:nowrap; font-size:10px; border-width:1px; }
+html.tower-mobile #game-screen .game-board { padding:4px; border-width:6px; border-radius:15px; flex:none; }
+html.tower-mobile #game-screen .cell { border-radius:6px; }
+html.tower-mobile #game-screen .column.hint::before { top:-28px; width:28px; height:28px; }
+html.tower-mobile #game-screen #chain-power-panel { width:100%; margin:0; padding:2px 6px; border-width:1px; border-radius:8px; }
+html.tower-mobile #game-screen .chain-power-heading { font-size:9px; line-height:1; }
+html.tower-mobile #game-screen .chain-power-heading strong { font-size:10px; }
+html.tower-mobile #game-screen .chain-power-segments { gap:3px; margin-top:2px; }
+html.tower-mobile #game-screen .chain-power-segment { height:5px; }
+html.tower-mobile #game-screen #falling-controls { width:100%; max-width:none; min-width:0; margin:0; gap:5px; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); grid-template-rows:repeat(2,var(--mobile-control-height)); align-content:center; }
+html.tower-mobile #game-screen:not(.pair-falling-mode) #hold-swap-btn { grid-column:2; grid-row:1; }
+html.tower-mobile #game-screen:not(.pair-falling-mode) #move-left-btn { grid-column:1; grid-row:2; }
+html.tower-mobile #game-screen:not(.pair-falling-mode) #hard-drop-btn { grid-column:2; grid-row:2; }
+html.tower-mobile #game-screen:not(.pair-falling-mode) #move-right-btn { grid-column:3; grid-row:2; }
+html.tower-mobile #game-screen:not(.falling-mode) #falling-controls { grid-template-rows:var(--mobile-control-height); }
+html.tower-mobile #game-screen .falling-control { width:100%; min-width:0; height:var(--mobile-control-height); border-width:2px; border-radius:13px; gap:3px; padding:2px; touch-action:manipulation; }
+html.tower-mobile #game-screen .falling-control span { font-size:21px; }
+html.tower-mobile #game-screen .falling-control b, html.tower-mobile #game-screen .falling-control.rotate b { font-size:12px; line-height:1.1; }
+html.tower-mobile #game-screen #falling-controls[hidden] { display:none; }
+html.tower-mobile #game-screen .game-footer { grid-row:2; height:36px; min-width:0; flex-direction:row; gap:4px; }
+html.tower-mobile #game-screen .hint-strip { height:36px; min-width:0; }
+html.tower-mobile #game-screen .hint-bird { width:27px; height:32px; margin-right:-7px; }
+html.tower-mobile #game-screen .hint-bubble { height:32px; min-height:0; min-width:0; max-width:none; padding:2px 5px 2px 9px; font-size:9px; line-height:1.15; }
+html.tower-mobile #game-screen .hint-bubble img { width:14px; height:14px; margin-right:3px; }
+html.tower-mobile #game-screen .game-controls { gap:3px; flex:none; }
+html.tower-mobile #game-screen .control-btn { height:34px; border-width:2px; border-radius:10px; padding:3px 5px; gap:2px; font-size:10px; }
+html.tower-mobile #game-screen .control-btn img { width:19px; height:19px; }
+html.tower-mobile #game-screen .chain-toast { font-size:27px; padding:10px 17px; left:50%; }
+html.tower-mobile #game-screen .star-award-toast { font-size:18px; padding:8px 12px; border-width:3px; }
+html.tower-mobile #game-screen .star-award-toast img { width:40px; height:40px; }
+html.tower-mobile #game-screen .pause-card { width:min(300px,90%); padding:20px; }
+html.tower-mobile #game-screen .countdown-card { width:200px; height:190px; }
+html.tower-mobile #game-screen .countdown-card strong { font-size:70px; }
+html.tower-mobile #game-screen.tutorial-mode .game-shell { grid-template-rows:minmax(0,1fr) 62px; }
+html.tower-mobile #game-screen.tutorial-mode .mobile-game-layout { grid-template-rows:64px 32px minmax(0,1fr) 23px; }
+html.tower-mobile #game-screen.tutorial-mode.falling-mode .mobile-game-layout { grid-template-rows:64px 32px minmax(0,1fr) 23px calc(var(--mobile-control-height) + 6px); }
+html.tower-mobile #game-screen.tutorial-mode .mobile-status::after { display:none; }
+html.tower-mobile #game-screen.tutorial-mode .tutorial-step-badge { position:static; width:100%; height:32px; padding:5px 2px; border-width:2px; font-size:12px; text-align:center; }
+html.tower-mobile #game-screen.tutorial-mode .game-footer, html.tower-mobile #game-screen.tutorial-mode .hint-strip { height:62px; }
+html.tower-mobile #game-screen.tutorial-mode .hint-bubble { height:58px; min-height:58px; font-size:12px; line-height:1.3; }
+html.tower-mobile #game-screen.tutorial-mode .hint-bird { height:45px; width:35px; }
+html.tower-mobile #game-screen.tutorial-mode.falling-mode .board-caption { left:50%!important; transform:translateX(-50%)!important; max-width:98%; }
+html.tower-mobile #game-screen.tutorial-mode #falling-controls { grid-template-rows:var(--mobile-control-height); }
+html.tower-mobile #game-screen.tutorial-mode #move-left-btn, html.tower-mobile #game-screen.tutorial-mode #hard-drop-btn, html.tower-mobile #game-screen.tutorial-mode #move-right-btn { grid-row:1; }
+
+html.tower-mobile .mobile-tower img.brick-gain { animation:mobileBrickGain .28s ease-out; }
+html.tower-mobile .mobile-tower-celebration.show:not([hidden]) {
+  position:absolute; left:50%; top:40%; z-index:28; transform:translate(-50%,-50%);
+  width:min(190px,52vw); padding:8px; display:flex; flex-direction:column; align-items:center;
+  background:rgba(255,249,226,.96); border:3px solid #e8b34a; border-radius:22px;
+  box-shadow:0 5px 0 rgba(97,62,28,.16); pointer-events:none; animation:mobileTowerComplete .7s ease-out both;
+}
+html.tower-mobile .mobile-tower-celebration img { height:clamp(120px,20dvh,180px); width:100%; object-fit:contain; }
+html.tower-mobile .mobile-tower-celebration strong { font-size:clamp(13px,3.8vw,18px); white-space:nowrap; color:#b66022; }
+@keyframes mobileBrickGain { 50% { transform:scale(1.18); } }
+@keyframes mobileTowerComplete {
+  0% { opacity:0; transform:translate(-50%,-50%) scale(.65); }
+  20%,72% { opacity:1; transform:translate(-50%,-50%) scale(1); }
+  100% { opacity:0; transform:translate(-50%,-50%) scale(.8); }
+}
+@media (prefers-reduced-motion:reduce) {
+  html.tower-mobile .mobile-tower img.brick-gain { animation:none; }
+  html.tower-mobile .mobile-tower-celebration.show:not([hidden]) { animation:none; }
+}
+
+/* Supporting screens use natural vertical scrolling and bounded widths. */
+html.tower-mobile .title-panel { position:relative; left:auto; top:auto; transform:none; width:calc(100% - 24px); margin:5vh auto 15px; padding:20px 16px; }
+html.tower-mobile .title-panel .game-logo { font-size:74px; }
+html.tower-mobile .title-actions .paper-btn { min-height:48px; }
+html.tower-mobile .mode-panel { position:relative; left:auto; top:auto; transform:none; width:calc(100% - 20px); margin:10px auto; padding:14px; }
+html.tower-mobile .mode-panel h2 { font-size:26px; margin:0 0 8px; }
+html.tower-mobile .mode-mascot { display:none; }
+html.tower-mobile .mode-card { min-height:79px; margin:5px 0; padding:10px 12px; border-radius:18px; }
+html.tower-mobile .mode-card strong { font-size:23px; }
+html.tower-mobile .mode-card > span { font-size:11px; }
+html.tower-mobile .mode-card.pair-falling { padding-right:85px; }
+html.tower-mobile .pair-trial-badge { font-size:10px; right:7px; }
+html.tower-mobile .pair-card-blocks { right:15px; }
+html.tower-mobile .pair-card-blocks i { width:26px; height:26px; font-size:20px; }
+html.tower-mobile .settings-card { width:calc(100% - 18px); max-width:none; padding:16px; margin:10px auto; }
+html.tower-mobile .settings-actions { flex-wrap:wrap; }
+html.tower-mobile .falling-intro-panel { position:relative; left:auto; top:auto; transform:none; width:calc(100% - 18px); margin:10px auto; padding:18px; }
+html.tower-mobile .falling-intro-mascot { display:none; }
+html.tower-mobile .falling-intro-panel h2 { font-size:27px; }
+html.tower-mobile .falling-intro-actions { flex-wrap:wrap; }
+html.tower-mobile .falling-key-guide { font-size:12px; }
+html.tower-mobile .tutorial-complete-panel { position:relative; left:auto; top:auto; transform:none; width:calc(100% - 20px); margin:12px auto; padding:20px; }
+html.tower-mobile .tutorial-complete-bird { position:relative; width:130px; height:140px; left:auto; bottom:auto; }
+html.tower-mobile .tutorial-complete-copy h2 { font-size:30px; }
+html.tower-mobile .tutorial-complete-copy p { font-size:20px; }
+html.tower-mobile .result-card, html.tower-mobile .result-card.falling-result-active, html.tower-mobile .result-card.pair-result-active { position:relative; left:auto; top:auto; transform:none; margin:8px auto; width:calc(100% - 16px); height:auto; min-height:calc(100% - 16px); padding:12px; overflow:hidden; }
+html.tower-mobile .result-card h2 { font-size:26px; margin:6px 0; }
+html.tower-mobile .result-card .result-message { font-size:14px; }
+html.tower-mobile .result-card .result-main { display:grid; grid-template-columns:1fr; overflow:visible; gap:8px; }
+html.tower-mobile .result-card .result-visual { height:clamp(210px,30dvh,280px); min-height:0; }
+html.tower-mobile .result-card .result-visual #result-tower-img { width:min(78%,260px); height:100%; object-position:center bottom; }
+html.tower-mobile .result-card .result-bird { width:clamp(68px,20vw,90px); height:clamp(68px,20vw,90px); right:4px; }
+html.tower-mobile .result-card .result-tower-badge { left:auto; right:4px; top:12px; min-width:80px; font-size:26px; padding:6px 12px; transform:none; }
+html.tower-mobile .falling-result-panel { width:100%; margin:0; gap:6px; }
+html.tower-mobile .falling-record-hero { padding:6px 9px; border-width:2px; }
+html.tower-mobile .falling-record-hero > span { font-size:13px; }
+html.tower-mobile .falling-record-hero > strong { font-size:26px; }
+html.tower-mobile .falling-record-hero > small { font-size:11px; }
+html.tower-mobile .falling-result-mini { padding:4px 6px; border-width:2px; }
+html.tower-mobile .falling-result-mini span { font-size:10px; }
+html.tower-mobile .falling-result-mini strong { font-size:19px; }
+html.tower-mobile .falling-result-card { grid-template-columns:36px minmax(0,1fr); padding:5px 6px; border-width:2px; gap:5px; }
+html.tower-mobile .falling-result-card img { width:34px; height:34px; }
+html.tower-mobile .falling-result-card strong { font-size:15px; }
+html.tower-mobile .falling-result-card span { font-size:10px; }
+html.tower-mobile .falling-result-card small { font-size:9px; }
+html.tower-mobile .result-card .result-actions { flex-wrap:wrap; gap:6px; margin-top:10px; }
+html.tower-mobile .result-card .result-actions .paper-btn, html.tower-mobile .result-card #result-retry-btn { min-width:0; min-height:45px; font-size:17px; padding:7px 12px; transform:none; }
+
+/* A tablet keeps the same groups, with bounded previews and controls. */
+@media (min-width:601px) and (orientation:portrait) {
+  html.tower-mobile .mobile-game-layout,
+  html.tower-mobile #game-screen:not(.falling-mode) .mobile-game-layout { grid-template-rows:80px 32px minmax(0,1fr) 23px var(--mobile-control-height); }
+  html.tower-mobile #game-screen.falling-mode .mobile-game-layout { grid-template-rows:80px 32px minmax(0,1fr) 23px var(--mobile-control-area); }
+  html.tower-mobile #game-screen #info-bar.mobile-preview { width:100%; max-width:660px; margin-inline:auto; }
+  html.tower-mobile #game-screen #info-bar.mobile-preview .info-card:not(.time-card) { height:80px; }
+  html.tower-mobile #game-screen #info-bar.mobile-preview .info-label { font-size:13px; }
+  html.tower-mobile #game-screen #info-bar.mobile-preview .number-tile { width:42px; height:42px; font-size:28px; }
+  html.tower-mobile #game-screen #info-bar.mobile-preview .number-tile.current { width:48px; height:48px; }
+  html.tower-mobile #game-screen.pair-falling-mode #info-bar.mobile-preview { --pair-mini-size:22px; --pair-mini-gap:2px; --pair-mini-font:16px; --pair-preview-extent:46px; }
+  html.tower-mobile #game-screen.pair-falling-mode #info-bar.mobile-preview .number-tile { width:46px; height:46px; min-width:46px; }
+  html.tower-mobile .mobile-status-row { width:100%; max-width:620px; margin-inline:auto; }
+  html.tower-mobile #game-screen #chain-power-panel { width:100%; max-width:560px; justify-self:center; }
+  html.tower-mobile #game-screen #falling-controls { width:100%; max-width:560px; justify-self:center; }
+  html.tower-mobile #game-screen.tutorial-mode:not(.falling-mode) .mobile-game-layout { grid-template-rows:80px 32px minmax(0,1fr) 23px; }
+  html.tower-mobile #game-screen.tutorial-mode.falling-mode .mobile-game-layout { grid-template-rows:80px 32px minmax(0,1fr) 23px calc(var(--mobile-control-height) + 6px); }
+}
+
+/* Low landscape screens put the full board left and all touch controls right. */
+html.tower-landscape { --mobile-side-width:clamp(210px,32vw,320px); }
+html.tower-landscape .mobile-game-layout,
+html.tower-landscape #game-screen.tutorial-mode .mobile-game-layout,
+html.tower-landscape #game-screen.tutorial-mode.falling-mode .mobile-game-layout {
+  grid-template-columns:minmax(0,1fr) var(--mobile-side-width);
+  grid-template-rows:56px 30px minmax(0,1fr) 23px var(--mobile-control-area); column-gap:8px;
+}
+html.tower-landscape #game-screen:not(.falling-mode) .mobile-game-layout { grid-template-rows:56px 30px minmax(0,1fr) 23px var(--mobile-control-height); }
+html.tower-landscape #game-screen #info-bar.mobile-preview { grid-column:2; grid-row:1; }
+html.tower-landscape #game-screen #info-bar.mobile-preview .info-card:not(.time-card) { height:56px; padding:1px; }
+html.tower-landscape #game-screen #info-bar.mobile-preview .info-label { font-size:9px; }
+html.tower-landscape .mobile-status-row { grid-column:2; grid-row:2; gap:3px; }
+html.tower-landscape .mobile-status { width:100px; }
+html.tower-landscape .mobile-tower { padding-right:4px; gap:3px; }
+html.tower-landscape .mobile-tower img { width:24px; height:24px; }
+html.tower-landscape .mobile-tower strong { font-size:13px; }
+html.tower-landscape .mobile-tower span { font-size:11px; }
+html.tower-landscape #game-screen #timer-item { height:30px; gap:3px; padding:1px 3px; }
+html.tower-landscape #game-screen #time-left { font-size:18px; }
+html.tower-landscape #game-screen .board-stage { grid-column:1; grid-row:1 / -1; }
+html.tower-landscape #game-screen #chain-power-panel { grid-column:2; grid-row:4; }
+html.tower-landscape #game-screen #falling-controls { grid-column:2; grid-row:5; }
+html.tower-landscape #game-screen .falling-control { gap:2px; }
+html.tower-landscape #game-screen .falling-control span { font-size:18px; }
+html.tower-landscape #game-screen .falling-control b,
+html.tower-landscape #game-screen .falling-control.rotate b { font-size:10px; }
+html.tower-landscape .mobile-tower-celebration.show:not([hidden]) { left:calc((100% - var(--mobile-side-width) - 8px) / 2); }
+html.tower-landscape .mobile-tower-celebration img { height:120px; }
+html.tower-landscape .howto-card { height:auto; margin:8px auto 16px; padding:16px; justify-content:flex-start; }
+html.tower-landscape .guide-mascot { position:relative; left:auto; bottom:auto; width:100px; height:100px; margin-inline:auto; }
+html.tower-landscape .steps { grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); }
+html.tower-landscape .settings-card { height:auto; }
+
+/* Compact battle information. Normal modes keep their approved layout. */
+html.tower-mobile #game-screen.battle-mode .mobile-game-layout {
+  grid-template-rows:64px 32px 28px 46px minmax(0,1fr) 23px var(--mobile-control-area);
+}
+html.tower-mobile #game-screen.battle-mode #info-bar { grid-row:1; }
+html.tower-mobile #game-screen.battle-mode .mobile-status-row { grid-row:2; }
+html.tower-mobile #game-screen.battle-mode #battle-hud { grid-row:3; height:28px; gap:4px; margin:0; min-width:0; }
+html.tower-mobile #game-screen.battle-mode #battle-hud > div { height:28px; min-width:0; padding:1px 5px; gap:3px; border-radius:9px; }
+html.tower-mobile #game-screen.battle-mode #battle-hud img { width:24px; height:24px; }
+html.tower-mobile #game-screen.battle-mode #battle-hud span { font-size:9px; }
+html.tower-mobile #game-screen.battle-mode #battle-hud strong { font-size:13px; }
+html.tower-mobile #game-screen.battle-mode #battle-opponents { grid-row:4; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; margin:0; }
+html.tower-mobile #game-screen.battle-mode .battle-opponent-card { height:46px; grid-template-columns:22px minmax(0,1fr); grid-template-rows:minmax(0,1fr) 10px; gap:0 3px; padding:2px 3px; border-radius:9px; }
+html.tower-mobile #game-screen.battle-mode .battle-opponent-card img { width:22px; height:22px; }
+html.tower-mobile #game-screen.battle-mode .battle-opponent-card strong { font-size:10px; }
+html.tower-mobile #game-screen.battle-mode .battle-opponent-card small { font-size:8px; white-space:normal; }
+html.tower-mobile #game-screen.battle-mode .battle-opponent-card .op-status { grid-column:1 / -1; font-size:8px; padding:1px 3px; justify-self:end; }
+html.tower-mobile #game-screen.battle-mode .board-stage { grid-row:5; }
+html.tower-mobile #game-screen.battle-mode #chain-power-panel { grid-row:6; }
+html.tower-mobile #game-screen.battle-mode #falling-controls { grid-row:7; }
+html.tower-mobile #game-screen.battle-mode #falling-controls .falling-control { min-width:0; }
+@media (min-width:601px) and (orientation:portrait) {
+  html.tower-mobile #game-screen.battle-mode .mobile-game-layout { grid-template-rows:80px 32px 28px 46px minmax(0,1fr) 23px var(--mobile-control-area); }
+}
+html.tower-landscape #game-screen.battle-mode .mobile-game-layout { grid-template-columns:minmax(0,1fr) var(--mobile-side-width); grid-template-rows:48px 26px 24px 38px minmax(0,1fr) 20px var(--mobile-control-area); gap:3px 8px; }
+html.tower-landscape #game-screen.battle-mode .board-stage { grid-column:1; grid-row:1 / -1; }
+html.tower-landscape #game-screen.battle-mode #battle-hud, html.tower-landscape #game-screen.battle-mode #battle-opponents { grid-column:2; }
+html.tower-landscape #game-screen.battle-mode #battle-hud, html.tower-landscape #game-screen.battle-mode #battle-hud > div { height:24px; }
+html.tower-landscape #game-screen.battle-mode .battle-opponent-card { height:38px; }
+html.tower-landscape #game-screen.battle-mode #info-bar.mobile-preview .info-card:not(.time-card) { height:48px; }
+html.tower-landscape #game-screen.battle-mode #battle-hud .battle-target-card,
+html.tower-landscape #game-screen.battle-mode #battle-hud .battle-garbage-card { flex-direction:column; justify-content:center; gap:0; }
+html.tower-landscape #game-screen.battle-mode #battle-hud .battle-self-card div { flex-direction:column; align-items:center; gap:0; line-height:1; }
+html.tower-landscape #game-screen.battle-mode #battle-hud span { font-size:8px; white-space:nowrap; }
+html.tower-landscape #game-screen.battle-mode #battle-hud strong { font-size:11px; white-space:nowrap; line-height:1; }
