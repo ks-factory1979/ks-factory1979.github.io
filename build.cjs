@@ -2,6 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const data = JSON.parse(fs.readFileSync(path.join(__dirname, 'apps.json'), 'utf8'));
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
+const phraseText = (value, parts) => {
+  if (!parts) return escape(value);
+  if (parts.join('') !== value) throw new Error('Text parts must preserve the original copy.');
+  return parts.map(part => `<span class="text-chunk">${escape(part)}</span>`).join('<wbr>');
+};
 const publicApps = data.apps.filter(app => app.status === 'published');
 const upcomingApps = data.apps.filter(app => app.status === 'coming-soon');
 const siteUrl = new URL(data.siteUrl);
@@ -31,12 +36,12 @@ const cards = publicApps.map(app => `
         </div>
         <div class="app-content">
           <p class="category">${escape(app.category)}</p>
-          <h3>${escape(app.title)}</h3>
-          <p class="app-lead">${escape(app.lead)}</p>
+          <h3>${phraseText(app.title, app.titleParts)}</h3>
+          <p class="app-lead">${phraseText(app.lead, app.leadParts)}</p>
           <p class="app-description">${escape(app.description)}</p>
           <ul class="tags" aria-label="このアプリで楽しめること">${app.tags.map(tag => `<li>${escape(tag)}</li>`).join('')}</ul>
           <a class="play-button" href="${escape(app.url)}" target="_blank" rel="noopener noreferrer" aria-label="${escape(app.title)}であそぶ（新しいタブ）">あそぶ <span aria-hidden="true">↗</span></a>
-          <p class="requirements">${escape(app.requirements)}</p>
+          <p class="requirements">${escape(app.requirements).split('・').map(part => `<span class="text-chunk">${part}</span>`).join('・<wbr>')}</p>
           ${app.note ? `<p class="app-note">${escape(app.note)}</p>` : ''}
         </div>
       </article>`).join('\n');

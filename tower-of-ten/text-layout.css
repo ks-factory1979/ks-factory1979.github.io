@@ -1,0 +1,81 @@
+/* Keep short labels intact; longer copy wraps between its written phrases. */
+.text-chunk { display:inline-block; white-space:nowrap; }
+.paper-btn, .mode-card strong, .mode-card > span, .tutorial-entry-btn strong,
+.tutorial-entry-btn > span, .choice-card, .falling-intro-lead,
+.falling-key-guide b, .falling-board-note, .step-card strong,
+.pair-examples, .pause-card strong, .battle-room-message,
+.battle-network-status strong, .falling-result-card strong,
+.falling-result-card small, .falling-record-hero small {
+  word-break:keep-all; overflow-wrap:break-word;
+}
+.title-small-actions .paper-btn, .mini-toggle span, .control-btn,
+.default-settings-btn,
+.result-actions .paper-btn, .settings-actions .paper-btn,
+.battle-pin-actions .paper-btn, .battle-menu-actions .paper-btn,
+.battle-room-header span, .battle-room-header strong,
+.falling-result-mini span { white-space:nowrap; }
+.mini-toggle img, .mini-toggle input { flex:none; }
+.pair-examples b { display:inline-block; white-space:nowrap; }
+.hint-bubble { word-break:keep-all; overflow-wrap:break-word; }
+.setting-row > span { min-width:0; }
+.setting-row .setting-copy { display:block; word-break:keep-all; }
+.setting-row .setting-copy .text-chunk { display:inline-block; }
+.falling-intro-lead .text-chunk { font-size:inherit; margin:0; color:inherit; }
+.choice-card strong .text-chunk { display:inline-block; font-size:inherit; margin:0; }
+.battle-result-actions { flex-wrap:wrap; }
+.battle-pin-actions { flex-wrap:wrap; justify-content:center; }
+
+html.tower-mobile .title-small-actions .paper-btn { padding-inline:12px; }
+html.tower-mobile .quick-toggles { gap:8px; }
+html.tower-mobile .mini-toggle { padding:5px 8px; gap:5px; font-size:15px; }
+html.tower-mobile .mini-toggle img { width:28px; height:28px; }
+html.tower-mobile .mini-toggle input { width:24px; height:24px; margin:0; }
+html.tower-mobile .setting-row { font-size:16px; }
+html.tower-mobile .setting-row img { width:30px; height:30px; flex:none; }
+html.tower-mobile .setting-row input, html.tower-mobile .setting-row select { min-width:0; }
+html.tower-mobile .setting-row input[type=number] { width:74px; }
+html.tower-mobile .falling-intro-lead { font-size:20px; line-height:1.5; }
+html.tower-mobile .falling-key-guide { padding:10px 8px; }
+html.tower-mobile .falling-key-guide > div { font-size:16px; gap:6px; }
+html.tower-mobile .falling-key-guide .keycap { width:42px; height:42px; flex:none; font-size:23px; }
+html.tower-mobile .falling-board-note { font-size:14px; padding-inline:9px; }
+html.tower-mobile .choice-card strong { font-size:19px; }
+html.tower-mobile .choice-card span { font-size:11px; }
+html.tower-mobile .choice-card strong .text-chunk { font-size:inherit; }
+html.tower-mobile .tutorial-complete-actions .paper-btn { padding-inline:12px; }
+html.tower-mobile .battle-menu-copy h2 { font-size:30px; white-space:nowrap; }
+html.tower-mobile .battle-menu-copy > p:not(.battle-error) { font-size:20px; word-break:keep-all; }
+html.tower-mobile .battle-pin-panel h2 { font-size:26px; word-break:keep-all; line-height:1.4; }
+html.tower-mobile .battle-pin-boxes { width:100%; max-width:330px; gap:6px; }
+html.tower-mobile .battle-pin-boxes span { width:auto; min-width:0; flex:1; height:64px; font-size:34px; }
+html.tower-mobile .battle-pin-actions { width:100%; gap:8px; }
+html.tower-mobile .battle-pin-actions .paper-btn { min-width:0; padding-inline:12px; font-size:18px; }
+html.tower-mobile .battle-room-header { padding:8px; gap:8px; }
+html.tower-mobile .battle-room-header > div:first-child { min-width:0; flex:1; grid-template-columns:1fr; }
+html.tower-mobile .battle-room-header small { grid-column:auto; font-size:10px; word-break:keep-all; }
+html.tower-mobile .battle-room-header strong { font-size:30px; letter-spacing:4px; }
+html.tower-mobile .battle-room-count { flex:none; }
+html.tower-mobile .battle-room-count strong { font-size:22px; letter-spacing:0; }
+html.tower-mobile .battle-room-main h3 { font-size:20px; word-break:keep-all; line-height:1.4; }
+html.tower-mobile .battle-character-card { grid-template-columns:1fr; justify-items:center; padding:6px 4px; gap:2px; }
+html.tower-mobile .battle-character-card img { width:68px; height:68px; }
+html.tower-mobile .battle-character-card > div { text-align:center; }
+html.tower-mobile .battle-character-card strong { font-size:20px; white-space:nowrap; }
+html.tower-mobile .battle-character-card small { font-size:10px; white-space:nowrap; }
+html.tower-mobile .battle-character-card.taken::after { display:none; }
+html.tower-mobile .battle-member-slot { grid-template-columns:44px minmax(0,1fr) auto; gap:5px; padding:4px; }
+html.tower-mobile .battle-member-slot img { width:42px; height:42px; }
+html.tower-mobile .battle-member-slot span { font-size:10px; word-break:keep-all; }
+html.tower-mobile .battle-member-slot .member-ready,
+html.tower-mobile .battle-member-slot .member-waiting { padding:4px; white-space:nowrap; }
+html.tower-mobile .battle-room-actions { grid-template-columns:1fr; }
+html.tower-mobile .battle-room-actions .paper-btn { font-size:18px; }
+html.tower-mobile .battle-spectator-copy h2 { font-size:28px; word-break:keep-all; line-height:1.4; }
+html.tower-mobile .battle-result-panel h2 { font-size:28px; word-break:keep-all; overflow-wrap:break-word; }
+html.tower-mobile .battle-result-actions { gap:8px; }
+html.tower-mobile .battle-result-actions .paper-btn { min-width:0; padding-inline:12px; font-size:18px; }
+
+@media (max-width:600px) {
+  html.tower-mobile .mode-card.falling { padding-top:29px; }
+  html.tower-mobile .mode-card.falling .difficulty-badge { top:3px; }
+}

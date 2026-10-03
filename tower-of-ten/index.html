@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="battle-style.css">
   <link rel="stylesheet" href="mobile-layout.css">
+  <link rel="stylesheet" href="text-layout.css">
 </head>
 <body>
   <main id="app">
@@ -132,7 +133,7 @@
     <!-- PIN入力 -->
     <section id="battle-pin-screen" class="screen screen-bg howto-bg" aria-label="PIN入力">
       <div class="battle-pin-panel paper-panel">
-        <h2>へやの PINを いれてね</h2>
+        <h2><span class="text-chunk">へやの PINを</span> <span class="text-chunk">いれてね</span></h2>
         <div id="battle-pin-boxes" class="battle-pin-boxes" aria-live="polite">
           <span>−</span><span>−</span><span>−</span><span>−</span>
         </div>
@@ -159,7 +160,7 @@
         </header>
         <div class="battle-room-main">
           <section class="battle-character-section">
-            <h3>キャラクターを えらぼう！</h3>
+            <h3><span class="text-chunk">キャラクターを</span> <span class="text-chunk">えらぼう！</span></h3>
             <div id="battle-character-grid" class="battle-character-grid"></div>
             <button id="battle-ready-btn" class="paper-btn green battle-ready-btn" type="button" onclick="battleToggleReady()" disabled>じゅんびOK！</button>
           </section>
@@ -180,7 +181,7 @@
     <section id="battle-spectator-screen" class="screen screen-bg result-bg" aria-label="対戦観戦画面">
       <div class="battle-spectator-panel paper-panel">
         <img id="battle-spectator-character" data-battle-asset="pipi_cheer" alt="応援するキャラクター">
-        <div class="battle-spectator-copy"><h2>いっぱいになったよ！</h2><p>みんなを<br>おうえんしよう！</p></div>
+        <div class="battle-spectator-copy"><h2><span class="text-chunk">いっぱいに</span><wbr><span class="text-chunk">なったよ！</span></h2><p>みんなを<br>おうえんしよう！</p></div>
         <div class="battle-spectator-time">のこり <strong id="battle-spectator-time">0:00</strong></div>
         <div id="battle-spectator-list" class="battle-spectator-list"></div>
       </div>
@@ -193,8 +194,8 @@
         <p id="battle-result-network-note" class="battle-result-network-note" hidden>つうしんが ふあんていだったため、けっかが ずれることがあります</p>
         <div id="battle-result-list" class="battle-result-list"></div>
         <div class="battle-result-actions">
-          <button class="paper-btn blue" type="button" onclick="battleRequestRematch()">もういちど たいせん</button>
-          <button class="paper-btn orange" type="button" onclick="battleLeaveToModes()">モードを えらぶ</button>
+          <button class="paper-btn blue" type="button" onclick="battleRequestRematch()"><span class="text-chunk">もういちど</span> <span class="text-chunk">たいせん</span></button>
+          <button class="paper-btn orange" type="button" onclick="battleLeaveToModes()"><span class="text-chunk">モードを</span> <span class="text-chunk">えらぶ</span></button>
         </div>
       </div>
     </section>
@@ -221,15 +222,15 @@
         <div class="falling-intro-content">
           <span class="difficulty-badge intro-badge">むずかしい！</span>
           <h2>おちてくるモード</h2>
-          <p class="falling-intro-lead">3ぷんで きろくに ちょうせん！<br><span>れんさで とうが ぐんとのびるよ</span></p>
+          <p class="falling-intro-lead"><span class="text-chunk">3ぷんで きろくに</span> <span class="text-chunk">ちょうせん！</span><br><span class="falling-intro-subcopy"><span class="text-chunk">れんさで とうが</span> <span class="text-chunk">ぐんとのびるよ</span></span></p>
           <div class="falling-key-guide" aria-label="操作方法">
             <div><span class="keycap">◀</span><span class="keycap">▶</span><b>で うごかそう</b></div>
-            <div><span class="keycap down">▼</span><b>で いっきに おとそう</b></div>
+            <div><span class="keycap down">▼</span><b><span class="text-chunk">で いっきに</span> <span class="text-chunk">おとそう</span></b></div>
           </div>
-          <p class="falling-board-note">7れつ × 8だんの おおきな ばんめんだよ</p>
+          <p class="falling-board-note"><span class="text-chunk">7れつ × 8だんの</span> <span class="text-chunk">おおきな ばんめんだよ</span></p>
           <div class="falling-choice-actions">
-            <button class="choice-card practice" type="button" onclick="startFallingTutorial()"><strong>れんしゅうする</strong><span>ゆっくり そうさを おぼえよう</span></button>
-            <button class="choice-card direct" type="button" onclick="startGame('falling')"><strong>すぐにはじめる</strong><span>ほんばんに ちょうせん！</span></button>
+            <button class="choice-card practice" type="button" onclick="startFallingTutorial()"><strong><span class="text-chunk">れんしゅう</span><wbr><span class="text-chunk">する</span></strong><span>ゆっくり そうさを おぼえよう</span></button>
+            <button class="choice-card direct" type="button" onclick="startGame('falling')"><strong><span class="text-chunk">すぐに</span><wbr><span class="text-chunk">はじめる</span></strong><span>ほんばんに ちょうせん！</span></button>
           </div>
           <button class="paper-btn blue compact" type="button" onclick="showScreen('mode')">もどる</button>
         </div>
@@ -242,7 +243,7 @@
         <img class="tutorial-complete-bird" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/mascot/mascot_cheer.png" alt="よろこぶ青い小鳥">
         <div class="tutorial-complete-copy"><h2>れんしゅう できた！</h2><p>10の とうを<br>つくってみよう！</p></div>
         <div class="tutorial-complete-actions">
-          <button class="paper-btn green" type="button" onclick="startGame('free')">じっくりモードではじめる</button>
+          <button class="paper-btn green" type="button" onclick="startGame('free')"><span class="text-chunk">じっくりモードで</span><wbr><span class="text-chunk">はじめる</span></button>
           <button class="paper-btn orange compact" type="button" onclick="showScreen('mode')">モードをえらぶ</button>
           <button class="paper-btn blue compact" type="button" onclick="startBasicTutorial()">もういちど れんしゅう</button>
         </div>
@@ -255,7 +256,7 @@
         <img class="tutorial-complete-bird" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/mascot/mascot_cheer.png" alt="よろこぶ青い小鳥">
         <div class="tutorial-complete-copy"><h2>ばっちり！</h2><p>おちてくるモードに<br>ちょうせんしよう！</p></div>
         <div class="tutorial-complete-actions">
-          <button class="paper-btn green" type="button" onclick="startGame('falling')">おちてくるモードをはじめる</button>
+          <button class="paper-btn green" type="button" onclick="startGame('falling')"><span class="text-chunk">おちてくるモードを</span><wbr><span class="text-chunk">はじめる</span></button>
           <button class="paper-btn orange compact" type="button" onclick="showScreen('mode')">モードをえらぶ</button>
           <button class="paper-btn blue compact" type="button" onclick="startFallingTutorial()">もういちど れんしゅう</button>
         </div>
@@ -441,11 +442,11 @@
         <div class="settings-grid">
           <label class="setting-row"><span><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/speaker_on.png" alt="">おと</span><input type="checkbox" id="setting-sound"></label>
           <label class="setting-row"><span><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/bulb.png" alt="">ヒント</span><input type="checkbox" id="setting-hint"></label>
-          <label class="setting-row"><span><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/clock.png" alt="">チャレンジじかん</span><select id="setting-time"><option value="1">１ぷん</option><option value="2">２ふん</option><option value="3">３ぷん</option><option value="4">４ふん</option><option value="5">５ふん</option></select></label>
+          <label class="setting-row"><span><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/clock.png" alt=""><span class="setting-copy"><span class="text-chunk">チャレンジ</span><wbr><span class="text-chunk">じかん</span></span></span><select id="setting-time"><option value="1">１ぷん</option><option value="2">２ふん</option><option value="3">３ぷん</option><option value="4">４ふん</option><option value="5">５ふん</option></select></label>
           <label class="setting-row"><span>ばんめんの れつ</span><input type="number" id="setting-cols" min="3" max="7" value="5"></label>
           <label class="setting-row"><span>ばんめんの だん</span><input type="number" id="setting-rows" min="4" max="8" value="6"></label>
-          <label class="setting-row"><span>でる すうじ</span><select id="setting-range" onchange="updateRangeVisibility()"><option value="all">1〜9 すべて</option><option value="low">1〜5</option><option value="high">6〜9</option><option value="custom">せんせい してい</option></select></label>
-          <label id="custom-range-container" class="setting-row custom-row"><span>すうじを カンマで</span><input type="text" id="setting-custom" placeholder="1,3,5,7"></label>
+          <label class="setting-row"><span class="setting-copy"><span class="text-chunk">でる</span> <span class="text-chunk">すうじ</span></span><select id="setting-range" onchange="updateRangeVisibility()"><option value="all">1〜9 すべて</option><option value="low">1〜5</option><option value="high">6〜9</option><option value="custom">せんせい してい</option></select></label>
+          <label id="custom-range-container" class="setting-row custom-row"><span class="setting-copy"><span class="text-chunk">すうじを</span> <span class="text-chunk">カンマで</span></span><input type="text" id="setting-custom" placeholder="1,3,5,7"></label>
         </div>
         <div class="falling-settings-note">※おちてくるモードは 7れつ×8だんです</div>
         <div class="settings-default-box">
