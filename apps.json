@@ -15,13 +15,25 @@
       "featured": true,
       "lead": "村を育てて、その先の洞窟へ。",
       "description": "ことばを打って素材を集め、自分の村を育てよう。村を完成させたら「試練の洞窟」へ。どこまで進めるか挑戦して、みんなの記録と自分のベストを比べられます。",
-      "tags": ["ローマ字入力", "村づくり", "自己ベストに挑戦"],
+      "tags": [
+        "ローマ字入力",
+        "村づくり",
+        "自己ベストに挑戦"
+      ],
       "requirements": "キーボード推奨・Googleログイン不要",
       "url": "https://script.google.com/macros/s/AKfycbx2Mif7UiKL39yoMH2xBmJafxYC4tVGCuxAabwfFC2Zfq9blBA0UBKlG5NI1-sIZpLOhg/exec",
       "cover": "typing-cave.png",
       "coverAlt": "試練の洞窟のゲーム画面。たいまつの残り時間を見ながら、表示されたことばを入力します。",
       "logo": "typing-logo.webp",
-      "note": "洞窟の比較はブラウザごとの自己ベストで集計します。30件未満は集計中と表示されます。"
+      "note": "洞窟の比較はブラウザごとの自己ベストで集計します。30件未満は集計中と表示されます。",
+      "titleParts": [
+        "ことば探検",
+        "タイピング村"
+      ],
+      "leadParts": [
+        "村を育てて、",
+        "その先の洞窟へ。"
+      ]
     },
     {
       "id": "hiragana-town",
@@ -30,13 +42,25 @@
       "status": "published",
       "lead": "ことばを見つけて、自分だけの町へ。",
       "description": "ひらがなを読んで、ぴったりの絵を選ぼう。宝箱から集めたアイテムを好きな場所に並べて、自分だけの町づくり。あ行からわ行まで220語に挑戦できます。",
-      "tags": ["ひらがなの読み", "220語のことば", "自由な町づくり"],
+      "tags": [
+        "ひらがなの読み",
+        "220語のことば",
+        "自由な町づくり"
+      ],
       "requirements": "タッチ・マウス対応・Googleログイン不要",
       "url": "https://ks-factory1979.github.io/hiragana-town/",
       "cover": "hiragana-cover.webp",
       "coverAlt": "ひらがなタウンの明るい町の背景",
       "logo": "hiragana-logo.webp",
-      "note": "町の記録はこの端末・ブラウザに保存。「せんせい」メニューからセーブを書き出したり、GAS版の記録を読み込んだりできます。"
+      "note": "町の記録はこの端末・ブラウザに保存。「せんせい」メニューからセーブを書き出したり、GAS版の記録を読み込んだりできます。",
+      "titleParts": [
+        "ひらがなタウン",
+        "をつくろう！"
+      ],
+      "leadParts": [
+        "ことばを見つけて、",
+        "自分だけの町へ。"
+      ]
     },
     {
       "id": "tower-of-ten",
@@ -54,9 +78,21 @@
       "url": "https://ks-factory1979.github.io/tower-of-ten/",
       "cover": "tower-of-ten/portal-cover.webp",
       "coverAlt": "れんがを持つ青い小鳥と、色とりどりの塔。10の塔のタイトル背景。",
-      "note": "自己ベストはこの端末・ブラウザに保存。おちてくる3分とペアおち3分の共有記録・オンライン対戦には通信が必要です。氏名・メールアドレスは保存しません。"
+      "note": "自己ベストはこの端末・ブラウザに保存。おちてくる3分とペアおち3分の共有記録・オンライン対戦には通信が必要です。氏名・メールアドレスは保存しません。",
+      "titleParts": [
+        "10の塔"
+      ],
+      "leadParts": [
+        "10をつくって、",
+        "塔を育てよう。"
+      ],
+      "logo": "tower-of-ten/portal-logo.png"
     },
-    {"id":"coloring-logic","title":"ぬりえロジック","status":"coming-soon"},
+    {
+      "id": "coloring-logic",
+      "title": "ぬりえロジック",
+      "status": "coming-soon"
+    },
     {
       "id": "calculation-battle",
       "title": "ひっぱれ！けいさんバトル",
@@ -64,14 +100,24 @@
       "status": "published",
       "lead": "こたえて、ひっぱれ！",
       "description": "たし算・ひき算・かけ算・わり算に答えて、綱引き勝負。動物CPUとの対戦、1台をはさんだ2人対戦、月間王者のゴーストへの挑戦を楽しめます。",
-      "tags": ["四則計算", "ひとり・ふたり対戦", "月間王者に挑戦"],
+      "tags": [
+        "四則計算",
+        "ひとり・ふたり対戦",
+        "月間王者に挑戦"
+      ],
       "requirements": "タッチ・キーボード対応・Googleログイン不要",
       "url": "https://ks-factory1979.github.io/calculation-battle/",
       "cover": "calculation-battle/assets/characters/17c516aac6e586eb7300.png",
       "coverAlt": "運動場を舞台にした、ひっぱれ！けいさんバトルのゲーム画面",
       "logo": "calculation-battle/assets/backgrounds/c7fcae6f3938fd48f7bc.png",
-      "note": "通常CPU戦と2人対戦は通信できない時も遊べます。公式記録・月間王者・ゴーストはK's Factory一般公開サーバーを利用し、氏名・メールアドレスは保存しません。"
+      "note": "通常CPU戦と2人対戦は通信できない時も遊べます。公式記録・月間王者・ゴーストはK's Factory一般公開サーバーを利用し、氏名・メールアドレスは保存しません。",
+      "titleParts": [
+        "ひっぱれ！",
+        "けいさんバトル"
+      ],
+      "leadParts": [
+        "こたえて、ひっぱれ！"
+      ]
     }
   ]
 }
-
