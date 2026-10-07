@@ -78,6 +78,7 @@ html.tower-mobile #game-screen .star-award-toast img { width:40px; height:40px; 
 html.tower-mobile #game-screen .pause-card { width:min(300px,90%); padding:20px; }
 html.tower-mobile #game-screen .countdown-card { width:200px; height:190px; }
 html.tower-mobile #game-screen .countdown-card strong { font-size:70px; }
+html.tower-mobile #game-screen .countdown-card strong.start-label { font-size:34px; }
 html.tower-mobile #game-screen.tutorial-mode .game-shell { grid-template-rows:minmax(0,1fr) 62px; }
 html.tower-mobile #game-screen.tutorial-mode .mobile-game-layout { grid-template-rows:64px 32px minmax(0,1fr) 23px; }
 html.tower-mobile #game-screen.tutorial-mode.falling-mode .mobile-game-layout { grid-template-rows:64px 32px minmax(0,1fr) 23px calc(var(--mobile-control-height) + 6px); }
