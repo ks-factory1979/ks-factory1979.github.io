@@ -2228,6 +2228,7 @@ function beginResumeCountdown() {
   function next() {
     if (!gameRunning || session !== gameSessionToken) return;
     countdownText.textContent = steps[index];
+    countdownText.classList.toggle('start-label', index === steps.length - 1);
     index++;
     if (index < steps.length) {
       countdownTimer = setTimeout(next, 620);
@@ -2235,6 +2236,7 @@ function beginResumeCountdown() {
       countdownTimer = setTimeout(() => {
         if (!gameRunning || session !== gameSessionToken) return;
         countdownOverlay.hidden = true;
+        countdownText.classList.remove('start-label');
         resumeCountdownActive = false;
         paused = false;
         setPauseButton(false);
