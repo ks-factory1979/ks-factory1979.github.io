@@ -59,9 +59,12 @@ for(const rule of ['two','three','either'])test(`${rule}: time expiry waits for 
 test('pair generator excludes internal ten in all rules, including explicit complementary inputs',()=>{
   const g=setup();for(const rule of ['two','three','either']){g.run(`ruleMode='${rule}'`);for(let i=0;i<1000;i++){const p=g.c.makePairObject();assert.notEqual(p.first.val+p.second.val,10);}const p=g.c.makePairObject(4,6);assert.notEqual(p.first.val+p.second.val,10);}
 });
-test('Phase 1 keeps the existing rescue in free, timed and normal falling',()=>{
+test('two rescue remains in free/timed and is absent from all falling modes',()=>{
   const g=setup();g.setBoard([[9],[],[]]);g.c.Math.random=()=>0;g.run('noTenCounter=4');
-  for(const mode of ['free','timed','falling']){g.run(`currentMode='${mode}'`);assert.equal(g.c.randomNumber(),1);}g.run("currentMode='battle'");assert.equal(g.c.randomNumber(),8);
+  for(const mode of ['free','timed']){g.run(`currentMode='${mode}'`);assert.equal(g.c.randomNumber(),1);}
+  g.c.Math.random=()=>0.5;
+  for(const mode of ['falling','pairFalling','fallingTutorial']){g.run(`currentMode='${mode}'`);assert.equal(g.c.randomNumber(),5);}
+  g.run("currentMode='battle'");assert.equal(g.c.randomNumber(),8);
 });
 test('hold is disabled after one use and while paused',()=>{
   const g=setup();g.run('numbersQueue=[{kind:"number",val:3}]');assert.equal(g.c.canUseHold(),true);

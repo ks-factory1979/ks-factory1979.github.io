@@ -106,6 +106,7 @@ let bestChain = 0;
 let noTenCounter = 0;
 let currentMode = 'free';
 let ruleMode = 'two';
+let selectedSoloRule = 'two';
 let soundOn = true;
 let hintOn = true;
 let paused = false;
@@ -1129,6 +1130,24 @@ function openFallingIntro() {
   requestGameFullscreen();
   stopCurrentGame();
   showScreen('fallingIntro');
+  document.getElementById('falling-intro-rule').textContent = getRuleLabel(selectedSoloRule);
+}
+function getRuleLabel(rule = getActiveRuleMode()) {
+  return {two:'2つで10', three:'3つで10', either:'どっちでも10'}[rule];
+}
+function selectSoloRule(rule) {
+  if (!TenTowerRules.ruleModes.includes(rule)) throw new RangeError('Invalid ruleMode');
+  selectedSoloRule = rule;
+  document.querySelectorAll('[data-solo-rule]').forEach(button => {
+    button.setAttribute('aria-pressed', String(button.dataset.soloRule === rule));
+  });
+  document.getElementById('solo-rule-description').textContent = {
+    two:'たて・よこに 2こで10！', three:'たて・よこに 3こで10！', either:'2こでも 3こでも10！'
+  }[rule];
+}
+function startSelectedSoloMode(mode) {
+  if (!['free','timed','falling','pairFalling'].includes(mode)) throw new RangeError('Invalid solo mode');
+  startGame(mode, {ruleMode:selectedSoloRule});
 }
 function returnToTitle() {
   if (isBattleMode() && typeof battleLeaveToModes === 'function') { battleLeaveToModes(); return; }
@@ -1192,7 +1211,8 @@ function startGame(mode, options = {}) {
   gameScreen.classList.remove('tutorial-mode');
   updateActionControlVisibility();
   const caption = document.getElementById('board-caption');
-  caption.textContent = isPairFallingMode() ? '2こを まわして れんさをねらえ！' : (isFallingMode() ? '◀ ▶で うごかそう！' : 'おきたい れつを タップ！');
+  caption.textContent = isBattleMode() || isTutorialMode() ? '◀ ▶で うごかそう！' :
+    `${getRuleLabel()}・${isPairFallingMode() ? 'ペアを まわそう！' : (isFallingMode() ? '◀ ▶で うごかそう！' : 'れつを タップ！')}`;
   setTutorialChrome(false);
 
   if (timerInterval) clearInterval(timerInterval);
@@ -1300,13 +1320,21 @@ function randomNumber() {
     allowed = [1,2,3,4,5,6,7,8,9];
   }
 
-  if (noTenCounter >= 4) {
+  const rescueAfter = getActiveRuleMode() === 'either' ? 6 : 4;
+  if (['free','timed'].includes(currentMode) && noTenCounter >= rescueAfter) {
     const candidatesSet = new Set();
-    for (let c = 0; c < BOARD_COLS; c++) {
-      for (let r = 0; r < board[c].length; r++) {
-        const complement = 10 - board[c][r].val;
-        if (complement >= 1 && complement <= 9) candidatesSet.add(complement);
+    if (getActiveRuleMode() === 'two') {
+      // Keep the original two-rule rescue distribution in free/timed.
+      for (let c = 0; c < BOARD_COLS; c++) {
+        for (let r = 0; r < board[c].length; r++) {
+          const complement = 10 - board[c][r].val;
+          if (complement >= 1 && complement <= 9) candidatesSet.add(complement);
+        }
       }
+    } else {
+      allowed.forEach(value => {
+        if (TenTowerRules.findPlacementHints(board, {ruleMode:getActiveRuleMode(), value, maxRows:BOARD_ROWS}).length) candidatesSet.add(value);
+      });
     }
     const candidates = allowed.filter(n => candidatesSet.has(n));
     if (candidates.length > 0) return candidates[Math.floor(Math.random() * candidates.length)];
@@ -1654,18 +1682,21 @@ function clearHintHighlights() {
   if (hintText) hintText.textContent = '';
 }
 function getHintColumns(current) {
-  const hintCols = [];
-  for (let col = 0; col < BOARD_COLS; col++) {
-    const colData = board[col];
-    if (colData.length >= BOARD_ROWS) continue;
-    const rowIndex = colData.length;
-    let immediate = false;
-    if (rowIndex > 0 && colData[rowIndex - 1].val + current === 10) immediate = true;
-    if (col > 0 && board[col - 1].length > rowIndex && board[col - 1][rowIndex].val + current === 10) immediate = true;
-    if (col < BOARD_COLS - 1 && board[col + 1].length > rowIndex && board[col + 1][rowIndex].val + current === 10) immediate = true;
-    if (immediate) hintCols.push(col);
+  return TenTowerRules.findPlacementHints(board, {ruleMode:getActiveRuleMode(), value:current, maxRows:BOARD_ROWS}).map(hint => hint.col);
+}
+function getNumberHintText(current) {
+  const rule = getActiveRuleMode();
+  const hints = TenTowerRules.findPlacementHints(board, {ruleMode:rule, value:current, maxRows:BOARD_ROWS});
+  if (rule === 'two') {
+    return hints.length ? (isFallingMode() ? `${10-current}の となりを めざそう！` : `${10-current}を さがしてみよう！`) :
+      (isFallingMode() ? 'つぎの すうじも みてみよう' : `${10-current}を さがしてみよう！`);
   }
-  return hintCols;
+  if (!hints.length) return rule === 'three' ? 'たて・よこに 3こで10！' : '2こか 3こで10を ねらおう！';
+  const hint = hints[0], group = hint.groups[0], anchor = `${hint.col},${hint.row}`;
+  const others = group.cells.filter(key => key !== anchor).map(key => {
+    const [col,row] = key.split(',').map(Number); return board[col][row].val;
+  });
+  return `${others.join('と')}に つなげよう！`;
 }
 function updateHints() {
   document.querySelectorAll('#board .column').forEach(col => col.classList.remove('hint'));
@@ -1680,17 +1711,12 @@ function updateHints() {
   if (isStarBlock(currentObj)) { hintIcon.style.display='block'; hintText.textContent='すきな れつで じゅうじに けそう！'; return; }
   if (isPairBlock(currentObj)) {
     hintIcon.style.display='block';
-    hintText.textContent='2こを まわして 10と れんさを ねらおう！';
+    hintText.textContent={two:'ペアを まわして 2こで10！',three:'ペアを まわして 3こで10！',either:'ペアを まわして 2こか3こで10！'}[getActiveRuleMode()];
     return;
   }
   const current = currentObj.val;
-  const hintCols = getHintColumns(current);
   hintIcon.style.display = 'block';
-  if (hintCols.length > 0) {
-    hintText.textContent = isFallingMode() ? `${10 - current}の となりを めざそう！` : `${10 - current}を さがしてみよう！`;
-  } else {
-    hintText.textContent = isFallingMode() ? 'つぎの すうじも みてみよう' : `${10 - current}を さがしてみよう！`;
-  }
+  hintText.textContent = getNumberHintText(current);
 }
 
 // ========= 通常モードの配置 =========

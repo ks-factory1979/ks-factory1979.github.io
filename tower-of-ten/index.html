@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="battle-style.css">
   <link rel="stylesheet" href="mobile-layout.css">
   <link rel="stylesheet" href="text-layout.css">
+  <link rel="stylesheet" href="solo-rules.css">
 </head>
 <body>
   <main id="app">
@@ -74,7 +75,7 @@
             <div class="mini-demo"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/brick.png" alt="れんが"><span class="demo-arrow">→</span><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/towers/tower_3.png" alt="塔"></div>
           </article>
         </div>
-        <div class="pair-examples">10の なかま： <b>1と9</b>・<b>2と8</b>・<b>3と7</b>・<b>4と6</b>・<b>5と5</b><br><span class="next-tower-note">とうが できたら、つぎの とうを つくろう！</span></div>
+        <div class="pair-examples"><span class="text-chunk">2つで10：4＋6</span>　<span class="text-chunk">3つで10：2＋3＋5</span><br><span class="text-chunk">どっちでも10は 両方OK！</span><br><span class="next-tower-note">たて・よこに つなげよう。ななめは きえないよ。</span></div>
       </div>
     </section>
 
@@ -83,24 +84,30 @@
       <div class="mode-panel paper-panel">
         <img class="mode-mascot" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/mascot/mascot_title.png" alt="れんがを持つ青い小鳥">
         <h2>どれで あそぶ？</h2>
-        <button class="mode-card free" type="button" onclick="startGame('free')">
+        <div class="solo-rule-picker" role="group" aria-label="10のルール">
+          <button type="button" data-solo-rule="two" aria-pressed="true" onclick="selectSoloRule('two')"><span class="text-chunk">2つで10</span></button>
+          <button type="button" data-solo-rule="three" aria-pressed="false" onclick="selectSoloRule('three')"><span class="text-chunk">3つで10</span></button>
+          <button type="button" data-solo-rule="either" aria-pressed="false" onclick="selectSoloRule('either')"><span class="text-chunk">どっちでも10</span></button>
+        </div>
+        <p id="solo-rule-description" class="solo-rule-description" aria-live="polite">たて・よこに 2こで10！</p>
+        <button class="mode-card free" type="button" onclick="startSelectedSoloMode('free')">
           <strong>じっくりモード</strong><span>じぶんの ペースで かんがえよう</span>
         </button>
-        <button class="mode-card timed" type="button" onclick="startGame('timed')">
+        <button class="mode-card timed" type="button" onclick="startSelectedSoloMode('timed')">
           <strong><span id="mode-time-label">３</span>ぷん チャレンジ</strong><span>３ぷんで とうを いくつ つくれるかな？</span>
         </button>
         <button class="mode-card falling" type="button" onclick="openFallingIntro()">
           <span class="difficulty-badge">むずかしい！</span>
           <strong>おちてくるモード</strong><span>3ぷんで どこまで とうを のばせるかな？</span>
         </button>
-        <button class="mode-card pair-falling" type="button" onclick="startGame('pairFalling')">
+        <button class="mode-card pair-falling" type="button" onclick="startSelectedSoloMode('pairFalling')">
           <span class="pair-trial-badge">ためし版</span>
           <span class="pair-card-blocks" aria-hidden="true"><i>3</i><i>6</i></span>
           <strong>ペアおち3分</strong><span>2こをまわして れんさをねらえ！</span>
         </button>
         <button class="mode-card battle" type="button" onclick="openBattleMenu()">
           <span class="battle-new-badge">みんなで！</span>
-          <strong>たいせんモード</strong><span>みんなで 10を つくろう！</span>
+          <strong>たいせんモード</strong><span>たいせんは 2つで10だよ</span>
         </button>
         <button class="paper-btn blue compact" type="button" onclick="showScreen('title')">もどる</button>
       </div>
@@ -222,6 +229,7 @@
         <div class="falling-intro-content">
           <span class="difficulty-badge intro-badge">むずかしい！</span>
           <h2>おちてくるモード</h2>
+          <p id="falling-intro-rule" class="intro-rule-label">2つで10</p>
           <p class="falling-intro-lead"><span class="text-chunk">3ぷんで きろくに</span> <span class="text-chunk">ちょうせん！</span><br><span class="falling-intro-subcopy"><span class="text-chunk">れんさで とうが</span> <span class="text-chunk">ぐんとのびるよ</span></span></p>
           <div class="falling-key-guide" aria-label="操作方法">
             <div><span class="keycap">◀</span><span class="keycap">▶</span><b>で うごかそう</b></div>
@@ -230,7 +238,7 @@
           <p class="falling-board-note"><span class="text-chunk">7れつ × 8だんの</span> <span class="text-chunk">おおきな ばんめんだよ</span></p>
           <div class="falling-choice-actions">
             <button class="choice-card practice" type="button" onclick="startFallingTutorial()"><strong><span class="text-chunk">れんしゅう</span><wbr><span class="text-chunk">する</span></strong><span>ゆっくり そうさを おぼえよう</span></button>
-            <button class="choice-card direct" type="button" onclick="startGame('falling')"><strong><span class="text-chunk">すぐに</span><wbr><span class="text-chunk">はじめる</span></strong><span>ほんばんに ちょうせん！</span></button>
+            <button class="choice-card direct" type="button" onclick="startSelectedSoloMode('falling')"><strong><span class="text-chunk">すぐに</span><wbr><span class="text-chunk">はじめる</span></strong><span>ほんばんに ちょうせん！</span></button>
           </div>
           <button class="paper-btn blue compact" type="button" onclick="showScreen('mode')">もどる</button>
         </div>

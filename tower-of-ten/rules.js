@@ -47,5 +47,22 @@
     }
     return { groups, unionCells, groupCount: groups.length };
   }
-  return Object.freeze({ ruleModes, findTenGroups });
+  // Simulate a legal single-number placement without changing the live board.
+  function findPlacementHints(board, { ruleMode = 'two', value, maxRows = Infinity } = {}) {
+    if (!Array.isArray(board) || board.some(col => !Array.isArray(col))) throw new TypeError('Invalid board');
+    if (!ruleModes.includes(ruleMode)) throw new RangeError('Invalid ruleMode');
+    if (maxRows !== Infinity && (!Number.isInteger(maxRows) || maxRows < 1)) throw new RangeError('Invalid maxRows');
+    if (!Number.isInteger(value) || value < 1 || value > 9) return [];
+    const hints = [];
+    for (let col = 0; col < board.length; col++) {
+      const row = board[col].length;
+      if (row >= maxRows) continue;
+      const trial = board.slice();
+      trial[col] = [...board[col], { kind: 'number', val: value }];
+      const found = findTenGroups(trial, { ruleMode, scope: 'anchor', anchor: { col, row } });
+      if (found.groupCount) hints.push({ col, row, ...found });
+    }
+    return hints;
+  }
+  return Object.freeze({ ruleModes, findTenGroups, findPlacementHints });
 });

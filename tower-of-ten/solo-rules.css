@@ -1,0 +1,29 @@
+/* Solo rule selection only; the approved gameplay layout remains in place. */
+#mode-screen { overflow-y:auto; overflow-x:hidden; }
+#mode-screen .mode-panel { position:relative; left:auto; top:auto; transform:none; margin:14px auto 24px; }
+.solo-rule-picker { position:relative; z-index:2; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+.solo-rule-picker button { min-width:0; min-height:48px; padding:7px 3px; border:2px solid #9cb9c4; border-radius:12px; background:#fff; color:#40515b; font-size:clamp(12px,1.3vw,17px); font-weight:900; cursor:pointer; }
+.solo-rule-picker button[aria-pressed="true"] { border-color:#287da9; background:#d9f2ff; color:#145174; box-shadow:inset 0 -3px #a6d6ec; }
+.solo-rule-picker button:focus-visible { outline:3px solid #e67b2d; outline-offset:2px; }
+.solo-rule-description { position:relative; z-index:2; margin:7px 0; font-size:14px; font-weight:800; }
+.intro-rule-label { position:relative; z-index:2; display:inline-block; margin:0 0 5px; padding:3px 14px; border-radius:20px; background:#d9f2ff; color:#145174; font-weight:900; }
+#mode-screen .mode-panel { padding-top:18px; padding-bottom:18px; }
+#mode-screen .mode-panel h2 { margin-bottom:10px; }
+#mode-screen .mode-card { min-height:76px; margin:5px 0; padding-top:9px; padding-bottom:9px; }
+#mode-screen .mode-card strong { font-size:clamp(23px,2.4vw,30px); }
+#mode-screen .mode-card > span { font-size:clamp(11px,1.3vw,16px); }
+@media (max-width:850px) {
+  #mode-screen .mode-panel { width:calc(100% - 20px); padding:14px; }
+  #mode-screen .mode-mascot { display:none; }
+  #mode-screen .mode-card { min-height:76px; padding-inline:12px; }
+  #mode-screen .mode-card.pair-falling { padding-right:85px; }
+  .solo-rule-picker button { font-size:clamp(11px,3.1vw,16px); min-height:44px; }
+  .solo-rule-description { font-size:12px; }
+}
+@media (max-height:540px) and (orientation:landscape) {
+  #mode-screen .mode-panel { width:min(760px,calc(100% - 20px)); padding:12px 18px; }
+  #mode-screen .mode-mascot { display:none; }
+}
+@media (max-width:600px) {
+  #mode-screen .mode-card.falling { padding-top:36px; }
+}
