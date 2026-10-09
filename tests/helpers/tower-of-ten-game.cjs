@@ -7,13 +7,14 @@ const names=['getRandomColor','getRandomTexture','makeNumberObject','makeStarBlo
   'isBattleMode','getActiveRuleMode','isPairFallingMode','isThreeMinuteFallingMode','isFallingMode','isRealFallingMode','getCurrentFallingConfig','isBasicTutorial','isFallingTutorial','isTutorialMode',
   'getImmediatePairs','findAllPairs','removeAndDrop','isBoardFull','resolvePlacedBlock','resolveSettledPair','processRemovals','processStarCross','getFallingChainBonus','randomNumber','canUseHold',
   'saveAndGetFalling3MinuteRecord','saveAndGetPair3MinuteRecord','saveGeneralRecords','getFallingTotalBricks','makeFallingResultId',
-  'startGame','getRuleLabel','selectSoloRule','startSelectedSoloMode','getHintColumns','getNumberHintText','expireFallingChallenge','maybeFinalizeExpiredFalling','endGame','renderRuleTrialNotice'];
+  'startGame','getRuleLabel','selectSoloRule','startSelectedSoloMode','getHintColumns','getNumberHintText','expireFallingChallenge','maybeFinalizeExpiredFalling','endGame'];
 function createGame(){
   let now=0,nextId=0;const timers=new Map(),intervals=new Map(),stored=new Map(),elements=new Map(),calls={submits:[],screens:[],spawns:[]};
   const no=()=>{};
   const element=id=>{if(!elements.has(id)){const classes=new Set();elements.set(id,{textContent:'',firstChild:{textContent:''},hidden:false,src:'',style:{removeProperty:no},
     classList:{add:(...v)=>v.forEach(x=>classes.add(x)),remove:(...v)=>v.forEach(x=>classes.delete(x)),contains:x=>classes.has(x),toggle:(x,v)=>v?classes.add(x):classes.delete(x)}});}return elements.get(id);};
   const mocks={console,Math:Object.create(Math),Date,Set,Map,Number,Array,JSON,TenTowerRules:require('../../tower-of-ten/rules.js'),
+    TenTowerSoloRecords:require('../../tower-of-ten/solo-records.js'),
     APP_ASSETS:new Proxy({},{get:(_,key)=>key}),window:{},crypto:{randomUUID:()=>`test-result-${++nextId}`},performance:{now:()=>now},
     setTimeout:(fn,delay=0)=>{const id=++nextId;timers.set(id,{fn,at:now+delay});return id;},clearTimeout:id=>timers.delete(id),
     setInterval:fn=>{const id=++nextId;intervals.set(id,fn);return id;},clearInterval:id=>intervals.delete(id),
@@ -24,12 +25,13 @@ function createGame(){
     'showFallingChainBonus','showToast','playSound','updateTower','awardPendingStarBlock','playStarCrashSound','createStarEffect','cleanupStarEffectDom',
     'requestGameFullscreen','resetTransientUI','loadStoredSettings','resetSpecialGameplayState','updateActionControlVisibility','setTutorialChrome','updateTimeDisplay',
     'renderBoard','setPauseButton','hidePauseLayers','resetFallingResultPresentation','startSpeedClock','startFallingChallengeClock','clearNamedTimer',
-    'removeFallingVisuals','clearGameTimers','renderFallingEnhancedResult','renderPairEnhancedResult','completeBasicTutorial','completeFallingTutorial'])mocks[name]=no;
+    'removeFallingVisuals','clearGameTimers','renderSoloEnhancedResult','renderFallingEnhancedResult','renderPairEnhancedResult','completeBasicTutorial','completeFallingTutorial'])mocks[name]=no;
   mocks.stopCurrentGame=no;
   mocks.scheduleSpawn=delay=>calls.spawns.push(delay);
   mocks.showScreen=screen=>{calls.screens.push(screen);element('result-screen').classList.toggle('active',screen==='result');};
   mocks.submitFallingCommunityResult=snapshot=>calls.submits.push({mode:'falling',snapshot});
   mocks.submitPairCommunityResult=snapshot=>calls.submits.push({mode:'pairFalling',snapshot});
+  mocks.submitSoloCommunityResult=snapshot=>calls.submits.push({mode:snapshot.gameMode,snapshot});
   const c=vm.createContext(mocks),run=s=>vm.runInContext(s,c);
   run(source.slice(0,functions[0].index));
   run(names.map(actual).join('\n'));

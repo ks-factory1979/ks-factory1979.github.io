@@ -149,6 +149,7 @@ let fallingLastTenShown = false;
 let fallingVisibilityPaused = false;
 let fallingResultViewToken = 0;
 let pairResultRequest = null;
+let soloResultRequest = null;
 
 // v2.0.14 ペアおち3分 試作版
 let pairPlacements = 0;
@@ -1151,11 +1152,13 @@ function startSelectedSoloMode(mode) {
 }
 function returnToTitle() {
   if (isBattleMode() && typeof battleLeaveToModes === 'function') { battleLeaveToModes(); return; }
+  if (gameRunning && currentMode === 'free' && !isTutorialMode()) { endGame('quit'); return; }
   stopCurrentGame();
   showScreen('title');
 }
 function returnToModes() {
   if (isBattleMode() && typeof battleLeaveToModes === 'function') { battleLeaveToModes(); return; }
+  if (gameRunning && currentMode === 'free' && !isTutorialMode()) { endGame('quit'); return; }
   stopCurrentGame();
   showScreen('mode');
 }
@@ -2341,7 +2344,7 @@ function chooseFallingNextGoal(snapshot, recordInfo, communityStats=null) {
   return `あと${toNextTower}れんがで ${nextTower}とう！`;
 }
 function resetFallingResultPresentation() {
-  const card=document.getElementById('result-card'); if(card) card.classList.remove('falling-result-active','pair-result-active');
+  const card=document.getElementById('result-card'); if(card) card.classList.remove('falling-result-active','pair-result-active','solo-result-active');
   const panel=document.getElementById('falling-result-panel'); if(panel) panel.hidden=true;
   const pairPanel=document.getElementById('pair-result-panel'); if(pairPanel) pairPanel.hidden=true;
   const standard=document.getElementById('standard-result-numbers'); if(standard) standard.hidden=false;
@@ -2433,9 +2436,13 @@ function updatePairCommunityCard(stats,snapshot,recordInfo) {
   document.getElementById('pair-next-goal').textContent=chooseFallingNextGoal(snapshot,recordInfo,{collecting:false,percentile:pct});
 }
 function cancelPairResultRequest() {
+  if(soloResultRequest){soloResultRequest.cancel();soloResultRequest=null;}
   if(!pairResultRequest)return;
   clearTimeout(pairResultRequest.timeout);clearTimeout(pairResultRequest.retryTimer);
   pairResultRequest=null;
+}
+function cancelSoloOnPageHide() {
+  cancelPairResultRequest();fallingResultViewToken++;
 }
 function submitPairCommunityResult(snapshot,recordInfo,viewToken) {
   cancelPairResultRequest();
@@ -2503,12 +2510,10 @@ function endGame(reason = '') {
   if (isBasicTutorial()) { completeBasicTutorial(); return; }
   if (isFallingTutorial()) { completeFallingTutorial(); return; }
   if (!gameRunning) return;
-  const wasFalling=isRealFallingMode();
-  const wasPair=isPairFallingMode();
-  const recordableRule=getActiveRuleMode()==='two';
-  const finalTotalBricks=(wasFalling||wasPair)?getFallingTotalBricks():completedTowers*TOWER_BRICKS+bricks;
-  const fallingSnapshot=wasFalling?{resultId:makeFallingResultId(),totalBricks:finalTotalBricks,maxChain:bestChain,chainBonusTotal:fallingChainBonusTotal}:null;
-  const pairSnapshot=wasPair?{resultId:'pair-'+makeFallingResultId(),totalBricks:finalTotalBricks,maxChain:bestChain,chainBonusTotal:fallingChainBonusTotal,pairPlacements}:null;
+  const snapshot={gameMode:currentMode,ruleMode:getActiveRuleMode(),
+    resultId:(isPairFallingMode()?'pair-':'')+makeFallingResultId(),totalBricks:getFallingTotalBricks(),
+    maxChain:bestChain,chainBonusTotal:isThreeMinuteFallingMode()?fallingChainBonusTotal:0,
+    tenCount,pairPlacements:isPairFallingMode()?pairPlacements:0,endReason:reason||'full'};
   gameRunning = false;
   endingGame = false;
   paused = true;
@@ -2518,12 +2523,9 @@ function endGame(reason = '') {
   clearGameTimers();
   removeFallingVisuals();
   gameSessionToken++;
-  if(!wasPair && recordableRule) saveGeneralRecords();
-  // New rules remain a trial until the independent records are implemented in Phase 3.
-  const trialRecord={previousBestTotal:null,bestTotal:finalTotalBricks,previousBestChain:null,bestChain,
-    firstPlay:true,isNewRecord:false,improvement:0,saved:false};
-  const fallingRecord = wasFalling ? (recordableRule ? saveAndGetFalling3MinuteRecord(finalTotalBricks) : trialRecord) : null;
-  const pairRecord = wasPair ? (recordableRule ? saveAndGetPair3MinuteRecord(pairSnapshot) : trialRecord) : null;
+  let recordInfo;
+  try{recordInfo=TenTowerSoloRecords.save(localStorage,snapshot);}
+  catch(e){recordInfo={saved:false,storageUnavailable:true,firstPlay:true,isNewRecord:false,bestTotal:snapshot.totalBricks,bestChain:snapshot.maxChain,previousBestTotal:null};}
 
   document.getElementById('result-towers').textContent = completedTowers + 'こ';
   document.getElementById('result-bricks').textContent = bricks + ' / ' + TOWER_BRICKS;
@@ -2543,38 +2545,53 @@ function endGame(reason = '') {
 
   resetFallingResultPresentation();
   const bestNote = document.getElementById('falling-best-note'); if(bestNote) bestNote.hidden=true;
-  if(wasFalling){
-    const viewToken=++fallingResultViewToken;
-    renderFallingEnhancedResult(fallingSnapshot,fallingRecord,reason);
-    hidePauseLayers(); showScreen('result');
-    if(recordableRule) submitFallingCommunityResult(fallingSnapshot,fallingRecord,viewToken);
-    else renderRuleTrialNotice('falling');
-    return;
-  }
-  if(wasPair){
-    const viewToken=++fallingResultViewToken;
-    renderPairEnhancedResult(pairSnapshot,pairRecord,reason);
-    hidePauseLayers(); showScreen('result');
-    if(recordableRule) submitPairCommunityResult(pairSnapshot,pairRecord,viewToken);
-    else renderRuleTrialNotice('pair');
-    return;
-  }
-
-  const title=document.getElementById('result-title'); if(title) title.textContent='おつかれさま！';
-  let message;
-  if (completedTowers >= 3) message = `とうが ${completedTowers}こも できた！すごい！`;
-  else if (completedTowers > 0) message = `とうが ${completedTowers}こ できたよ！`;
-  else if (towerStage >= TOWER_IMAGES.length - 2) message = 'あと すこしで とうが できそう！';
-  else if (towerStage > 0) message = 'とうが そだってきたね！';
-  else message = 'つぎは とうを たてよう！';
-  const messageEl = document.getElementById('result-message');
-  messageEl.firstChild ? messageEl.firstChild.textContent = message : messageEl.textContent = message;
+  const viewToken=++fallingResultViewToken;
+  renderSoloEnhancedResult(snapshot,recordInfo);
   hidePauseLayers(); showScreen('result');
+  if(snapshot.endReason!=='quit')submitSoloCommunityResult(snapshot,recordInfo,viewToken);
 }
-function renderRuleTrialNotice(prefix) {
-  document.getElementById(`${prefix}-result-best`).textContent='ルールの おためし';
-  document.getElementById(`${prefix}-community-value`).textContent='おためしの きろく';
-  document.getElementById(`${prefix}-community-note`).textContent='このルールの きろくは まだ ほぞんしません';
+function getSoloModeLabel(mode) {
+  return {free:'じっくり',timed:'チャレンジ',falling:'おちてくる3分',pairFalling:'ペアおち3分'}[mode];
+}
+function renderSoloEnhancedResult(snapshot,recordInfo) {
+  renderPairEnhancedResult(snapshot,recordInfo,snapshot.endReason);
+  document.getElementById('result-card').classList.add('solo-result-active');
+  document.getElementById('result-title').innerHTML=snapshot.endReason==='quit'?'<span class="text-chunk">ここまで</span> <span class="text-chunk">おつかれさま！</span>':snapshot.endReason==='time'?'<span class="text-chunk">じかんだよ！</span> <span class="text-chunk">おつかれさま！</span>':'おつかれさま！';
+  document.getElementById('solo-result-department').textContent=`${getSoloModeLabel(snapshot.gameMode)} ／ ${getRuleLabel(snapshot.ruleMode)}`;
+  document.getElementById('solo-record-label').textContent='🏰 とうのきろく';
+  const falling=['falling','pairFalling'].includes(snapshot.gameMode);
+  document.getElementById('solo-second-stat-label').textContent=falling?'✨ れんさボーナス':'✨ できた10';
+  document.getElementById('pair-result-chain-bonus').textContent=falling?`＋${snapshot.chainBonusTotal}れんが`:`${snapshot.tenCount}かい`;
+  document.querySelector('#pair-result-panel .pair-placement-note').hidden=snapshot.gameMode!=='pairFalling';
+  let old=null;
+  try{if(snapshot.ruleMode==='two'&&['free','timed'].includes(snapshot.gameMode))old=TenTowerSoloRecords.legacyGeneral(localStorage);}catch(e){}
+  const oldNote=document.getElementById('solo-legacy-best');oldNote.hidden=old===null;
+  oldNote.textContent=old===null?'':`以前の共通ベスト：${formatFallingTowerRecord(old).text}（モード分け前）`;
+  document.getElementById('result-title-btn').hidden=false;
+  updateSoloCommunityCard(snapshot.endReason==='quit'?{localOnly:true}:null,snapshot,recordInfo,true);
+}
+function updateSoloCommunityCard(stats,snapshot,recordInfo,loading=false) {
+  const card=document.getElementById('pair-community-card'),value=document.getElementById('pair-community-value'),note=document.getElementById('pair-community-note');
+  card.classList.remove('community-high','community-soft');
+  const local=recordInfo.saved?'ベストは このたんまつに ほぞんしたよ':'このたんまつには ほぞんできていないよ';
+  if(stats?.localOnly){value.textContent='じぶんで おわった きろく';note.textContent=local+'／みんなのきろくには おくらないよ';return;}
+  if(loading){value.textContent='みんなのきろくを みています…';note.textContent=local;return;}
+  const valid=stats?.ok&&stats.gameMode===snapshot.gameMode&&stats.ruleMode===snapshot.ruleMode&&Number.isSafeInteger(stats.totalRecordCount)&&stats.totalRecordCount>=0;
+  if(!valid){value.textContent='今回は みんなのきろくを よみこめませんでした';note.textContent=(stats?.saved?'今回のきろくは おくれたよ／':'')+local;return;}
+  const count=stats.totalRecordCount;
+  if(count<50||stats.collecting){value.textContent='みんなのきろくを あつめています！';note.textContent=`このぶもん ${count}かいぶん／50かいから くらべるよ`;return;}
+  if(!Number.isFinite(stats.percentile)||stats.percentile<1||stats.percentile>100){value.textContent='今回は みんなのきろくを よみこめませんでした';note.textContent=local;return;}
+  const pct=Math.round(stats.percentile);value.textContent=`上位${pct}％！`;note.textContent=`このぶもん ${count}かいぶんの きろくと くらべたよ`;
+  if(pct<=20)card.classList.add('community-high');else if(pct>60)card.classList.add('community-soft');
+  document.getElementById('pair-next-goal').textContent=chooseFallingNextGoal(snapshot,recordInfo,{collecting:false,percentile:pct});
+}
+function submitSoloCommunityResult(snapshot,recordInfo,viewToken) {
+  if(soloResultRequest)soloResultRequest.cancel();
+  soloResultRequest=TenTowerSoloRecords.createSubmission({transport:window.TowerRecordTransport,onUpdate:stats=>{
+    if(viewToken!==fallingResultViewToken||currentMode!==snapshot.gameMode||getActiveRuleMode()!==snapshot.ruleMode||!document.getElementById('result-screen').classList.contains('active'))return;
+    updateSoloCommunityCard(stats,snapshot,recordInfo);
+  }});
+  soloResultRequest.start(snapshot);
 }
 
 function resetTransientUI() {
@@ -2743,6 +2760,7 @@ window.addEventListener('load', () => {
   syncControls();
   if (window.BGMController) BGMController.init();
 });
+window.addEventListener('pagehide', cancelSoloOnPageHide);
 document.addEventListener('visibilitychange', () => {
   if (typeof isBattleMode === 'function' && isBattleMode()) return;
   const hidden = document.visibilityState === 'hidden';

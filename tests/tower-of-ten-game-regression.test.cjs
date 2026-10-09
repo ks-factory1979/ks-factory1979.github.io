@@ -80,10 +80,11 @@ for(const [raw,flag] of [['{"version":0}','historyUnavailable'],['broken','stora
 test('legacy common best remains in the original keys',()=>{
   const g=setup();g.run('completedTowers=2;bricks=6;tenCount=22;bestChain=4');g.c.saveGeneralRecords();assert.equal(g.stored.get('bestTowerProgress'),'56');assert.equal(g.stored.has('freeBest'),false);
 });
-for(const mode of ['free','timed','falling','pairFalling'])for(const rule of ['three','either'])test(`${mode} / ${rule}: ending cannot write legacy records or submit`,()=>{
+for(const mode of ['free','timed','falling','pairFalling'])for(const rule of ['three','either'])test(`${mode} / ${rule}: ending saves only its own department and preserves legacy records`,()=>{
   const g=setup(rule,mode);g.run('completedTowers=2;bricks=6;tenCount=22;bestChain=4');g.stored.set('bestTowerProgress','77');g.stored.set('pairFalling3minRecordV1','existing');
-  const before=[...g.stored];g.c.endGame('full');assert.deepEqual([...g.stored],before);assert.deepEqual(g.calls.submits,[]);assert.equal(g.calls.screens.at(-1),'result');
-  if(mode==='falling'||mode==='pairFalling')assert.match(g.elements.get((mode==='falling'?'falling':'pair')+'-community-note').textContent,/ほぞんしません/);
+  const before=[...g.stored];g.c.endGame('full');for(const [key,value]of before)assert.equal(g.stored.get(key),value);
+  assert.equal(JSON.parse(g.stored.get(`tenTowerSoloRecordV1:${mode}:${rule}`)).bestTotalBricks,56);
+  assert.equal(g.calls.submits.length,1);assert.equal(g.calls.submits[0].snapshot.ruleMode,rule);assert.equal(g.calls.screens.at(-1),'result');
 });
 for(const mode of ['falling','pairFalling'])test(`${mode} / two: existing save and submit still occur`,()=>{
   const g=setup('two',mode);g.run('completedTowers=1;bricks=2');g.c.endGame('full');assert.equal(g.calls.submits.length,1);assert.ok(g.stored.size>0);assert.equal(g.calls.submits[0].snapshot.totalBricks,27);

@@ -101,7 +101,6 @@
           <strong>おちてくるモード</strong><span>3ぷんで どこまで とうを のばせるかな？</span>
         </button>
         <button class="mode-card pair-falling" type="button" onclick="startSelectedSoloMode('pairFalling')">
-          <span class="pair-trial-badge">ためし版</span>
           <span class="pair-card-blocks" aria-hidden="true"><i>3</i><i>6</i></span>
           <strong>ペアおち3分</strong><span>2こをまわして れんさをねらえ！</span>
         </button>
@@ -382,7 +381,7 @@
         <img class="confetti confetti-left" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/effects/confetti.png" alt="">
         <img class="confetti confetti-right" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/effects/confetti.png" alt="">
         <h2 id="result-title">おつかれさま！</h2>
-        <p id="result-message" class="result-message">よく がんばったね！<span id="falling-best-note" class="falling-best-note" hidden></span></p>
+        <p id="result-message" class="result-message">よく がんばったね！<span id="falling-best-note" class="falling-best-note" hidden></span><span id="solo-result-department" class="solo-result-department"></span></p>
         <div class="result-main">
           <div class="result-visual">
             <img id="result-tower-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/towers/tower_0.png" alt="今回育った塔">
@@ -416,18 +415,18 @@
           </div>
           <div id="pair-result-panel" class="falling-result-panel pair-result-panel" hidden>
             <div class="falling-record-hero result-pop-item" style="--result-delay:0ms">
-              <span>🏰 ペアおちの とうのきろく</span>
+              <span id="solo-record-label">🏰 とうのきろく</span>
               <strong id="pair-result-record">0とう ＋ 0れんが</strong>
-              <small><span class="pair-best-label">このたんまつのベスト</span><span id="pair-result-best">はじめての きろく！</span></small>
+              <small><span class="pair-best-label">このたんまつのベスト</span><span id="pair-result-best">はじめての きろく！</span><span id="solo-legacy-best" hidden></span></small>
             </div>
             <div class="falling-result-mini-grid">
               <div class="falling-result-mini result-pop-item" style="--result-delay:90ms"><span>🔥 さいだいれんさ</span><strong id="pair-result-max-chain">0れんさ</strong></div>
-              <div class="falling-result-mini result-pop-item" style="--result-delay:160ms"><span>✨ れんさボーナス</span><strong id="pair-result-chain-bonus">＋0れんが</strong></div>
+              <div class="falling-result-mini result-pop-item" style="--result-delay:160ms"><span id="solo-second-stat-label">✨ れんさボーナス</span><strong id="pair-result-chain-bonus">＋0れんが</strong></div>
               <div class="pair-placement-note result-pop-item" style="--result-delay:160ms">おいたペア <strong id="pair-result-placements">0かい</strong></div>
             </div>
             <div id="pair-community-card" class="falling-result-card community result-pop-item" style="--result-delay:240ms" aria-live="polite">
               <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/community_record.webp" alt="みんなの記録">
-              <div><span>ペアおちの みんなのきろくとくらべると</span><strong id="pair-community-value">みんなのきろくを みています…</strong><small id="pair-community-note"></small></div>
+              <div><span>このぶもんの みんなのきろくとくらべると</span><strong id="pair-community-value">みんなのきろくを みています…</strong><small id="pair-community-note"></small></div>
             </div>
             <div class="falling-result-card goal result-pop-item" style="--result-delay:330ms">
               <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-asset="assets/ui/icons/goal_flag.webp" alt="つぎの目標">
@@ -470,6 +469,7 @@
     </section>
   </main>
   <script src="rules.js"></script>
+  <script src="solo-records.js"></script>
   <script src="game.js"></script>
   <script src="battle.js"></script>
   <script src="mobile-layout.js"></script>

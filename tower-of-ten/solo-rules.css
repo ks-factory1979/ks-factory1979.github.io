@@ -27,3 +27,7 @@
 @media (max-width:600px) {
   #mode-screen .mode-card.falling { padding-top:36px; }
 }
+.solo-result-department { display:block; font-size:clamp(12px,1.3vw,17px); color:#6250a0; line-height:1.5; }
+#solo-legacy-best { display:block; font-size:10px; line-height:1.5; }
+#solo-legacy-best[hidden], .pair-placement-note[hidden] { display:none!important; }
+.solo-result-active .falling-result-card strong { word-break:keep-all; overflow-wrap:break-word; }

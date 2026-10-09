@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   const protocol = 'ten-tower-record-bridge-v1';
-  const methods = new Set(['submitFallingResult', 'submitPairFallingResult']);
+  const methods = new Set(['submitFallingResult', 'submitPairFallingResult', 'submitSoloResult']);
   const publicOrigin = 'https://ks-factory1979.github.io';
   const localOrigin = origin => /^http:\/\/(?:127\.0\.0\.1|localhost):[1-9]\d{0,4}$/.test(origin);
   const error = code => Object.assign(new Error(code), {code});
@@ -70,6 +70,7 @@
     }
     async call(method, payload) {
       if (!methods.has(method)) throw error('BRIDGE_METHOD_NOT_ALLOWED');
+      if (method === 'submitSoloResult' && !window.TenTowerSoloRecords?.payloadValid(payload)) throw error('INVALID_RESULT');
       const deadline = Date.now() + this.timeoutMs;
       await this.connect();
       const remaining = deadline - Date.now(); if (remaining <= 0) throw error('BRIDGE_REQUEST_TIMEOUT');
