@@ -27,6 +27,7 @@ HTML・CSS・ゲーム・画像60点・BGM9曲は静的ファイルとして配�
 | index.html | 各画面・操作ボタン |
 | style.css / battle-style.css | 現行スタイル |
 | game.js / battle.js | 現行ゲーム・対戦クライアント |
+| rules.js | 副作用のない共通10判定（2つ・3つ・両方） |
 | config.js | バージョン・段階・後工程のGAS公開URL |
 | gas-bridge-client.js | 記録専用の非表示iframe・メッセージ確認・タイムアウト |
 | battle-bridge-client.js | 対戦専用の非表示iframe・固定9メソッド・応答期限 |
@@ -37,6 +38,22 @@ HTML・CSS・ゲーム・画像60点・BGM9曲は静的ファイルとして配�
 | audio-assets.js / audio/ | 既存BGM辞書・正式MP3 |
 
 素材・スクリプトは相対パスで読み込むため、`/tower-of-ten/` 以下で動作します。画像の元キーは`.png`や`.jpg`でも実体がWebPのものがあり、実ファイル名はMIMEに合わせています。対応表を変えるときは既存の素材キーを維持してください。
+
+## 新ルール開発：Phase 1
+
+`feature/tower-of-ten-rule-expansion`で段階実装しています。Phase 1は共通判定エンジンと試遊までです。通常のメニュー・対戦・チュートリアルは従来の「2つで10」です。正式な12種類の選択画面、ルール別の数字生成・ヒント、独立した記録は後続Phaseで実装します。
+
+`rules.js`の`TenTowerRules.findTenGroups(board, options)`は、列ごと・下から上の配列を受け取り、成立組の`groups`、消去セルの`unionCells`（Set）、成立組数の`groupCount`を返します。`ruleMode`は`two`・`three`・`either`です。数字1〜9が縦または横に連続する組だけを数え、重なった組は別々に数えます。盤面自体は変更しません。
+
+配置直後には`scope: 'anchor', anchor: {col, row}`を使い、置いたセルを含む組だけを検索します。重力後・星の処理後・ペア着地後の全盤面検索には既定の`scope: 'all'`を使います。既存の消去タイミング、wave単位の連鎖、成立組数によるれんが加算、落下モードの連鎖ボーナスを維持します。
+
+開発用には`startGame('free', {ruleMode: 'three'})`のように開始できます。省略時は`two`に戻り、対戦・チュートリアルでは常に`two`です。新しい2ルールの終了時は既存の端末ベストへ保存せず、共有記録にも送信しません。専用の試遊環境は公開フォルダー外に置き、保存と本番APIへの接続を隔離します。
+
+リポジトリのルートで次を実行すると、判定・既存挙動・消去と連鎖・記録保護の回帰テストを確認できます。
+
+```sh
+node --test tests/tower-of-ten-rules.test.cjs tests/tower-of-ten-game-regression.test.cjs
+```
 
 ## 更新と段階確認
 

@@ -105,6 +105,7 @@ let tenCount = 0;
 let bestChain = 0;
 let noTenCounter = 0;
 let currentMode = 'free';
+let ruleMode = 'two';
 let soundOn = true;
 let hintOn = true;
 let paused = false;
@@ -888,6 +889,7 @@ function isGameScreenActive() {
   return !!(game && game.classList.contains('active'));
 }
 function isBattleMode() { return currentMode === 'battle'; }
+function getActiveRuleMode() { return isBattleMode() || isTutorialMode() ? 'two' : ruleMode; }
 function isPairFallingMode() { return currentMode === 'pairFalling'; }
 function isThreeMinuteFallingMode() { return currentMode === 'falling' || currentMode === 'pairFalling'; }
 function isFallingMode() {
@@ -1166,9 +1168,12 @@ function hidePauseLayers() {
 }
 
 // ========= ゲーム開始 =========
-function startGame(mode) {
+function startGame(mode, options = {}) {
+  const requestedRule = options.ruleMode === undefined ? 'two' : options.ruleMode;
+  if (!TenTowerRules.ruleModes.includes(requestedRule)) throw new RangeError('Invalid ruleMode');
   requestGameFullscreen(); stopCurrentGame(); resetTransientUI(); loadStoredSettings();
   currentMode = mode; tutorialKind = null; tutorialStep = 0;
+  ruleMode = isBattleMode() || isTutorialMode() ? 'two' : requestedRule;
   BOARD_COLS = isFallingMode() ? FALLING_COLS : configuredCols;
   BOARD_ROWS = isFallingMode() ? FALLING_ROWS : configuredRows;
   paused = false; animating = false; gameRunning = true; endingGame = false; resumeCountdownActive = false;
@@ -2063,25 +2068,8 @@ function finishFallingFull() {
 
 // ========= 配置後の共通処理 =========
 function getImmediatePairs(col, row, currentObj) {
-  const toDelete = new Set();
-  let immediatePairs = 0;
-  const colData = board[col];
-  if (row > 0 && colData[row - 1].val + currentObj.val === 10) {
-    toDelete.add(`${col},${row - 1}`);
-    toDelete.add(`${col},${row}`);
-    immediatePairs++;
-  }
-  if (col > 0 && board[col - 1].length > row && board[col - 1][row].val + currentObj.val === 10) {
-    toDelete.add(`${col - 1},${row}`);
-    toDelete.add(`${col},${row}`);
-    immediatePairs++;
-  }
-  if (col < BOARD_COLS - 1 && board[col + 1].length > row && board[col + 1][row].val + currentObj.val === 10) {
-    toDelete.add(`${col + 1},${row}`);
-    toDelete.add(`${col},${row}`);
-    immediatePairs++;
-  }
-  return { toDelete, immediatePairs };
+  const found = TenTowerRules.findTenGroups(board, { ruleMode: getActiveRuleMode(), scope: 'anchor', anchor: { col, row } });
+  return { toDelete: found.unionCells, immediatePairs: found.groupCount };
 }
 function resolvePlacedBlock(col, row, currentObj) {
   if (!gameRunning) return;
@@ -2157,25 +2145,8 @@ function removeAndDrop(set) {
   for (let c = 0; c < BOARD_COLS; c++) board[c] = board[c].filter(item => item !== null);
 }
 function findAllPairs() {
-  const toDelete = new Set();
-  let countPairs = 0;
-  for (let c = 0; c < BOARD_COLS; c++) {
-    const colData = board[c];
-    for (let r = 0; r < colData.length; r++) {
-      const val = colData[r].val;
-      if (r > 0 && val + colData[r - 1].val === 10) {
-        toDelete.add(`${c},${r}`);
-        toDelete.add(`${c},${r - 1}`);
-        countPairs++;
-      }
-      if (c > 0 && board[c - 1].length > r && val + board[c - 1][r].val === 10) {
-        toDelete.add(`${c},${r}`);
-        toDelete.add(`${c - 1},${r}`);
-        countPairs++;
-      }
-    }
-  }
-  return { set: toDelete, count: countPairs };
+  const found = TenTowerRules.findTenGroups(board, { ruleMode: getActiveRuleMode() });
+  return { set: found.unionCells, count: found.groupCount };
 }
 function isBoardFull() {
   return board.every(col => col.length >= BOARD_ROWS);
@@ -2508,6 +2479,7 @@ function endGame(reason = '') {
   if (!gameRunning) return;
   const wasFalling=isRealFallingMode();
   const wasPair=isPairFallingMode();
+  const recordableRule=getActiveRuleMode()==='two';
   const finalTotalBricks=(wasFalling||wasPair)?getFallingTotalBricks():completedTowers*TOWER_BRICKS+bricks;
   const fallingSnapshot=wasFalling?{resultId:makeFallingResultId(),totalBricks:finalTotalBricks,maxChain:bestChain,chainBonusTotal:fallingChainBonusTotal}:null;
   const pairSnapshot=wasPair?{resultId:'pair-'+makeFallingResultId(),totalBricks:finalTotalBricks,maxChain:bestChain,chainBonusTotal:fallingChainBonusTotal,pairPlacements}:null;
@@ -2520,9 +2492,12 @@ function endGame(reason = '') {
   clearGameTimers();
   removeFallingVisuals();
   gameSessionToken++;
-  if(!wasPair) saveGeneralRecords();
-  const fallingRecord = wasFalling ? saveAndGetFalling3MinuteRecord(finalTotalBricks) : null;
-  const pairRecord = wasPair ? saveAndGetPair3MinuteRecord(pairSnapshot) : null;
+  if(!wasPair && recordableRule) saveGeneralRecords();
+  // New rules remain a trial until the independent records are implemented in Phase 3.
+  const trialRecord={previousBestTotal:null,bestTotal:finalTotalBricks,previousBestChain:null,bestChain,
+    firstPlay:true,isNewRecord:false,improvement:0,saved:false};
+  const fallingRecord = wasFalling ? (recordableRule ? saveAndGetFalling3MinuteRecord(finalTotalBricks) : trialRecord) : null;
+  const pairRecord = wasPair ? (recordableRule ? saveAndGetPair3MinuteRecord(pairSnapshot) : trialRecord) : null;
 
   document.getElementById('result-towers').textContent = completedTowers + 'こ';
   document.getElementById('result-bricks').textContent = bricks + ' / ' + TOWER_BRICKS;
@@ -2546,14 +2521,16 @@ function endGame(reason = '') {
     const viewToken=++fallingResultViewToken;
     renderFallingEnhancedResult(fallingSnapshot,fallingRecord,reason);
     hidePauseLayers(); showScreen('result');
-    submitFallingCommunityResult(fallingSnapshot,fallingRecord,viewToken);
+    if(recordableRule) submitFallingCommunityResult(fallingSnapshot,fallingRecord,viewToken);
+    else renderRuleTrialNotice('falling');
     return;
   }
   if(wasPair){
     const viewToken=++fallingResultViewToken;
     renderPairEnhancedResult(pairSnapshot,pairRecord,reason);
     hidePauseLayers(); showScreen('result');
-    submitPairCommunityResult(pairSnapshot,pairRecord,viewToken);
+    if(recordableRule) submitPairCommunityResult(pairSnapshot,pairRecord,viewToken);
+    else renderRuleTrialNotice('pair');
     return;
   }
 
@@ -2568,7 +2545,11 @@ function endGame(reason = '') {
   messageEl.firstChild ? messageEl.firstChild.textContent = message : messageEl.textContent = message;
   hidePauseLayers(); showScreen('result');
 }
-
+function renderRuleTrialNotice(prefix) {
+  document.getElementById(`${prefix}-result-best`).textContent='ルールの おためし';
+  document.getElementById(`${prefix}-community-value`).textContent='おためしの きろく';
+  document.getElementById(`${prefix}-community-note`).textContent='このルールの きろくは まだ ほぞんしません';
+}
 
 function resetTransientUI() {
   const chain = document.getElementById('chain-toast');
@@ -2815,7 +2796,7 @@ function serializeTestPiece(obj) {
 if (new URLSearchParams(location.search).get('test') === '1') {
   window.__tenTowerTest = {
     getState: () => ({
-      mode: currentMode, cols: BOARD_COLS, rows: BOARD_ROWS,
+      mode: currentMode, ruleMode: getActiveRuleMode(), cols: BOARD_COLS, rows: BOARD_ROWS,
       board: board.map(col => col.map(x => x.val)),
       queue: numbersQueue.map(serializeTestPiece),
       falling: serializeTestPiece(fallingPiece),
