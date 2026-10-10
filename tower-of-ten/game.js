@@ -119,6 +119,7 @@ let towerVisualToken = 0;
 let gameSessionToken = 0;
 let timerInterval = null;
 let timeLeft = 0;
+let timedTimeExpired = false;
 
 // おちてくるモード専用
 let fallingPiece = null;
@@ -855,6 +856,7 @@ function processStarCross(col,row) {
       updateBoardUI();updateInfoPanels();updateHints();updateFallingControls();
       if(isBattleMode()&&typeof battleAfterMove==='function'){battleAfterMove({pairs:0,chainStages:0,completedNow:0,starUsed:true});return;}
       if(isThreeMinuteFallingMode()&&fallingTimeExpired){maybeFinalizeExpiredFalling();return;}
+      if(maybeFinalizeExpiredTimed())return;
       if(isFallingMode())scheduleSpawn(150);else if(isBoardFull())endGame('full');
     },260);
   },760);
@@ -1172,6 +1174,7 @@ function returnToModes() {
 function stopCurrentGame() {
   cancelPairResultRequest();
   gameRunning = false; endingGame = false; paused = true; animating = false;
+  timedTimeExpired = false;
   fallingPiece = null; resumeCountdownActive = false;
   tutorialKind = null; tutorialStep = 0; tutorialTargetCol = null; tutorialExpectedControl = null;
   activeFallingTimeMs = 0; activeClockLastAt = 0; fallingSpeedLevel = 0;
@@ -1206,6 +1209,7 @@ function startGame(mode, options = {}) {
   BOARD_COLS = isFallingMode() ? FALLING_COLS : configuredCols;
   BOARD_ROWS = isFallingMode() ? FALLING_ROWS : configuredRows;
   paused = false; animating = false; gameRunning = true; endingGame = false; resumeCountdownActive = false;
+  timedTimeExpired = false;
   const session = ++gameSessionToken;
   board = Array.from({ length: BOARD_COLS }, () => []);
   bricks = 0; tenCount = 0; bestChain = 0; noTenCounter = 0; towerStage = 0; completedTowers = 0;
@@ -1702,6 +1706,7 @@ function getHintColumns(current) {
 }
 function getNumberHintText(current) {
   const rule = getActiveRuleMode();
+  if (rule === 'three' && current === 9) return '9は ほしで けそう！';
   const hints = TenTowerRules.findPlacementHints(board, {ruleMode:rule, value:current, maxRows:BOARD_ROWS});
   if (rule === 'two') {
     return hints.length ? (isFallingMode() ? `${10-current}の となりを めざそう！` : `${10-current}を さがしてみよう！`) :
@@ -1727,7 +1732,7 @@ function updateHints() {
   if (isStarBlock(currentObj)) { hintIcon.style.display='block'; hintText.textContent='すきな れつで じゅうじに けそう！'; return; }
   if (isPairBlock(currentObj)) {
     hintIcon.style.display='block';
-    hintText.textContent={two:'ペアを まわして 2こで10！',three:'ペアを まわして 3こで10！',either:'ペアを まわして 2こか3こで10！'}[getActiveRuleMode()];
+    hintText.textContent=getActiveRuleMode()==='three'&&[currentObj.first.val,currentObj.second.val].includes(9)?'9は ほしで けそう！':{two:'ペアを まわして 2こで10！',three:'ペアを まわして 3こで10！',either:'ペアを まわして 2こか3こで10！'}[getActiveRuleMode()];
     return;
   }
   const current = currentObj.val;
@@ -2125,6 +2130,7 @@ function resolvePlacedBlock(col, row, currentObj) {
     if (isTutorialMode()) { handleTutorialResolution({ pairs: 0, chainStages: 0, completedNow: 0 }); return; }
     if (isBattleMode() && typeof battleAfterMove === 'function') { battleAfterMove({ pairs: 0, chainStages: 0, completedNow: 0 }); return; }
     if (isThreeMinuteFallingMode() && fallingTimeExpired) { maybeFinalizeExpiredFalling(); return; }
+    if (maybeFinalizeExpiredTimed()) return;
     if (isFallingMode()) scheduleSpawn(160); else if (isBoardFull()) endGame('full');
   }
 }
@@ -2162,6 +2168,7 @@ function processRemovals(initialSet, initialPairs) {
           if (isTutorialMode()) { handleTutorialResolution({ pairs: totalPairs, chainStages, completedNow }); return; }
           if (isBattleMode() && typeof battleAfterMove === 'function') { battleAfterMove({ pairs: totalPairs, chainStages, completedNow }); return; }
           if (isThreeMinuteFallingMode() && fallingTimeExpired) { maybeFinalizeExpiredFalling(); return; }
+          if (maybeFinalizeExpiredTimed()) return;
           if (isFallingMode()) scheduleSpawn(150); else if (isBoardFull()) endGame('full');
         }, wait);
       }, 200);
@@ -2519,11 +2526,22 @@ function submitFallingCommunityResult(snapshot, recordInfo, viewToken, attempt=0
       });
   }catch(e){updateFallingCommunityCard({ok:false},snapshot,recordInfo);}
 }
+function maybeFinalizeExpiredTimed() {
+  if (currentMode !== 'timed' || !timedTimeExpired || !gameRunning || animating || starEffectActive) return false;
+  endGame('time');
+  return true;
+}
 function endGame(reason = '') {
   if (isBattleMode()) { if (typeof battleEliminate === 'function') battleEliminate(reason || 'full'); return; }
   if (isBasicTutorial()) { completeBasicTutorial(); return; }
   if (isFallingTutorial()) { completeFallingTutorial(); return; }
   if (!gameRunning) return;
+  if (currentMode === 'timed' && reason === 'time' && (animating || starEffectActive)) {
+    timedTimeExpired = true; timeLeft = 0;
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null; updateTimeDisplay();
+    return;
+  }
   const snapshot={gameMode:currentMode,ruleMode:getActiveRuleMode(),
     resultId:(isPairFallingMode()?'pair-':'')+makeFallingResultId(),totalBricks:getFallingTotalBricks(),
     maxChain:bestChain,chainBonusTotal:isThreeMinuteFallingMode()?fallingChainBonusTotal:0,

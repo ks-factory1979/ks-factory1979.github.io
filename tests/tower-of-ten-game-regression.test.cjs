@@ -59,6 +59,25 @@ for(const rule of ['two','three','either'])test(`${rule}: time expiry waits for 
 test('pair generator excludes internal ten in all rules, including explicit complementary inputs',()=>{
   const g=setup();for(const rule of ['two','three','either']){g.run(`ruleMode='${rule}'`);for(let i=0;i<1000;i++){const p=g.c.makePairObject();assert.notEqual(p.first.val+p.second.val,10);}const p=g.c.makePairObject(4,6);assert.notEqual(p.first.val+p.second.val,10);}
 });
+for(const rule of ['two','three','either']){
+  test(`timed/${rule}: time expiry finishes the active chain and submits its complete score once`,()=>{
+    const g=setup(rule,'timed'),three=rule==='three';g.setBoard(three?[[2,3,1,5],[1,1,4],[1,1,5]]:[[3,4,7],[1,6]]);
+    g.c.resolvePlacedBlock(three?2:1,three?2:1,{val:three?5:6});g.c.endGame('time');
+    assert.equal(g.state().gameRunning,true);g.flush();assert.equal(g.state().gameRunning,false);assert.equal(g.state().tenCount,2);assert.equal(g.state().bricks,2);assert.equal(g.state().bestChain,2);
+    assert.equal(g.calls.submits.length,1);assert.equal(g.calls.submits[0].snapshot.totalBricks,2);assert.equal(g.calls.submits[0].snapshot.endReason,'time');
+  });
+  test(`timed/${rule}: time expiry waits for star aftermath and credits its ten`,()=>{
+    const g=setup(rule,'timed');g.setBoard(rule==='three'?[[1,2],[1,3],[1,5],['STAR']]:[[1,4],[1,6],['STAR']]);
+    g.c.processStarCross(rule==='three'?3:2,0);g.c.endGame('time');assert.equal(g.state().gameRunning,true);g.flush();assert.equal(g.state().tenCount,1);assert.equal(g.calls.submits.length,1);assert.equal(g.calls.submits[0].snapshot.tenCount,1);
+  });
+  test(`timed/${rule}: time expiry during an unmatched placement ends without waiting for another move`,()=>{
+    const g=setup(rule,'timed');g.setBoard([[9],[],[]]);g.run('animating=true');g.c.endGame('time');g.run('animating=false');g.c.resolvePlacedBlock(0,0,{val:9});g.flush();
+    assert.equal(g.state().gameRunning,false);assert.equal(g.calls.submits.length,1);assert.equal(g.calls.submits[0].snapshot.tenCount,0);assert.equal(g.calls.submits[0].snapshot.endReason,'time');
+  });
+}
+test('restarting after a pending timed finish cannot end the new game',()=>{
+  const g=setup('two','timed');g.setBoard([[4,6]]);const found=g.c.findAllPairs();g.c.processRemovals(found.set,found.count);g.c.endGame('time');g.c.startGame('free',{ruleMode:'three'});g.flush();assert.equal(g.state().gameRunning,true);assert.equal(g.state().tenCount,0);assert.equal(g.calls.submits.length,0);
+});
 test('two rescue remains in free/timed and is absent from all falling modes',()=>{
   const g=setup();g.setBoard([[9],[],[]]);g.c.Math.random=()=>0;g.run('noTenCounter=4');
   for(const mode of ['free','timed']){g.run(`currentMode='${mode}'`);assert.equal(g.c.randomNumber(),1);}

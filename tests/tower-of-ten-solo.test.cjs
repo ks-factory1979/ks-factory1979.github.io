@@ -53,6 +53,10 @@ test('three/either hint text names the actual numbers of a legal triple',()=>{
   for(const rule of ['three','either']){const g=game(rule);g.setBoard([[2],[3],[]]);assert.deepEqual([...g.c.getHintColumns(5)],[2]);assert.equal(g.c.getNumberHintText(5),'2と3に つなげよう！');}
   const g=game('three');g.setBoard([[4],[]]);assert.equal(g.c.getNumberHintText(6),'たて・よこに 3こで10！');
 });
+test('three hints explain that nine needs a star while other rules can match it',()=>{
+  const g=game('three');g.setBoard([[1]]);assert.equal(g.c.getNumberHintText(9),'9は ほしで けそう！');assert.equal(g.c.getHintColumns(9).length,0);
+  for(const rule of ['two','either']){const other=game(rule);other.setBoard([[1]]);assert.ok(other.c.getHintColumns(9).length>0);assert.doesNotMatch(other.c.getNumberHintText(9),/ほし/);}
+});
 
 for(const rule of ['two','three','either'])for(const mode of ['free','timed','falling','pairFalling']){
   test(`${mode}/${rule}: actual hold, pause/resume and a second-turn swap preserve pieces`,()=>{

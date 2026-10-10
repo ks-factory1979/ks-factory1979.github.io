@@ -7,7 +7,7 @@ const names=['getRandomColor','getRandomTexture','makeNumberObject','makeStarBlo
   'isBattleMode','getActiveRuleMode','isPairFallingMode','isThreeMinuteFallingMode','isFallingMode','isRealFallingMode','getCurrentFallingConfig','isBasicTutorial','isFallingTutorial','isTutorialMode',
   'getImmediatePairs','findAllPairs','removeAndDrop','isBoardFull','resolvePlacedBlock','resolveSettledPair','processRemovals','processStarCross','getFallingChainBonus','randomNumber','canUseHold',
   'saveAndGetFalling3MinuteRecord','saveAndGetPair3MinuteRecord','saveGeneralRecords','getFallingTotalBricks','makeFallingResultId',
-  'startGame','getRuleLabel','selectSoloRule','startSelectedSoloMode','getHintColumns','getNumberHintText','expireFallingChallenge','maybeFinalizeExpiredFalling','endGame'];
+  'startGame','getRuleLabel','selectSoloRule','startSelectedSoloMode','getHintColumns','getNumberHintText','expireFallingChallenge','maybeFinalizeExpiredFalling','maybeFinalizeExpiredTimed','endGame'];
 function createGame(){
   let now=0,nextId=0;const timers=new Map(),intervals=new Map(),stored=new Map(),elements=new Map(),calls={submits:[],screens:[],spawns:[]};
   const no=()=>{};
