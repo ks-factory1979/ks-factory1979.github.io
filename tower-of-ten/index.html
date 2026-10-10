@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="mobile-layout.css">
   <link rel="stylesheet" href="text-layout.css">
   <link rel="stylesheet" href="solo-rules.css">
+  <link rel="stylesheet" href="battle-layout.css">
 </head>
 <body>
   <main id="app">
@@ -371,6 +372,7 @@
       <div id="battle-attack-toast" class="battle-attack-toast" hidden aria-live="polite"><img id="battle-attack-character" alt=""><div><strong id="battle-attack-sender">もこから</strong><span id="battle-attack-message">おじゃま 3こ！</span><small id="battle-garbage-tip" hidden>10を つくれば きえるよ！</small></div></div>
       <div id="battle-garbage-warning" class="battle-garbage-warning" hidden aria-live="polite">
         <strong id="battle-garbage-warning-text">おじゃま 1こ くるよ！</strong>
+        <span id="battle-garbage-time"></span><span id="battle-counter-result" role="status"></span>
         <div class="battle-garbage-warning-track"><span id="battle-garbage-warning-bar"></span></div>
       </div>
       <div id="star-award-toast" class="star-award-toast" hidden aria-live="polite"><img data-asset="assets/ui/blocks/star_block.png" alt=""><strong>星ブロック ゲット！</strong></div>
@@ -485,6 +487,7 @@
   <script src="solo-records.js"></script>
   <script src="game.js"></script>
   <script src="battle.js"></script>
+  <script src="battle-counter.js"></script>
   <script src="mobile-layout.js"></script>
   <script>
     if (new URLSearchParams(location.search).get('layout') === 'edit') {

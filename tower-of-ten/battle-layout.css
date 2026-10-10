@@ -1,0 +1,172 @@
+/* Battle screens fit the available viewport, including the local trial frame. */
+html:not(.tower-mobile) #game-screen.battle-mode.counter-battle .game-shell { grid-template-rows:76px 38px 26px minmax(0,1fr) 42px; gap:3px; }
+html:not(.tower-mobile) #game-screen.battle-mode .play-area { grid-template-rows:minmax(0,1fr); }
+html:not(.tower-mobile) #game-screen.battle-mode .board-section,html:not(.tower-mobile) #game-screen.battle-mode .tower-side { min-height:0; }
+html:not(.tower-mobile) #game-screen.battle-mode .board-stage { flex:1; width:100%; min-height:0; }
+html:not(.tower-mobile) #game-screen.battle-mode #falling-controls { flex:none; }
+#game-screen.battle-mode.counter-battle .server-counter { position:static; transform:none; width:100%; min-width:0; height:26px; padding:2px 6px; display:grid; grid-template-columns:auto auto minmax(0,1fr); grid-template-rows:16px 3px; gap:1px 6px; border:1px solid #c99052; border-radius:8px; box-shadow:none; background:#fff2d1; pointer-events:none; }
+#game-screen.battle-mode.counter-battle .server-counter strong { font-size:12px; line-height:16px; white-space:nowrap; animation:none; }
+#game-screen.battle-mode.counter-battle #battle-garbage-time { font-size:11px; line-height:16px; white-space:nowrap; }
+#game-screen.battle-mode.counter-battle #battle-counter-result { font-size:12px; font-weight:900; color:#6943a2; text-align:right; white-space:nowrap; line-height:16px; }
+#game-screen.battle-mode.counter-battle .battle-garbage-warning-track { grid-column:1/-1; height:3px; margin:0; border:0; }
+#game-screen.battle-mode.counter-battle #battle-attack-toast { display:none; }
+#game-screen.battle-mode .op-stats-compact { display:none; }
+html.tower-mobile #game-screen.battle-mode.counter-battle .mobile-game-layout { grid-template-rows:64px 32px 28px 46px 26px minmax(0,1fr) 23px var(--mobile-control-area); }
+html.tower-mobile #game-screen.battle-mode.counter-battle .server-counter { grid-row:5; }
+html.tower-mobile #game-screen.battle-mode.counter-battle .board-stage { grid-row:6; }
+html.tower-mobile #game-screen.battle-mode.counter-battle #chain-power-panel { grid-row:7; }
+html.tower-mobile #game-screen.battle-mode.counter-battle #falling-controls { grid-row:8; }
+html.tower-landscape #game-screen.battle-mode.counter-battle .mobile-game-layout { grid-template-rows:48px 26px 24px 38px 26px minmax(0,1fr) 20px var(--mobile-control-area); }
+html.tower-landscape #game-screen.battle-mode.counter-battle .board-stage { grid-row:1/-1; }
+html.tower-landscape #game-screen.battle-mode.counter-battle .server-counter { grid-column:2; }
+#battle-menu-screen,#battle-pin-screen,#battle-room-screen,#battle-spectator-screen,#battle-result-screen { overflow:hidden; }
+#battle-menu-screen .battle-menu-panel,#battle-pin-screen .battle-pin-panel,#battle-room-screen .battle-room-panel,#battle-spectator-screen .battle-spectator-panel,#battle-result-screen .battle-result-panel {
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:min(900px,calc(100% - 16px)); height:min(620px,calc(100% - 16px)); max-height:none; margin:0; padding:clamp(10px,2vw,20px); overflow:visible; min-height:0;
+}
+#battle-menu-screen .battle-menu-cast { min-height:0; height:100%; }
+#battle-menu-screen .battle-menu-cast img { height:min(27dvh,240px); }
+#battle-menu-screen .battle-menu-copy { min-height:0; display:flex; flex-direction:column; justify-content:center; gap:6px; }
+#battle-menu-screen h2 { margin:0; font-size:clamp(24px,3.3vw,40px); line-height:1.2; }
+#battle-menu-screen .battle-label { align-self:center; font-size:clamp(12px,1.4vw,18px); padding:4px 12px; }
+#battle-menu-screen .battle-menu-copy>p { margin:0; font-size:clamp(14px,2vw,20px); }
+#battle-menu-screen .battle-settings { margin:0; }
+#battle-menu-screen .battle-setting-options span { font-size:clamp(11px,1.3vw,16px); padding:8px 2px; }
+#battle-menu-screen .battle-menu-actions { margin:3px 0; gap:7px; }
+#battle-menu-screen .battle-large-btn { min-height:46px; padding:6px 12px; font-size:clamp(20px,2.8vw,28px); }
+#battle-menu-screen .compact { align-self:center; min-height:44px; padding:5px 18px; }
+#battle-pin-screen .battle-pin-panel { width:min(620px,calc(100% - 16px)); justify-content:space-evenly; gap:6px; }
+#battle-pin-screen h2 { font-size:clamp(24px,3.3vw,34px); margin:0; }
+#battle-pin-screen .battle-pin-boxes { margin:0; gap:8px; }
+#battle-pin-screen .battle-pin-boxes span { width:clamp(44px,12vw,68px); height:clamp(44px,11dvh,76px); font-size:34px; }
+#battle-pin-screen .battle-keypad { gap:6px; grid-template-columns:repeat(3,clamp(58px,17vw,82px)); }
+#battle-pin-screen .battle-keypad button { height:clamp(44px,8dvh,54px); }
+#battle-pin-screen .battle-keypad .small-key { padding:2px; font-size:13px; line-height:1.15; white-space:nowrap; }
+#battle-pin-screen .battle-error { min-height:0; font-size:16px; margin:0; }
+#battle-pin-screen .battle-pin-actions { gap:6px; }
+#battle-pin-screen .battle-pin-actions .paper-btn { min-width:0; min-height:44px; height:44px; padding:5px 12px; font-size:17px; }
+.battle-error:empty { display:none; }
+#battle-room-screen .battle-room-header { padding:5px 10px; flex:none; gap:8px; }
+#battle-room-screen .battle-room-header>div:first-child { grid-template-columns:auto 1fr; gap:0 10px; }
+#battle-room-screen .battle-room-header strong { font-size:30px; line-height:1.1; letter-spacing:5px; }
+#battle-room-screen .battle-room-header small { grid-column:1/-1; font-size:11px; line-height:1.3; }
+#battle-room-screen .battle-room-main { min-height:0; gap:8px; margin-top:7px; }
+#battle-room-screen .battle-room-main section { min-height:0; padding:6px; }
+#battle-room-screen .battle-room-main h3 { font-size:18px; line-height:1.3; margin:0 0 5px; }
+#battle-room-screen .battle-character-card { grid-template-columns:clamp(38px,5vw,72px) minmax(0,1fr); justify-items:stretch; min-height:0; padding:3px; gap:4px; }
+#battle-room-screen .battle-character-card img { width:100%; height:clamp(38px,7dvh,72px); }
+#battle-room-screen .battle-character-card strong { font-size:18px; }
+#battle-room-screen .battle-character-card small { font-size:10px; }
+#battle-room-screen .battle-ready-btn { min-width:0; width:min(230px,100%); min-height:44px; margin-top:5px; padding:5px; font-size:18px; }
+#battle-room-screen .battle-member-slot { min-height:0; height:auto; grid-template-columns:40px minmax(0,1fr) auto; gap:4px; padding:3px; }
+#battle-room-screen .battle-member-slot img { width:38px; height:38px; }
+#battle-room-screen .battle-member-slot strong { font-size:17px; }
+#battle-room-screen .battle-member-slot span { font-size:10px; }
+#battle-room-screen .battle-member-slot strong,#battle-room-screen .battle-member-slot div>span { display:block; line-height:1.1; }
+#battle-room-screen .battle-member-slot div>span:empty { display:none; }
+#battle-room-screen .battle-member-slot.empty::before { width:24px; height:24px; font-size:20px; }
+#battle-room-screen .battle-member-slots { min-height:0; grid-template-rows:repeat(4,minmax(0,1fr)); }
+#battle-room-screen .battle-room-message { font-size:13px; line-height:1.3; min-height:17px; margin:4px 0; }
+#battle-room-screen .battle-room-actions { grid-template-columns:minmax(0,1.55fr) minmax(90px,1fr); gap:5px; }
+#battle-room-screen .battle-room-actions .paper-btn { min-height:44px; height:44px; padding:5px; font-size:clamp(14px,1.7vw,18px); }
+#battle-result-screen .battle-result-panel { display:flex; flex-direction:column; }
+#battle-result-screen h2 { flex:none; font-size:clamp(21px,3vw,32px); margin:0 0 7px; }
+#battle-result-screen .battle-result-list { flex:1; min-height:0; height:auto; grid-template-columns:repeat(2,minmax(0,1fr)); }
+#battle-result-screen .battle-result-card { min-height:0; grid-template-columns:clamp(44px,8vw,100px) minmax(0,1fr); padding:5px; }
+#battle-result-screen .battle-result-card img { width:100%; height:min(15dvh,125px); }
+#battle-result-screen .battle-result-rank { font-size:clamp(18px,2.5vw,28px); line-height:1.2; }
+#battle-result-screen .battle-result-name { font-size:clamp(16px,2vw,23px); }
+#battle-result-screen .battle-result-stats { font-size:clamp(10px,1.1vw,13px); line-height:1.4; word-break:keep-all; overflow-wrap:normal; }
+#battle-result-screen .battle-result-actions { flex:none; flex-wrap:nowrap; gap:6px; }
+#battle-result-screen .battle-result-actions .paper-btn { flex:1; min-width:0; min-height:44px; padding:5px; font-size:clamp(14px,1.8vw,20px); }
+#battle-result-screen .battle-you-badge { right:3px; top:3px; font-size:10px; padding:2px 5px; }
+#battle-spectator-screen .battle-spectator-panel { grid-template-columns:minmax(100px,.65fr) minmax(0,1fr); grid-template-rows:auto auto minmax(0,1fr); }
+#battle-spectator-screen .battle-spectator-panel>img { grid-row:1/4; width:100%; height:min(40dvh,300px); }
+#battle-spectator-screen .battle-spectator-copy h2 { font-size:clamp(22px,3vw,34px); }
+#battle-spectator-screen .battle-spectator-copy p { font-size:clamp(17px,2.6vw,25px); }
+#battle-spectator-screen .battle-watch-card { min-height:0; grid-template-columns:40px minmax(0,1fr); padding:4px; }
+#battle-spectator-screen .battle-watch-card img { width:38px; height:38px; }
+#battle-spectator-screen .battle-watch-card strong { font-size:16px; }
+#battle-spectator-screen .battle-watch-card small { font-size:11px; }
+@media (max-width:850px) and (orientation:portrait) {
+  #battle-menu-screen .battle-menu-panel { grid-template-columns:1fr; grid-template-rows:clamp(64px,15dvh,120px) minmax(0,1fr); gap:6px; }
+  #battle-menu-screen .battle-menu-cast { grid-template-columns:repeat(4,minmax(0,1fr)); align-items:center; }
+  #battle-menu-screen .battle-menu-cast img { height:100%; max-height:120px; }
+  #battle-menu-screen .battle-menu-copy { justify-content:space-evenly; gap:3px; }
+  #battle-room-screen .battle-room-main { grid-template-columns:1fr; grid-template-rows:auto minmax(0,1fr); gap:6px; }
+  #battle-room-screen .battle-character-grid { flex:none; grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px; }
+  #battle-room-screen .battle-character-card { grid-template-columns:1fr; justify-items:center; gap:0; padding:2px; }
+  #battle-room-screen .battle-character-card img { width:38px; height:38px; }
+  #battle-room-screen .battle-character-card strong { font-size:16px; }
+  #battle-room-screen .battle-character-card small { font-size:8px; letter-spacing:-.3px; }
+  #battle-room-screen .battle-character-card.selected::after { width:18px; height:18px; right:1px; top:1px; font-size:12px; }
+  #battle-room-screen .battle-room-main h3 { font-size:17px; }
+  #battle-room-screen .battle-member-slot img { width:32px; height:32px; }
+  #battle-room-screen .battle-member-slot { grid-template-columns:34px minmax(0,1fr) auto; }
+  #battle-spectator-screen .battle-spectator-panel { grid-template-columns:1fr; grid-template-rows:auto auto auto minmax(0,1fr); gap:5px; }
+  #battle-spectator-screen .battle-spectator-panel>img { grid-row:auto; height:clamp(60px,15dvh,125px); }
+  #battle-spectator-screen .battle-spectator-copy { text-align:center; }
+  #battle-spectator-screen .battle-spectator-copy p br { display:none; }
+  #battle-spectator-screen .battle-spectator-time { text-align:center; }
+}
+@media (max-width:850px) and (max-height:620px) and (orientation:portrait) {
+  #battle-room-screen .battle-room-panel { padding:10px; }
+  #battle-room-screen .battle-room-header { padding:3px 6px; }
+  #battle-room-screen .battle-room-header strong { font-size:24px; }
+  #battle-room-screen .battle-character-card img { width:32px; height:32px; }
+  #battle-room-screen .battle-character-card strong { line-height:1.1; }
+  #battle-room-screen .battle-character-card small { line-height:1.2; }
+  #battle-room-screen .battle-member-slots { gap:3px; }
+  #battle-room-screen .battle-member-slot { padding:2px 3px; }
+  #battle-room-screen .battle-member-slot { grid-template-columns:26px minmax(0,1fr) auto; }
+  #battle-room-screen .battle-member-slot img { width:24px; height:24px; }
+  #battle-room-screen .battle-member-slot strong,#battle-room-screen .battle-member-slot span { line-height:1.1; }
+}
+@media (max-height:540px) and (orientation:landscape) {
+  html.tower-landscape #game-screen.battle-mode .battle-opponent-card { grid-template-columns:minmax(0,1fr); }
+  html.tower-landscape #game-screen.battle-mode .battle-opponent-card img,html.tower-landscape #game-screen.battle-mode .op-stats-full { display:none; }
+  html.tower-landscape #game-screen.battle-mode .op-stats-compact { display:block; white-space:nowrap; }
+  #battle-room-screen .battle-room-panel { padding:10px; }
+  #battle-pin-screen .battle-pin-panel { width:min(720px,calc(100% - 16px)); display:grid; grid-template-columns:minmax(0,1fr) auto; grid-template-rows:auto auto auto auto; gap:5px 20px; justify-items:center; align-items:center; }
+  #battle-pin-screen h2,#battle-pin-screen .battle-pin-boxes,#battle-pin-screen .battle-error,#battle-pin-screen .battle-pin-actions { grid-column:1; }
+  #battle-pin-screen .battle-keypad { grid-column:2; grid-row:1/-1; }
+  #battle-pin-screen .battle-pin-actions { flex-wrap:wrap; justify-content:center; }
+  #battle-menu-screen .battle-menu-panel { grid-template-columns:.65fr 1.35fr; gap:10px; padding:8px 12px; }
+  #battle-menu-screen .battle-menu-cast img { height:min(32dvh,120px); }
+  #battle-menu-screen .battle-menu-copy { display:grid; grid-template-columns:1fr 1fr; gap:4px 10px; align-items:center; }
+  #battle-menu-screen .battle-label,#battle-menu-screen h2,#battle-menu-screen .battle-menu-copy>p,#battle-menu-screen .compact { grid-column:1/-1; justify-self:center; }
+  #battle-menu-screen .battle-label { font-size:11px; padding:2px 9px; }
+  #battle-menu-screen h2 { font-size:24px; }
+  #battle-menu-screen .battle-menu-copy>p { font-size:14px; }
+  #battle-menu-screen .battle-large-btn { font-size:20px; }
+  #battle-menu-screen .battle-settings legend { font-size:12px; }
+  #battle-menu-screen .battle-settings>small { font-size:10px; }
+  #battle-menu-screen .battle-setting-options { gap:3px; }
+  #battle-menu-screen .battle-setting-options span { font-size:10px; padding:6px 1px; }
+  #battle-room-screen .battle-room-header { padding:3px 8px; }
+  #battle-room-screen .battle-room-header strong { font-size:24px; }
+  #battle-room-screen .battle-room-header small { font-size:9px; }
+  #battle-room-screen .battle-room-main { grid-template-columns:1fr 1fr; margin-top:5px; flex:1; }
+  #battle-room-screen .battle-room-main h3 { font-size:15px; margin-bottom:3px; }
+  #battle-room-screen .battle-character-grid { flex:1; gap:3px; }
+  #battle-room-screen .battle-character-card { grid-template-columns:36px minmax(0,1fr); }
+  #battle-room-screen .battle-character-card img { width:36px; height:36px; }
+  #battle-room-screen .battle-character-card strong { font-size:16px; line-height:1.1; }
+  #battle-room-screen .battle-character-card small { font-size:9px; }
+  #battle-room-screen .battle-member-slots { gap:3px; grid-template-columns:repeat(2,minmax(0,1fr)); grid-template-rows:repeat(2,minmax(0,1fr)); }
+  #battle-room-screen .battle-member-slot { grid-template-columns:25px minmax(0,1fr) auto; padding:1px 3px; }
+  #battle-room-screen .battle-member-slot img { width:24px; height:24px; }
+  #battle-room-screen .battle-member-slot strong { font-size:14px; }
+  #battle-room-screen .battle-member-slot span { font-size:9px; line-height:1.1; }
+  #battle-room-screen .battle-room-message { font-size:11px; }
+  #battle-spectator-screen .battle-spectator-copy p { font-size:17px; margin:2px 0; }
+  #battle-spectator-screen .battle-spectator-copy h2 { font-size:22px; }
+  #battle-spectator-screen .battle-spectator-time strong { font-size:24px; }
+  #battle-spectator-screen .battle-spectator-panel { padding:10px; gap:4px; }
+  #battle-spectator-screen .battle-spectator-copy { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  #battle-spectator-screen .battle-spectator-copy h2 { line-height:1.2; }
+  #battle-spectator-screen .battle-spectator-copy p { line-height:1.2; margin:0; }
+  #battle-spectator-screen .battle-spectator-copy p br { display:none; }
+  #battle-spectator-screen .battle-spectator-time { font-size:16px; line-height:1.2; }
+  #battle-spectator-screen .battle-watch-card strong { line-height:1.1; }
+  #battle-spectator-screen .battle-watch-card small { line-height:1.25; }
+}

@@ -21,14 +21,14 @@ var TenTowerBattleRules = (() => {
     return object(v,['kind','val','recentGarbage','garbageBatchId']) && (v.kind === 'star' && v.val === null || v.kind === 'number' && integer(v.val,1,9)) && (v.recentGarbage === undefined || typeof v.recentGarbage === 'boolean') && (v.garbageBatchId === undefined || v.garbageBatchId === '' || id(v.garbageBatchId));
   }
   function moves(list) {
-    return Array.isArray(list) && list.length <= 10 && list.every(v => object(v,['clientMoveEventId','totalPairsInMove','chainDepth','createdAt']) && id(v.clientMoveEventId) && integer(v.totalPairsInMove,1,999) && integer(v.chainDepth,1,999) && integer(v.createdAt,0,9999999999999));
+    return Array.isArray(list) && list.length <= 10 && list.every(v => object(v,['clientMoveEventId','totalPairsInMove','chainDepth','createdAt','moveSerial']) && id(v.clientMoveEventId) && integer(v.totalPairsInMove,1,999) && integer(v.chainDepth,1,999) && integer(v.createdAt,0,9999999999999) && (v.moveSerial===undefined||integer(v.moveSerial,1,2147483647)));
   }
   function samePiece(a,b) {
     if(!a||!b||a.kind!==b.kind)return false;
     return a.kind==='pair'?a.pairId===b.pairId&&a.orientation===b.orientation&&samePiece(a.first,b.first)&&samePiece(a.second,b.second):a.val===b.val;
   }
   function validState(s, expected) {
-    const keys = ['version','savedAt','fallMode','ruleMode','board','queue','held','holdUsed','chainPower','pendingStarAward','falling','matchId','sequenceIndex','bricks','tenCount','bestChain','completedTowers','towerStage','garbageQueue','garbageWarningQueue','garbageWarningRemainingMs','clientSequence','pendingAcks','receivedAttackRecords','seenAttackIds','pairPlacements','fallingChainBonusTotal','pendingMoves'];
+    const keys = ['version','savedAt','fallMode','ruleMode','board','queue','held','holdUsed','chainPower','pendingStarAward','falling','matchId','sequenceIndex','bricks','tenCount','bestChain','completedTowers','towerStage','garbageQueue','garbageWarningQueue','garbageWarningRemainingMs','clientSequence','pendingAcks','receivedAttackRecords','seenAttackIds','pairPlacements','fallingChainBonusTotal','pendingMoves','moveSerial','appliedDropIds','garbageResolutionPending'];
     if (!object(s,keys) || ![1,2].includes(s.version)) return false;
     const config = s.version === 1 ? {...defaults} : settings({fallMode:s.fallMode,ruleMode:s.ruleMode});
     if (!config || expected && (config.fallMode !== expected.fallMode || config.ruleMode !== expected.ruleMode)) return false;
@@ -47,6 +47,9 @@ var TenTowerBattleRules = (() => {
     for (const k of ['pendingAcks','seenAttackIds']) if (s[k] !== undefined && (!Array.isArray(s[k]) || s[k].length > 100 || !s[k].every(id))) return false;
     for (const k of ['garbageQueue','garbageWarningQueue']) if (s[k] !== undefined && (!Array.isArray(s[k]) || s[k].length > 30 || !s[k].every(v => object(v,['value','eventId','senderCharacterId']) && integer(v.value,1,9) && id(v.eventId) && ['pipi','rabi','moko','kon',''].includes(v.senderCharacterId)))) return false;
     if (s.receivedAttackRecords !== undefined && (!Array.isArray(s.receivedAttackRecords) || s.receivedAttackRecords.length > 100 || !s.receivedAttackRecords.every(v => object(v,['eventId','receivedAt']) && id(v.eventId) && integer(v.receivedAt,0,9999999999999)))) return false;
+    if(s.moveSerial!==undefined&&!integer(s.moveSerial,0,2147483647))return false;
+    if(s.garbageResolutionPending!==undefined&&typeof s.garbageResolutionPending!=='boolean')return false;
+    if(s.appliedDropIds!==undefined&&(!Array.isArray(s.appliedDropIds)||s.appliedDropIds.length>300||!s.appliedDropIds.every(id)))return false;
     return s.pendingMoves === undefined || moves(s.pendingMoves);
   }
   function nextPair(rng) {
