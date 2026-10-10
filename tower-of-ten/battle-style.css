@@ -213,3 +213,29 @@
   #game-screen.battle-mode .falling-control.hold-swap{min-width:96px}
   #game-screen.battle-mode .falling-control.hold-swap>b{font-size:10px}
 }
+
+/* Room settings are selected once by the creator, then shared by all participants. */
+.battle-settings { margin:8px 0 12px; }
+.battle-settings fieldset { border:0; padding:0; margin:5px 0; min-width:0; }
+.battle-settings legend { font-size:14px; font-weight:900; margin:auto; }
+.battle-setting-options { display:flex; gap:5px; }
+.battle-setting-options label { flex:1; min-width:0; position:relative; cursor:pointer; }
+.battle-setting-options input { position:absolute; opacity:0; }
+.battle-setting-options span { display:block; padding:7px 2px; border:2px solid #bf965a; border-radius:12px; background:#fff9e9; font-size:clamp(11px,1.15vw,16px); font-weight:900; white-space:nowrap; }
+.battle-setting-options input:checked + span { background:#fff0ab; border-color:#936221; box-shadow:inset 0 0 0 1px #936221; }
+.battle-setting-options input:focus-visible + span { outline:3px solid #2467ac; outline-offset:2px; }
+.battle-settings > small { display:block; font-size:12px; }
+.battle-menu-copy h2 { font-size:clamp(27px,3.4vw,42px); }
+.battle-menu-copy > p:not(.battle-error) { font-size:20px; margin-bottom:8px; }
+.battle-menu-panel { overflow:auto; }
+#battle-room-rules { font-weight:900; }
+.battle-opponent-card strong { line-height:1.3; }
+#game-screen.battle-mode:not(.pair-falling-mode) .info-card:not(.time-card) { padding:3px 8px; }
+#game-screen.battle-mode:not(.pair-falling-mode) .info-label { font-size:13px; line-height:1.3; }
+#game-screen.battle-mode:not(.pair-falling-mode) .number-tile { width:44px; height:44px; margin-top:2px; font-size:30px; }
+@media (max-height:540px) and (orientation:landscape) {
+  .battle-room-panel,.battle-spectator-panel,.battle-result-panel { position:relative; left:auto; top:auto; transform:none; height:auto; max-height:none; margin:2vh auto; overflow:visible; }
+  .battle-room-main { flex:none; }
+  .battle-character-grid { flex:none; }
+  .battle-character-card { min-height:100px; }
+}

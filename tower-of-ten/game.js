@@ -223,7 +223,10 @@ function cloneBlockObject(obj) {
   const normalized = normalizeBlockObject(obj);
   return { ...normalized };
 }
-function makeQueueObject() { return isPairFallingMode() ? makePairObject() : makeNumberObject(); }
+function makeQueueObject() {
+  if (isPairFallingMode() && isBattleMode()) { const values=battleNextPair(); return makePairObject(values[0],values[1]); }
+  return isPairFallingMode() ? makePairObject() : makeNumberObject();
+}
 function ensureNumberQueue() { while (numbersQueue.length < 3) numbersQueue.push(makeQueueObject()); }
 function advanceCurrentQueue() { numbersQueue.shift(); ensureNumberQueue(); }
 function hasStarBlockOwned() { return !!(heldBlock && isStarBlock(heldBlock)) || numbersQueue.some(isStarBlock); }
@@ -338,6 +341,7 @@ function holdCurrentPairBlock() {
   playHoldSound();
   respawnCurrentPairQueuePiece(90);
   updateInfoPanels(); updateBoardUI(); updateHints(); updateFallingControls();
+  if (isBattleMode()) battlePersistLocalSnapshot();
   return true;
 }
 function holdCurrentBlock() {
@@ -856,16 +860,19 @@ function processStarCross(col,row) {
   },760);
 }
 function exportSpecialBattleState() {
-  const pack=obj=>obj?{kind:isStarBlock(obj)?BLOCK_KIND_STAR:BLOCK_KIND_NUMBER,val:isStarBlock(obj)?null:Number(obj.val),recentGarbage:!!obj.recentGarbage,garbageBatchId:obj.garbageBatchId||''}:null;
-  return {version:1,savedAt:Date.now(),board:board.map(col=>col.map(pack)),queue:numbersQueue.map(pack),held:pack(heldBlock),holdUsed:!!holdUsedThisTurn,chainPower:Number(chainPower)||0,pendingStarAward:!!pendingStarAward,falling:fallingPiece?{...pack(fallingPiece),col:fallingPiece.col,row:fallingPiece.row,phase:fallingPiece.phase,lockElapsed:fallingPiece.lockElapsed||0,intervalMs:fallingPiece.intervalMs||0}:null};
+  const pack=obj=>!obj?null:isPairBlock(obj)?{kind:BLOCK_KIND_PAIR,pairId:obj.pairId,first:pack(obj.first),second:pack(obj.second),orientation:obj.orientation}:{kind:isStarBlock(obj)?BLOCK_KIND_STAR:BLOCK_KIND_NUMBER,val:isStarBlock(obj)?null:Number(obj.val),recentGarbage:!!obj.recentGarbage,garbageBatchId:obj.garbageBatchId||''};
+  return {version:isBattleMode()?2:1,...(isBattleMode()?{fallMode:battleState.fallMode,ruleMode:battleState.ruleMode,pairPlacements,fallingChainBonusTotal}:{}),savedAt:Date.now(),board:board.map(col=>col.map(pack)),queue:numbersQueue.map(pack),held:pack(heldBlock),holdUsed:!!holdUsedThisTurn,chainPower:Number(chainPower)||0,pendingStarAward:!!pendingStarAward,falling:fallingPiece?{...pack(fallingPiece),col:fallingPiece.col,row:fallingPiece.row,phase:fallingPiece.phase,lockElapsed:fallingPiece.lockElapsed||0,intervalMs:fallingPiece.intervalMs||0}:null};
 }
 function importSpecialBattleState(state) {
   if(!state||typeof state!=='object'||!Array.isArray(state.board)||!Array.isArray(state.queue))return false;
+  if(isBattleMode()&&!TenTowerBattleRules.validState(state,{fallMode:battleState.fallMode,ruleMode:battleState.ruleMode}))return false;
   try{
+    const unpack=obj=>isPairBlock(obj)?{...clonePairObject(obj)}:normalizeBlockObject(obj);
     board=Array.from({length:BOARD_COLS},(_,c)=>(state.board[c]||[]).slice(0,BOARD_ROWS).map(normalizeBlockObject));
-    numbersQueue=state.queue.slice(0,5).map(normalizeBlockObject);ensureNumberQueue();
-    heldBlock=state.held?normalizeBlockObject(state.held):null;holdUsedThisTurn=!!state.holdUsed;chainPower=Math.max(0,Math.min(SPECIAL_FEATURE_CONFIG.chainPowerMax,Number(state.chainPower)||0));pendingStarAward=!!state.pendingStarAward;
-    fallingPiece=state.falling?{...normalizeBlockObject(state.falling),col:Math.max(0,Math.min(BOARD_COLS-1,Number(state.falling.col)||0)),row:Math.max(0,Math.min(BOARD_ROWS,Number.isFinite(Number(state.falling.row))?Number(state.falling.row):BOARD_ROWS)),phase:state.falling.phase==='locking'?'locking':'falling',lockElapsed:Math.max(0,Number(state.falling.lockElapsed)||0),lockStartedAt:0,intervalMs:Number(state.falling.intervalMs)||getFallingIntervalForLevel()}:null;
+    numbersQueue=state.queue.slice(0,5).map(unpack);ensureNumberQueue();
+    heldBlock=state.held?unpack(state.held):null;holdUsedThisTurn=!!state.holdUsed;chainPower=Math.max(0,Math.min(SPECIAL_FEATURE_CONFIG.chainPowerMax,Number(state.chainPower)||0));pendingStarAward=!!state.pendingStarAward;
+    fallingPiece=state.falling?{...unpack(state.falling),col:Math.max(0,Math.min(BOARD_COLS-1,Number(state.falling.col)||0)),row:Math.max(0,Math.min(BOARD_ROWS,Number.isFinite(Number(state.falling.row))?Number(state.falling.row):BOARD_ROWS)),phase:state.falling.phase==='locking'?'locking':'falling',lockElapsed:Math.max(0,Number(state.falling.lockElapsed)||0),lockStartedAt:0,intervalMs:Number(state.falling.intervalMs)||getFallingIntervalForLevel()}:null;
+    pairPlacements=Math.max(0,Number(state.pairPlacements)||0);fallingChainBonusTotal=Math.max(0,Number(state.fallingChainBonusTotal)||0);pairSettling=false;
     updateBoardUI();updateInfoPanels();updateHints();updateFallingControls();return true;
   }catch(e){return false;}
 }
@@ -891,8 +898,8 @@ function isGameScreenActive() {
   return !!(game && game.classList.contains('active'));
 }
 function isBattleMode() { return currentMode === 'battle'; }
-function getActiveRuleMode() { return isBattleMode() || isTutorialMode() ? 'two' : ruleMode; }
-function isPairFallingMode() { return currentMode === 'pairFalling'; }
+function getActiveRuleMode() { return isTutorialMode() ? 'two' : (isBattleMode() ? (typeof battleState !== 'undefined' ? battleState.ruleMode : 'two') : ruleMode); }
+function isPairFallingMode() { return currentMode === 'pairFalling' || (isBattleMode() && typeof battleState !== 'undefined' && battleState.fallMode === 'pairFalling'); }
 function isThreeMinuteFallingMode() { return currentMode === 'falling' || currentMode === 'pairFalling'; }
 function isFallingMode() {
   return currentMode === 'falling' || currentMode === 'fallingTutorial' || isPairFallingMode() || isBattleMode();
@@ -2001,6 +2008,7 @@ function resolveSettledPair() {
   animating=false; pairSettling=false;
   updateHints(); updateFallingControls();
   if(isThreeMinuteFallingMode()&&fallingTimeExpired){maybeFinalizeExpiredFalling();return;}
+  if(isBattleMode()){battleAfterMove();return;}
   scheduleSpawn(160);
 }
 function settlePairFallingPiece(fromHardDrop) {

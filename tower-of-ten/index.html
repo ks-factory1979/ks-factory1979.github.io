@@ -126,6 +126,18 @@
           <span class="battle-label">2〜4にんで あそべるよ！</span>
           <h2>たいせんモード</h2>
           <p>みんなで 10を つくろう！</p>
+          <div class="battle-settings">
+            <fieldset><legend>おちかた</legend><div class="battle-setting-options">
+              <label><input type="radio" name="battle-fall-mode" value="falling" checked><span>通常落下</span></label>
+              <label><input type="radio" name="battle-fall-mode" value="pairFalling"><span>ペアおち</span></label>
+            </div></fieldset>
+            <fieldset><legend>10の つくりかた</legend><div class="battle-setting-options">
+              <label><input type="radio" name="battle-rule-mode" value="two" checked><span>2つで10</span></label>
+              <label><input type="radio" name="battle-rule-mode" value="three"><span>3つで10</span></label>
+              <label><input type="radio" name="battle-rule-mode" value="either"><span>どっちでも10</span></label>
+            </div></fieldset>
+            <small>へやを つくる人が えらんでね</small>
+          </div>
           <div class="battle-menu-actions">
             <button class="paper-btn green battle-large-btn" type="button" onclick="battleCreateRoom()">へやを つくる</button>
             <button class="paper-btn blue battle-large-btn" type="button" onclick="openBattlePin()">へやに はいる</button>
@@ -161,7 +173,7 @@
     <section id="battle-room-screen" class="screen screen-bg howto-bg" aria-label="対戦待機画面">
       <div class="battle-room-panel paper-panel">
         <header class="battle-room-header">
-          <div><span>へやの PIN</span><strong id="battle-room-pin">0000</strong><small>PINを みんなに つたえてね！</small></div>
+          <div><span>へやの PIN</span><strong id="battle-room-pin">0000</strong><small>PINを みんなに つたえてね！</small><small id="battle-room-rules"></small></div>
           <div class="battle-room-count"><span>さんか</span><strong id="battle-room-count">1 / 4</strong></div>
         </header>
         <div class="battle-room-main">
@@ -469,6 +481,7 @@
     </section>
   </main>
   <script src="rules.js"></script>
+  <script src="battle-rules.js"></script>
   <script src="solo-records.js"></script>
   <script src="game.js"></script>
   <script src="battle.js"></script>

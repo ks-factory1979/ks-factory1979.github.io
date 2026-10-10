@@ -28,6 +28,7 @@ HTML・CSS・ゲーム・画像60点・BGM9曲は静的ファイルとして配�
 | style.css / battle-style.css | 現行スタイル |
 | game.js / battle.js | 現行ゲーム・対戦クライアント |
 | rules.js | 副作用のない共通10判定（2つ・3つ・両方） |
+| battle-rules.js | 対戦6種類の設定、匿名の復帰データ検証、共通ペア生成 |
 | solo-rules.css | ソロのルール選択・モード選択画面の配置 |
 | solo-records.js | ソロ12部門の端末ベスト、旧記録の安全な読込み、送信・再送管理 |
 | config.js | バージョン・段階・後工程のGAS公開URL |
@@ -41,9 +42,9 @@ HTML・CSS・ゲーム・画像60点・BGM9曲は静的ファイルとして配�
 
 素材・スクリプトは相対パスで読み込むため、`/tower-of-ten/` 以下で動作します。画像の元キーは`.png`や`.jpg`でも実体がWebPのものがあり、実ファイル名はMIMEに合わせています。対応表を変えるときは既存の素材キーを維持してください。
 
-## 新ルール開発：Phase 3
+## 新ルール開発：Phase 4
 
-`feature/tower-of-ten-rule-expansion`で段階実装しています。ソロのメニューでは「2つで10」「3つで10」「どっちでも10」を選び、じっくり・3分チャレンジ・おちてくる・ペアおちの4モードを開始できます。初期選択は「2つで10」で、対戦・チュートリアルも引き続き「2つで10」です。Phase 3では12種類の独立した記録と共通リザルトを実装しました。この開発内容は公開mainへ反映せず、本番GASも再デプロイしていません。
+`feature/tower-of-ten-rule-expansion`で段階実装しています。ソロのメニューでは「2つで10」「3つで10」「どっちでも10」を選び、じっくり・3分チャレンジ・おちてくる・ペアおちの4モードを開始できます。初期選択とチュートリアルは「2つで10」です。Phase 3で12種類の独立した記録と共通リザルト、Phase 4でオンライン対戦6種類を実装しました。この開発内容は公開mainへ反映せず、本番GASも再デプロイしていません。
 
 `rules.js`の`TenTowerRules.findTenGroups(board, options)`は、列ごと・下から上の配列を受け取り、成立組の`groups`、消去セルの`unionCells`（Set）、成立組数の`groupCount`を返します。`ruleMode`は`two`・`three`・`either`です。数字1〜9が縦または横に連続する組だけを数え、重なった組は別々に数えます。盤面自体は変更しません。
 
@@ -70,8 +71,20 @@ GAS拡張原稿は公開リポジトリ外に保管しています。公開GAS�
 リポジトリのルートで次を実行すると、判定・既存挙動・消去と連鎖・記録保護の回帰テストを確認できます。
 
 ```sh
-node --test tests/tower-of-ten-rules.test.cjs tests/tower-of-ten-game-regression.test.cjs tests/tower-of-ten-solo.test.cjs tests/tower-of-ten-records.test.cjs tests/tower-of-ten-record-bridge.test.cjs
+node --test tests/tower-of-ten-rules.test.cjs tests/tower-of-ten-game-regression.test.cjs tests/tower-of-ten-solo.test.cjs tests/tower-of-ten-records.test.cjs tests/tower-of-ten-record-bridge.test.cjs tests/tower-of-ten-battle.test.cjs
 ```
+
+### オンライン対戦6種類
+
+部屋を作る人が「通常落下／ペアおち」と3つの10判定ルールを選びます。作成後の設定は部屋に固定し、参加者・再接続・再戦へ引き継ぎます。2〜4人、3分間、1塔25れんが、順番に送るおじゃま、ACK・clientSequence・再送・重複攻撃防止は従来どおりです。相殺はPhase 5で追加します。
+
+対戦中の内部モードは常に`battle`で、落下形式だけを別に管理します。ペアは全参加者が同じseedから同じ2数を生成し、合計10になる組は生成しません。回転・分離・あとで・次のペア・星・おじゃま取り込みを既存処理へ接続しました。対戦へソロの連鎖ボーナスやソロ記録送信を適用しません。
+
+復帰データの`version: 2`は部屋の`fallMode`・`ruleMode`を含み、ペアの2数・向き・ID、保持中・落下中・次のペア、RNG位置、星、れんさパワー、おじゃま、未送信の攻撃イベントを復元します。形式やルールが違うデータは適用せず、必要な復帰データが読めなければ待機画面で案内します。初めて参加した人の最初の同期を復帰失敗として扱いません。時間切れが落下演出中に来ても、着地処理の完了後に1回だけ結果を確定します。
+
+対戦APIの拡張原稿も公開リポジトリ外に保管しています。固定9メソッドは維持し、作成時の第2引数へ設定を追加しました。新しい部屋へ入るクライアントは`battleRulesVersion: 2`を宣言します。旧クライアントは従来の通常落下・2つで10へ参加できますが、新ルールの部屋は更新を案内して拒否します。識別子のない旧部屋と旧復帰データは従来の通常落下・2つで10として扱い、保存データの一括変更は行いません。
+
+試遊ではGASの実コードをメモリ内のサービスで動かします。Googleの実サービス、実機スマホ・Chromebookでの通信は未検証です。公開前に記録・対戦両方の拡張GASを準備して確認し、別途公開承認を受けます。低い横画面の待機・観戦・結果はスクロールで全体を表示し、対戦中の盤面と6ボタンは画面内に収めます。
 
 ## 更新と段階確認
 
