@@ -80,6 +80,17 @@ test('network pause during committed-drop animation defers clearing until one re
   assert.equal(g.state().tenCount,0);assert.equal(g.run('battleState.garbageResolutionPending'),true);
   g.run('paused=false;');g.c.battleResumeCounterResolution();g.c.battleResumeCounterResolution();g.flush();assert.equal(g.state().tenCount,1);assert.equal(g.run('battleState.pendingMoves.length'),0);
 });
+for(const fallMode of ['falling','pairFalling'])for(const ruleMode of ['two','three','either'])test(`${fallMode}/${ruleMode}: moves survive an unprocessed paused response and clear only after server confirmation`,async()=>{
+ const g=game(fallMode,ruleMode);enableCounter(g);const sent=[];
+ g.run("battleStartSyncLoop=()=>{};battleApplyRoom=()=>{};battlePersistLocalSnapshot=()=>{};battleIngestAttacks=()=>{};battleState.pendingMoves=[{clientMoveEventId:'move-1',moveSerial:1,totalPairsInMove:1,chainDepth:1,createdAt:1},{clientMoveEventId:'move-2',moveSerial:2,totalPairsInMove:1,chainDepth:1,createdAt:2}];");
+ let watermark=0,duplicate=false,missing=false;
+ g.c.battleApi=async(method,token,payload)=>{sent.push(plain(payload.clientMoveEvents));return {ok:true,room:{status:watermark?'playing':'paused'},garbageState:missing?null:{lastMoveSerial:watermark},duplicateSequence:duplicate,serverLastClientSequence:payload.clientSequence,nextExpectedClientSequence:payload.clientSequence+1};};
+ await g.c.battleSyncNow();assert.deepEqual(plain(g.run('battleState.pendingMoves.map(m=>m.moveSerial)')),[1,2]);
+ missing=true;await g.c.battleSyncNow();assert.equal(g.run('battleState.pendingMoves.length'),2);missing=false;
+ watermark=1;await g.c.battleSyncNow();assert.deepEqual(plain(g.run('battleState.pendingMoves.map(m=>m.moveSerial)')),[2]);assert.deepEqual(sent[2].map(m=>m.clientMoveEventId),['move-1','move-2']);
+ duplicate=true;watermark=2;await g.c.battleSyncNow();assert.equal(g.run('battleState.pendingMoves.length'),1);
+ duplicate=false;await g.c.battleSyncNow();assert.equal(g.run('battleState.pendingMoves.length'),0);assert.deepEqual(sent.at(-1).map(m=>m.clientMoveEventId),['move-2']);
+});
 for(const ruleMode of ['two','three','either'])test(`pair/${ruleMode}: rotation, uneven separation, no-match garbage routing and pair placements`,()=>{
   const g=game('pairFalling',ruleMode);g.setBoard([[9,9],[],[],[],[],[],[]]);g.run('numbersQueue[0]=makePairObject(2,3,0);fallingPiece={...clonePairObject(numbersQueue[0]),col:0,row:8,phase:"falling",lockElapsed:0,intervalMs:1200};');g.c.rotatePair(1);assert.equal(g.state().fallingPiece.orientation,1);
   g.c.settlePairFallingPiece(true);g.flush();assert.deepEqual(g.state().board.map(c=>c.map(x=>x.val)),[[9,9,2],[3],[],[],[],[],[]]);assert.equal(g.run('pairPlacements'),1);assert.equal(g.run('battleState.resolutionOrigin'),'playerMove');assert.ok(g.calls.spawns.length);assert.equal(g.state().currentMode,'battle');

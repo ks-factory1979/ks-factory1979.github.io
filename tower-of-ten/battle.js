@@ -1211,9 +1211,14 @@ async function battleSyncNow(forceFinal=false,elimination=false){
     const resolvedAcks=r.resolvedAckEventIds||r.acknowledgedEventIds||[];
     battleResolvePendingAcks(resolvedAcks);
 
+    // paused/countdownでは未処理の操作がokで返る。相殺対応版はサーバーの処理済みserialまでを解決する。
     // 古いsequenceではゲーム操作をサーバーが再実行しないため、moveは次の新しいsequenceへ残す。
     if(!r.duplicateSequence&&moveIds.length){
-      const done=new Set(moveIds);
+      const confirmedSerial=r.garbageState?.lastMoveSerial;
+      const confirmedMoves=battleState.counterVersion===1
+        ? payload.clientMoveEvents.filter(move=>Number.isSafeInteger(confirmedSerial)&&confirmedSerial>=0&&Number.isSafeInteger(move.moveSerial)&&move.moveSerial<=confirmedSerial).map(move=>String(move.clientMoveEventId||''))
+        : moveIds;
+      const done=new Set(confirmedMoves);
       battleState.pendingMoves=battleState.pendingMoves.filter(x=>!done.has(String(x&&x.clientMoveEventId||'')));
     }
 
