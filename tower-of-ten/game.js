@@ -1380,6 +1380,12 @@ function renderBoard() {
       const above = isPairFallingMode() ? 1.1 : 1;
       cellSize = Math.max(14, Math.min(54, Math.floor((stage.clientHeight - 48) / (BOARD_ROWS + above)) - 4, Math.floor((stage.clientWidth - 54) / BOARD_COLS) - 4));
     }
+  } else {
+    const stage = document.querySelector('#game-screen .board-stage');
+    if (stage && stage.clientHeight && stage.clientWidth) {
+      const above = isPairFallingMode() ? 1.1 : (isFallingMode() ? 1 : 0);
+      cellSize = Math.max(14, Math.min(maxCell, Math.floor((stage.clientHeight - 48) / (BOARD_ROWS + above)) - 4, Math.floor((stage.clientWidth - 54) / BOARD_COLS) - 4));
+    }
   }
   document.documentElement.style.setProperty('--cell-size', cellSize + 'px');
 

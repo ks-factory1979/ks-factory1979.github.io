@@ -122,6 +122,17 @@ html.tower-landscape #game-screen.battle-mode.counter-battle .server-counter { g
   #battle-room-screen .battle-member-slot strong,#battle-room-screen .battle-member-slot span { line-height:1.1; }
 }
 @media (max-height:540px) and (orientation:landscape) {
+  /* Keep result rows tall enough for their statistics before placing the actions. */
+  #battle-result-screen { overflow-y:auto; overflow-x:hidden; }
+  #battle-result-screen .battle-result-panel { position:relative; left:auto; top:auto; transform:none; height:auto; min-height:calc(100% - 16px); margin:8px auto; padding:6px 14px; }
+  #battle-result-screen h2 { font-size:22px; margin-bottom:5px; }
+  #battle-result-screen .battle-result-list { flex:none; gap:6px; }
+  #battle-result-screen .battle-result-card { grid-template-columns:54px minmax(0,1fr); padding:4px; }
+  #battle-result-screen .battle-result-card img { height:54px; }
+  #battle-result-screen .battle-result-rank,#battle-result-screen .battle-result-name { display:inline-block; font-size:18px; line-height:1.2; }
+  #battle-result-screen .battle-result-name { margin-left:8px; font-size:16px; }
+  #battle-result-screen .battle-result-stats { font-size:10px; line-height:1.25; }
+  #battle-result-screen .battle-result-actions { margin-top:10px; }
   html.tower-landscape #game-screen.battle-mode .battle-opponent-card { grid-template-columns:minmax(0,1fr); }
   html.tower-landscape #game-screen.battle-mode .battle-opponent-card img,html.tower-landscape #game-screen.battle-mode .op-stats-full { display:none; }
   html.tower-landscape #game-screen.battle-mode .op-stats-compact { display:block; white-space:nowrap; }
