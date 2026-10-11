@@ -9,7 +9,7 @@ function clearTowerOfTenStoredData() {
   ];
   for (let index = 0; index < localStorage.length; index++) {
     const key = localStorage.key(index);
-    if (key && key.startsWith('tenTowerBattleSequenceV213:')) keys.push(key);
+    if (key && (key.startsWith('tenTowerBattleSequenceV213:') || /^tenTowerSoloRecordV1:(free|timed|falling|pairFalling):(two|three|either)$/.test(key))) keys.push(key);
   }
   keys.forEach(key => localStorage.removeItem(key));
   sessionStorage.removeItem('tenTowerBattleToken');

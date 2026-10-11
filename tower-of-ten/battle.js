@@ -56,7 +56,8 @@ const battleState = {
   token:null, room:null, me:null, pinInput:'', syncTimer:null, syncBusy:false,
   matchId:null, preparedMatchId:null, serverOffset:0, remainingMs:BATTLE_MATCH_MS,
   remainingSnapshotAt:0, remainingRunning:false, timerLoop:null, countdownLoop:null,
-  rng:null, sequenceIndex:0, clientSequence:0, serverLastClientSequence:0, nextExpectedClientSequence:1,
+  counterVersion:0, counterData:null, moveSerial:0, appliedDropIds:new Set(), pendingDropAcks:new Set(), lastCounterOutcome:0, counterClockAt:0, counterClockStamp:0, garbageResolutionPending:false,
+  fallMode:'falling', ruleMode:'two', rng:null, sequenceIndex:0, clientSequence:0, serverLastClientSequence:0, nextExpectedClientSequence:1,
   sequenceRestoredFromStorage:false, sequenceCorrectedFromServer:false,
   pendingMoves:[], pendingAcks:[], seenAttackIds:new Set(), seenAttackAt:new Map(),
   garbageQueue:[], garbageBatchActive:false, resolutionOrigin:'playerMove',
@@ -72,7 +73,7 @@ const battleState = {
   actionInFlight:Object.create(null), seenSystemEventIds:new Set(), roomNotice:'', roomNoticeUntil:0,
   roomNoticeTimer:null, lastHostPlayerId:null, pageHiddenAt:0, connectionConfig:null,
   garbageWarningQueue:[], garbageWarningActive:false, garbageWarningRemainingMs:0, garbageWarningStartedAt:0, garbageWarningElapsedMs:0, garbageWarningRaf:null,
-  restoredClientState:false, lastClientStateSavedAt:0
+  restoredClientState:false, restoreFailed:false, lastClientStateSavedAt:0
 };
 const battleRetryWaits = new Set();
 const battleLoadingDelayTimers = new Set();
@@ -165,7 +166,7 @@ function battleCurrentStateName(){
 }
 function battleClientMeta(requestId='',retryCount=0,extra={}) {
   return {
-    requestId:String(requestId||''), retryCount:Number(retryCount)||0,
+    requestId:String(requestId||''), retryCount:Number(retryCount)||0, battleRulesVersion:3,
     battleState:battleCurrentStateName(),
     participantCount:battleState.room&&Array.isArray(battleState.room.players)?battleState.room.players.length:0,
     roomAnon:battleRoomAnon(), online:typeof navigator==='undefined'?true:navigator.onLine!==false,
@@ -186,7 +187,7 @@ function battleClientMeta(requestId='',retryCount=0,extra={}) {
 function battleBuildAttemptArgs(method,args,requestId,retryCount) {
   const built=args.slice();
   const meta=battleClientMeta(requestId,retryCount,{syncRequestId:method==='syncBattle'?requestId:''});
-  if(method==='syncBattle') {
+  if(method==='createBattleRoom') { built.unshift(meta); } else if(method==='syncBattle') {
     const payload=Object.assign({},built[1]||{});
     meta.clientSequence=Math.max(0,Number(payload.clientSequence)||0);
     meta.ackTargetCount=Array.isArray(payload.ackEventIds)?payload.ackEventIds.length:0;
@@ -533,9 +534,9 @@ function battleExportReceivedAttackRecords(){
 }
 function battleSerializeBlock(obj){if(!obj)return null;return {kind:isStarBlock(obj)?'star':'number',val:isStarBlock(obj)?null:Number(obj.val),recentGarbage:!!obj.recentGarbage,garbageBatchId:obj.garbageBatchId||''};}
 function battleBuildClientState(){
-  if(!isBattleMode()||!battleState.matchId||animating||starEffectActive)return null;
+  if(!isBattleMode()||!battleState.matchId||animating||pairSettling||starEffectActive)return null;
   const special=exportSpecialBattleState();
-  return {...special,matchId:battleState.matchId,sequenceIndex:battleState.sequenceIndex,bricks,tenCount,bestChain,completedTowers,towerStage,
+  return {...special,...(battleState.counterVersion===1?{moveSerial:battleState.moveSerial,appliedDropIds:Array.from(battleState.appliedDropIds).slice(-300),garbageResolutionPending:!!battleState.garbageResolutionPending}:{}),pendingMoves:battleState.pendingMoves.slice(0,10).map(x=>({...x})),matchId:battleState.matchId,sequenceIndex:battleState.sequenceIndex,bricks,tenCount,bestChain,completedTowers,towerStage,
     garbageQueue:battleState.garbageQueue.slice(0,30).map(x=>({value:Number(x.value),eventId:String(x.eventId||''),senderCharacterId:String(x.senderCharacterId||'')})),
     garbageWarningQueue:battleState.garbageWarningQueue.slice(0,30).map(x=>({value:Number(x.value),eventId:String(x.eventId||''),senderCharacterId:String(x.senderCharacterId||'')})),
     garbageWarningRemainingMs:Math.max(0,Math.round(battleGarbageWarningRemaining())),
@@ -554,6 +555,9 @@ function battleRestoreClientState(state,room){
   if(!state||state.matchId!==room.matchId){if(state)battleQueueClientDiagnostic('clientStateRestore',battleCreateApiError('CLIENT_STATE_MATCH_MISMATCH','ふっきデータのたいせんが一致しません'),0,'復帰状態を破棄');return false;}
   const ok=importSpecialBattleState(state);if(!ok){battleQueueClientDiagnostic('clientStateRestore',battleCreateApiError('CLIENT_STATE_RESTORE_FAILED','ふっきデータを読みこめませんでした'),0,'復帰状態を破棄');return false;}
   bricks=Math.max(0,Number(state.bricks)||0);tenCount=Math.max(0,Number(state.tenCount)||0);bestChain=Math.max(0,Number(state.bestChain)||0);completedTowers=Math.max(0,Number(state.completedTowers)||0);towerStage=Math.max(0,Number(state.towerStage)||0);
+  battleState.pendingMoves=(state.pendingMoves||[]).map(x=>({...x}));
+  battleState.moveSerial=Number(state.moveSerial)||0;battleState.appliedDropIds=new Set(state.appliedDropIds||[]);battleState.pendingDropAcks=new Set(state.appliedDropIds||[]);
+  battleState.garbageResolutionPending=!!state.garbageResolutionPending;battleState.lastCounterOutcome=battleState.moveSerial;
   battleState.sequenceIndex=Math.max(0,Number(state.sequenceIndex)||0);battleState.rng=mulberry32(Number(room.randomSeed)||1);for(let i=0;i<battleState.sequenceIndex;i++)battleState.rng();
   battleState.garbageQueue=(state.garbageQueue||[]).map(x=>({value:Number(x.value),eventId:String(x.eventId||''),senderCharacterId:String(x.senderCharacterId||'')}));
   battleState.garbageWarningQueue=(state.garbageWarningQueue||[]).map(x=>({value:Number(x.value),eventId:String(x.eventId||''),senderCharacterId:String(x.senderCharacterId||'')}));
@@ -566,7 +570,7 @@ function battleRestoreClientState(state,room){
   battleState.pendingAcks=[...new Set((state.pendingAcks||[]).map(String).filter(Boolean))].slice(0,BATTLE_DIAGNOSTIC_CONFIG.ackMaxIdsPerSync*3);
   battleState.clientSequence=Math.max(Number(battleState.clientSequence)||0,Number(state.clientSequence)||0,battleReadStoredClientSequence(room));
   battlePersistClientSequence(room);
-  battleState.restoredClientState=true;updateTower();updateInfoPanels();updateBoardUI();battleUpdateLocalStats();if(battleState.garbageWarningQueue.length)battleStartGarbageWarning(true);return true;
+  battleState.restoredClientState=true;updateTower();updateInfoPanels();updateBoardUI();battleUpdateLocalStats();if(battleState.counterVersion!==1&&battleState.garbageWarningQueue.length)battleStartGarbageWarning(true);return true;
 }
 function battleGarbageWarningRemaining(){
   if(!battleState.garbageWarningActive)return Math.max(0,battleState.garbageWarningRemainingMs||0);
@@ -635,12 +639,15 @@ function battleResetState(keepToken=false,options={}) {
   battleState.serverLastClientSequence=0; battleState.nextExpectedClientSequence=1; battleState.sequenceRestoredFromStorage=false; battleState.sequenceCorrectedFromServer=false;
   battleState.pendingMoves=[]; battleState.pendingAcks=[]; battleState.seenAttackIds=new Set(); battleState.seenAttackAt=new Map(); battleState.garbageQueue=[]; battleClearGarbageWarning();
   battleState.garbageBatchActive=false; battleState.resolutionOrigin='playerMove'; battleState.sentGarbage=0;
+  battleState.counterVersion=0;battleState.counterData=null;battleState.moveSerial=0;battleState.appliedDropIds=new Set();battleState.pendingDropAcks=new Set();battleState.garbageResolutionPending=false;
+  if(typeof battleSetupCounterLayout==='function')battleSetupCounterLayout();
   battleState.eliminated=false; battleState.timeExpired=false; battleState.finalized=false; battleState.networkPaused=false;
   battleState.localSpeedLevel=0; battleState.lastRoomStatus=null;
   battleState.countdownActive=false; battleState.countdownTargetAt=0; battleState.countdownType=null; battleState.countdownFinishTimer=null; battleState.countdownCompletedKey=null;
   battleState.firstGarbageTipShown=false; battleState.recentGarbageBatchSeq=0;
   battleState.consecutiveSyncFailures=0; battleState.reconnecting=false; battleState.offline=typeof navigator!=='undefined'?!navigator.onLine:false; battleState.diagnosticFlushBusy=false; battleState.lastSuccessfulSyncAt=0; battleState.resultMayBeInaccurate=false;
   battleState.sessionInvalidHandled=preserveInvalid;
+  battleState.restoreFailed=false;
   battleState.sessionExpiredHandled=preserveExpired;
   battleState.syncRequestSerial=0; battleState.latestAppliedSyncSerial=0; battleState.actionInFlight=Object.create(null);
   battleState.seenSystemEventIds=new Set(); battleState.roomNotice=''; battleState.roomNoticeUntil=0; battleState.lastHostPlayerId=null; battleState.pageHiddenAt=0; battleState.connectionConfig=null; battleState.restoredClientState=false; battleState.lastClientStateSavedAt=0;
@@ -723,7 +730,10 @@ async function battleCreateRoom() {
   battleShowError('battle-menu-message','');
   try {
     await battleWithLoading('へやを つくっているよ', async()=>{
-      const result=battleResultOrThrow(await battleApi('createBattleRoom'));
+      const settings=battleSelectedSettings();
+      const result=battleResultOrThrow(await battleApi('createBattleRoom',settings));
+      const received=TenTowerBattleRules.roomSettings(result.room);
+      if(!received||received.fallMode!==settings.fallMode||received.ruleMode!==settings.ruleMode||result.room.counterVersion!==1){if(result.sessionToken)battleLeaveSilently(result.sessionToken);throw battleCreateApiError('ROOM_RULES_UNSUPPORTED','このルールの へやを つくれなかったよ');}
       battleState.token=result.sessionToken; battleStoreSession(); battleApplyRoom(result.room); battleStartSyncLoop(500);
     });
   } catch(e) { battleHandleActionError(e); }
@@ -873,6 +883,7 @@ function battleApplyRoom(room) {
   if(room.status==='finished') { battleShowResult(room); battleStartSyncLoop(3000); }
 }
 function battleRenderRoom(room) {
+  document.getElementById('battle-room-rules').textContent=battleSettingsLabel(room);
   document.getElementById('battle-room-pin').textContent=room.pin || '0000';
   document.getElementById('battle-room-count').textContent=`${(room.players||[]).length} / 4`;
   const used=new Set((room.players||[]).filter(p=>!p.isMe&&p.characterId).map(p=>p.characterId));
@@ -917,6 +928,9 @@ function battleRenderRoom(room) {
 }
 
 function mulberry32(seed){ let a=seed>>>0; return function(){ a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;}; }
+function battleSelectedSettings(){return {fallMode:document.querySelector('input[name="battle-fall-mode"]:checked').value,ruleMode:document.querySelector('input[name="battle-rule-mode"]:checked').value};}
+function battleSettingsLabel(room){const s=TenTowerBattleRules.roomSettings(room);return s?`${s.fallMode==='pairFalling'?'ペアおち':'通常落下'} ・ ${{two:'2つで10',three:'3つで10',either:'どっちでも10'}[s.ruleMode]}`:'ルールを 確認できません';}
+function battleNextPair(){return TenTowerBattleRules.nextPair(()=>{battleState.sequenceIndex++;return (battleState.rng||Math.random)();});}
 function battleNextNumber(){ battleState.sequenceIndex++; return Math.floor((battleState.rng?battleState.rng():Math.random())*9)+1; }
 function battleGetFallInterval(){
   const elapsed=Math.max(0,BATTLE_MATCH_MS-battleCurrentRemaining());
@@ -926,20 +940,29 @@ function battleCanContinue(){ const r=battleState.room; const me=battleState.me;
 
 function battlePrepareMatch(room) {
   requestGameFullscreen(); stopCurrentGame(); resetTransientUI(); loadStoredSettings();
+  const settings=TenTowerBattleRules.roomSettings(room);
+  if(!settings)throw battleCreateApiError('ROOM_RULES_INVALID','へやの ルールを 確認できません');
+  battleState.fallMode=settings.fallMode;battleState.ruleMode=settings.ruleMode;
+  battleState.counterVersion=Number(room.counterVersion)||0;battleState.counterData=null;battleState.moveSerial=0;battleState.appliedDropIds=new Set();battleState.pendingDropAcks=new Set();battleState.lastCounterOutcome=0;
+  battleState.garbageResolutionPending=false;
   currentMode='battle'; tutorialKind=null; BOARD_COLS=FALLING_COLS; BOARD_ROWS=FALLING_ROWS;
   paused=true; animating=false; gameRunning=true; endingGame=false; resumeCountdownActive=false;
-  ++gameSessionToken; board=Array.from({length:BOARD_COLS},()=>[]); bricks=0;tenCount=0;bestChain=0;noTenCounter=0;towerStage=0;completedTowers=0;towerVisualToken++; resetSpecialGameplayState();
+  ++gameSessionToken; board=Array.from({length:BOARD_COLS},()=>[]); bricks=0;tenCount=0;bestChain=0;noTenCounter=0;towerStage=0;completedTowers=0;towerVisualToken++; resetSpecialGameplayState();pairPlacements=0;pairSettling=false;fallingTimeExpired=false;fallingChainBonusTotal=0;
   battleState.preparedMatchId=room.matchId; battleState.matchId=room.matchId; battleState.rng=mulberry32(Number(room.randomSeed)||1); battleState.sequenceIndex=0; battleState.clientSequence=0;
   battleState.serverLastClientSequence=Math.max(0,Number(room.serverLastClientSequence)||0);battleState.nextExpectedClientSequence=Math.max(1,Number(room.nextExpectedClientSequence)||battleState.serverLastClientSequence+1);
   battleState.pendingMoves=[];battleState.pendingAcks=[];battleState.seenAttackIds=new Set();battleState.seenAttackAt=new Map();battleState.garbageQueue=[];battleClearGarbageWarning();battleState.garbageBatchActive=false;battleState.resolutionOrigin='playerMove';battleState.eliminated=false;battleState.timeExpired=false;battleState.finalized=false;battleState.networkPaused=false;battleState.localSpeedLevel=0;
   battleState.firstGarbageTipShown=false; battleState.recentGarbageBatchSeq=0;
   battleState.consecutiveSyncFailures=0; battleState.reconnecting=false; battleState.offline=typeof navigator!=='undefined'?!navigator.onLine:false; battleState.diagnosticFlushBusy=false; battleState.lastSuccessfulSyncAt=0; battleState.resultMayBeInaccurate=false; battleState.countdownCompletedKey=null;
-  numbersQueue=[makeNumberObject(),makeNumberObject(),makeNumberObject()]; fallingPiece=null;
+  numbersQueue=[makeQueueObject(),makeQueueObject(),makeQueueObject()]; fallingPiece=null;
   const localRecord=battleReadLocalSnapshot(); const localState=localRecord&&localRecord.token===battleState.token&&localRecord.matchId===room.matchId?localRecord.state:null; const serverState=room.resumeState||null; const chosenState=localState&&Number(localState.savedAt||0)>=Number(serverState&&serverState.savedAt||0)?localState:serverState;
-  if(chosenState) battleRestoreClientState(chosenState,room);
+  battleState.restoreFailed=false;
+  if((!chosenState&&room.resumeStateRequired===true)||(chosenState&&!battleRestoreClientState(chosenState,room)&&!(serverState&&serverState!==chosenState&&battleRestoreClientState(serverState,room)))){
+    battleState.restoreFailed=true;paused=true;gameRunning=false;battleRenderRoom(room);battleShowError('battle-room-message','ふっきデータを 読みこめません。へやを でて もういちど あそんでね');showScreen('battleRoom');return;
+  }
   battleReconcileClientSequence(room.serverLastClientSequence,room.nextExpectedClientSequence,chosenState?'resume':'server');
-  const game=document.getElementById('game-screen'); game.classList.add('falling-mode','battle-mode'); game.classList.remove('tutorial-mode');
-  updateActionControlVisibility(); document.getElementById('timer-item').style.display='flex'; document.getElementById('board-caption').textContent='◀ ▶で うごかそう！';
+  const game=document.getElementById('game-screen'); game.classList.add('falling-mode','battle-mode'); game.classList.remove('tutorial-mode');game.classList.toggle('pair-falling-mode',isPairFallingMode());
+  if(typeof battleSetupCounterLayout==='function')battleSetupCounterLayout();
+  updateActionControlVisibility(); document.getElementById('timer-item').style.display='flex'; document.getElementById('board-caption').textContent=battleSettingsLabel(room);
   document.getElementById('battle-hud').hidden=false; document.getElementById('battle-opponents').hidden=false; document.getElementById('pause-btn').style.display='none';
   showScreen('game'); renderBoard(); updateTower(); updateInfoPanels(); updateFallingControls(); battleUpdateBattleHud(room); hidePauseLayers();
   if(window.BGMController) BGMController.prepareBattleMatch(room.matchId);
@@ -1002,10 +1025,12 @@ function battleBeginPlay(isResume) {
   battleState.networkPaused=false; paused=false; battleState.remainingSnapshotAt=performance.now(); battleState.remainingRunning=true;
   document.getElementById('battle-connection-overlay').hidden=true; updateFallingControls(); battleResumeGarbageWarning();
   if(window.BGMController) BGMController.syncBattle(battleCurrentRemaining(),{reason:isResume?'resume':'start',force:!!isResume});
+  if(battleState.counterVersion===1&&battleState.garbageResolutionPending&&typeof battleResumeCounterResolution==='function'){battleResumeCounterResolution();return;}
   if(isResume&&fallingPiece){ if(canFall()){fallingPiece.phase='falling';scheduleFallingStep(Math.min(450,getPieceFallInterval()));}else beginLockDelay(); }
   else if(!fallingPiece&&!animating) scheduleSpawn(100);
 }
 function battleHandleRuntimeStatus(room) {
+  if(battleState.restoreFailed)return;
   const me=(room.players||[]).find(p=>p.isMe);
   if(me&&(me.active===false||me.disconnectedAt)){
     battleHandleSessionExpired(battleCreateApiError('SESSION_EXPIRED','たいせんから はずれたよ。つぎの たいせんに さんかしてね'));
@@ -1053,7 +1078,7 @@ function battleStartTimerLoop(){
 function battleBeginTimeFinish(){
   if(battleState.timeExpired) return; battleState.timeExpired=true; paused=true; battleState.remainingRunning=false; clearFallingTimers(); updateFallingControls();
   if(window.BGMController) BGMController.finishBattleAtZero();
-  if(fallingPiece){ fallingPiece=null; removeFallingVisuals(); }
+  if(fallingPiece&&!animating){ fallingPiece=null; removeFallingVisuals(); }
   if(!animating) battleFinalizeLocal(); else { const wait=setInterval(()=>{if(!animating){clearInterval(wait);battleFinalizeLocal();}},100); }
 }
 function battleFinalizeLocal(){
@@ -1064,12 +1089,13 @@ function battleFinalizeLocal(){
 
 function battleUpdateLocalStats(){
   if(!isBattleMode()) return;
-  const wait=document.getElementById('battle-garbage-waiting'); if(wait) wait.textContent=(battleState.garbageQueue.length+battleState.garbageWarningQueue.length)+'こ';
+  const count=battleState.counterVersion===1&&typeof battleCounterPendingCount==='function'?battleCounterPendingCount():battleState.garbageQueue.length+battleState.garbageWarningQueue.length;
+  const wait=document.getElementById('battle-garbage-waiting'); if(wait) wait.textContent=count+'こ';
 }
 function battleProgress(){ return {towers:completedTowers,bricks:bricks,totalTens:tenCount,sentGarbage:battleState.sentGarbage,sequenceIndex:battleState.sequenceIndex}; }
 function battleRecordAttack(totalPairs,chainDepth){
   if(!isBattleMode()||battleState.resolutionOrigin!=='playerMove'||battleState.timeExpired||totalPairs<=0) return;
-  battleState.pendingMoves.push({clientMoveEventId:battleUuid(),totalPairsInMove:totalPairs,chainDepth:chainDepth,createdAt:battleServerNow()});
+  battleState.pendingMoves.push({...((battleState.counterVersion===1)?{moveSerial:++battleState.moveSerial}:{}),clientMoveEventId:battleUuid(),totalPairsInMove:totalPairs,chainDepth:chainDepth,createdAt:battleServerNow()});
   battleQueueSync(20);
 }
 function battleClearRecentGarbageMarks(){
@@ -1086,6 +1112,7 @@ function battleAfterMove(){
   battlePersistLocalSnapshot(); battleQueueSync(20);
   if(battleState.timeExpired){ battleFinalizeLocal(); return; }
   if(battleState.garbageBatchActive){ battleState.garbageBatchActive=false; battleState.resolutionOrigin='playerMove'; scheduleSpawn(160); return; }
+  if(battleState.counterVersion===1&&typeof battleProcessCounterGarbage==='function'&&battleProcessCounterGarbage())return;
   if(battleState.garbageWarningQueue.length>0){ battleStartGarbageWarning(true); battleState.resolutionOrigin='playerMove'; scheduleSpawn(150); return; }
   if(battleState.garbageQueue.length>0){ battleProcessGarbageBatch(); return; }
   battleState.resolutionOrigin='playerMove'; scheduleSpawn(150);
@@ -1172,6 +1199,7 @@ async function battleSyncNow(forceFinal=false,elimination=false){
   const clientSequence=++battleState.clientSequence;
   battlePersistClientSequence();
   const payload={heartbeat:true,matchId:battleState.matchId,clientSequence,requestResumeState:!battleState.preparedMatchId,progress:battleProgress(),clientState:battleBuildClientState(),clientMoveEvents:battleState.pendingMoves.slice(0,10),ackEventIds:ackIds,elimination:!!elimination,finalized:!!(forceFinal||battleState.finalized)};
+  if(battleState.counterVersion===1){payload.dropAckEventIds=Array.from(battleState.pendingDropAcks).filter(id=>payload.clientState&&payload.clientState.appliedDropIds.includes(id)).slice(0,100);if(payload.dropAckEventIds.length)payload.forceClientStateSave=true;}
   try{
     const r=battleResultOrThrow(await battleApi('syncBattle',tokenAtStart,payload));
     if(generation!==battleState.sessionGeneration||tokenAtStart!==battleState.token||battleState.sessionInvalidHandled) return;
@@ -1183,9 +1211,14 @@ async function battleSyncNow(forceFinal=false,elimination=false){
     const resolvedAcks=r.resolvedAckEventIds||r.acknowledgedEventIds||[];
     battleResolvePendingAcks(resolvedAcks);
 
+    // paused/countdownでは未処理の操作がokで返る。相殺対応版はサーバーの処理済みserialまでを解決する。
     // 古いsequenceではゲーム操作をサーバーが再実行しないため、moveは次の新しいsequenceへ残す。
     if(!r.duplicateSequence&&moveIds.length){
-      const done=new Set(moveIds);
+      const confirmedSerial=r.garbageState?.lastMoveSerial;
+      const confirmedMoves=battleState.counterVersion===1
+        ? payload.clientMoveEvents.filter(move=>Number.isSafeInteger(confirmedSerial)&&confirmedSerial>=0&&Number.isSafeInteger(move.moveSerial)&&move.moveSerial<=confirmedSerial).map(move=>String(move.clientMoveEventId||''))
+        : moveIds;
+      const done=new Set(confirmedMoves);
       battleState.pendingMoves=battleState.pendingMoves.filter(x=>!done.has(String(x&&x.clientMoveEventId||'')));
     }
 
@@ -1194,6 +1227,8 @@ async function battleSyncNow(forceFinal=false,elimination=false){
     battleState.offline=false;
     battleState.lastSuccessfulSyncAt=Date.now();
     battleApplyRoom(r.room);
+    (r.resolvedDropAckIds||[]).forEach(id=>battleState.pendingDropAcks.delete(id));
+    if(r.garbageState&&typeof battleApplyCounterState==='function')battleApplyCounterState(r.garbageState);
     battleIngestAttacks(r.newAttackEvents||[]);
     battlePersistLocalSnapshot();
   }catch(e){
@@ -1218,6 +1253,7 @@ async function battleSyncNow(forceFinal=false,elimination=false){
   }
 }
 function battleIngestAttacks(events){
+  if(battleState.counterVersion===1){events.forEach(ev=>{if(ev.matchId===battleState.matchId&&ev.eventId){battleRememberAttackId(String(ev.eventId));battleQueueAck(String(ev.eventId));}});return;}
   const fresh=[];
   battlePruneReceivedAttackIds();
   events.forEach(ev=>{
@@ -1260,12 +1296,12 @@ function battleUpdateBattleHud(room){
   const me=(room.players||[]).find(p=>p.isMe)||battleState.me; if(!me) return; battleState.me=me;
   battleSetImage(document.getElementById('battle-self-icon'),me.characterId||'pipi','normal'); document.getElementById('battle-self-name').textContent=battleName(me.characterId);
   const target=(room.players||[]).find(p=>p.playerId===room.nextTargetPlayerId); document.getElementById('battle-target-name').textContent=target?battleName(target.characterId):'−';
-  document.getElementById('battle-garbage-waiting').textContent=(battleState.garbageQueue.length+battleState.garbageWarningQueue.length)+'こ';
+  battleUpdateLocalStats();
   const wrap=document.getElementById('battle-opponents'); if(!wrap) return; wrap.innerHTML='';
   (room.players||[]).filter(p=>!p.isMe).forEach(p=>{
     const card=document.createElement('div'); card.className='battle-opponent-card'+(p.eliminatedAt?' eliminated':'')+(!p.connected?' waiting':'');
     const img=document.createElement('img'); battleSetImage(img,p.characterId||'pipi',p.eliminatedAt?'cheer':'normal');
-    const copy=document.createElement('div'); copy.innerHTML=`<strong>${battleName(p.characterId)}</strong><small>とう ${p.towers}こ　れんが ${p.bricks}/25</small>`;
+    const copy=document.createElement('div'); copy.innerHTML=`<strong>${battleName(p.characterId)}</strong><small aria-label="とう ${p.towers}こ、れんが ${p.bricks}/25"><span class="op-stats-full">とう ${p.towers}こ　れんが ${p.bricks}/25</span><span class="op-stats-compact">${p.towers}とう ${p.bricks}/25</span></small>`;
     const status=document.createElement('span'); status.className='op-status'; status.textContent=p.disconnectedAt?'つうしん切れ':(p.eliminatedAt?'いっぱい':(!p.connected?'つうしん待ち':'たいせん中'));
     card.append(img,copy,status); wrap.appendChild(card);
   });

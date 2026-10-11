@@ -105,6 +105,8 @@ let tenCount = 0;
 let bestChain = 0;
 let noTenCounter = 0;
 let currentMode = 'free';
+let ruleMode = 'two';
+let selectedSoloRule = 'two';
 let soundOn = true;
 let hintOn = true;
 let paused = false;
@@ -117,6 +119,7 @@ let towerVisualToken = 0;
 let gameSessionToken = 0;
 let timerInterval = null;
 let timeLeft = 0;
+let timedTimeExpired = false;
 
 // おちてくるモード専用
 let fallingPiece = null;
@@ -147,6 +150,7 @@ let fallingLastTenShown = false;
 let fallingVisibilityPaused = false;
 let fallingResultViewToken = 0;
 let pairResultRequest = null;
+let soloResultRequest = null;
 
 // v2.0.14 ペアおち3分 試作版
 let pairPlacements = 0;
@@ -220,7 +224,10 @@ function cloneBlockObject(obj) {
   const normalized = normalizeBlockObject(obj);
   return { ...normalized };
 }
-function makeQueueObject() { return isPairFallingMode() ? makePairObject() : makeNumberObject(); }
+function makeQueueObject() {
+  if (isPairFallingMode() && isBattleMode()) { const values=battleNextPair(); return makePairObject(values[0],values[1]); }
+  return isPairFallingMode() ? makePairObject() : makeNumberObject();
+}
 function ensureNumberQueue() { while (numbersQueue.length < 3) numbersQueue.push(makeQueueObject()); }
 function advanceCurrentQueue() { numbersQueue.shift(); ensureNumberQueue(); }
 function hasStarBlockOwned() { return !!(heldBlock && isStarBlock(heldBlock)) || numbersQueue.some(isStarBlock); }
@@ -335,6 +342,7 @@ function holdCurrentPairBlock() {
   playHoldSound();
   respawnCurrentPairQueuePiece(90);
   updateInfoPanels(); updateBoardUI(); updateHints(); updateFallingControls();
+  if (isBattleMode()) battlePersistLocalSnapshot();
   return true;
 }
 function holdCurrentBlock() {
@@ -848,21 +856,25 @@ function processStarCross(col,row) {
       updateBoardUI();updateInfoPanels();updateHints();updateFallingControls();
       if(isBattleMode()&&typeof battleAfterMove==='function'){battleAfterMove({pairs:0,chainStages:0,completedNow:0,starUsed:true});return;}
       if(isThreeMinuteFallingMode()&&fallingTimeExpired){maybeFinalizeExpiredFalling();return;}
+      if(maybeFinalizeExpiredTimed())return;
       if(isFallingMode())scheduleSpawn(150);else if(isBoardFull())endGame('full');
     },260);
   },760);
 }
 function exportSpecialBattleState() {
-  const pack=obj=>obj?{kind:isStarBlock(obj)?BLOCK_KIND_STAR:BLOCK_KIND_NUMBER,val:isStarBlock(obj)?null:Number(obj.val),recentGarbage:!!obj.recentGarbage,garbageBatchId:obj.garbageBatchId||''}:null;
-  return {version:1,savedAt:Date.now(),board:board.map(col=>col.map(pack)),queue:numbersQueue.map(pack),held:pack(heldBlock),holdUsed:!!holdUsedThisTurn,chainPower:Number(chainPower)||0,pendingStarAward:!!pendingStarAward,falling:fallingPiece?{...pack(fallingPiece),col:fallingPiece.col,row:fallingPiece.row,phase:fallingPiece.phase,lockElapsed:fallingPiece.lockElapsed||0,intervalMs:fallingPiece.intervalMs||0}:null};
+  const pack=obj=>!obj?null:isPairBlock(obj)?{kind:BLOCK_KIND_PAIR,pairId:obj.pairId,first:pack(obj.first),second:pack(obj.second),orientation:obj.orientation}:{kind:isStarBlock(obj)?BLOCK_KIND_STAR:BLOCK_KIND_NUMBER,val:isStarBlock(obj)?null:Number(obj.val),recentGarbage:!!obj.recentGarbage,garbageBatchId:obj.garbageBatchId||''};
+  return {version:isBattleMode()?2:1,...(isBattleMode()?{fallMode:battleState.fallMode,ruleMode:battleState.ruleMode,pairPlacements,fallingChainBonusTotal}:{}),savedAt:Date.now(),board:board.map(col=>col.map(pack)),queue:numbersQueue.map(pack),held:pack(heldBlock),holdUsed:!!holdUsedThisTurn,chainPower:Number(chainPower)||0,pendingStarAward:!!pendingStarAward,falling:fallingPiece?{...pack(fallingPiece),col:fallingPiece.col,row:fallingPiece.row,phase:fallingPiece.phase,lockElapsed:fallingPiece.lockElapsed||0,intervalMs:fallingPiece.intervalMs||0}:null};
 }
 function importSpecialBattleState(state) {
   if(!state||typeof state!=='object'||!Array.isArray(state.board)||!Array.isArray(state.queue))return false;
+  if(isBattleMode()&&!TenTowerBattleRules.validState(state,{fallMode:battleState.fallMode,ruleMode:battleState.ruleMode}))return false;
   try{
+    const unpack=obj=>isPairBlock(obj)?{...clonePairObject(obj)}:normalizeBlockObject(obj);
     board=Array.from({length:BOARD_COLS},(_,c)=>(state.board[c]||[]).slice(0,BOARD_ROWS).map(normalizeBlockObject));
-    numbersQueue=state.queue.slice(0,5).map(normalizeBlockObject);ensureNumberQueue();
-    heldBlock=state.held?normalizeBlockObject(state.held):null;holdUsedThisTurn=!!state.holdUsed;chainPower=Math.max(0,Math.min(SPECIAL_FEATURE_CONFIG.chainPowerMax,Number(state.chainPower)||0));pendingStarAward=!!state.pendingStarAward;
-    fallingPiece=state.falling?{...normalizeBlockObject(state.falling),col:Math.max(0,Math.min(BOARD_COLS-1,Number(state.falling.col)||0)),row:Math.max(0,Math.min(BOARD_ROWS,Number.isFinite(Number(state.falling.row))?Number(state.falling.row):BOARD_ROWS)),phase:state.falling.phase==='locking'?'locking':'falling',lockElapsed:Math.max(0,Number(state.falling.lockElapsed)||0),lockStartedAt:0,intervalMs:Number(state.falling.intervalMs)||getFallingIntervalForLevel()}:null;
+    numbersQueue=state.queue.slice(0,5).map(unpack);ensureNumberQueue();
+    heldBlock=state.held?unpack(state.held):null;holdUsedThisTurn=!!state.holdUsed;chainPower=Math.max(0,Math.min(SPECIAL_FEATURE_CONFIG.chainPowerMax,Number(state.chainPower)||0));pendingStarAward=!!state.pendingStarAward;
+    fallingPiece=state.falling?{...unpack(state.falling),col:Math.max(0,Math.min(BOARD_COLS-1,Number(state.falling.col)||0)),row:Math.max(0,Math.min(BOARD_ROWS,Number.isFinite(Number(state.falling.row))?Number(state.falling.row):BOARD_ROWS)),phase:state.falling.phase==='locking'?'locking':'falling',lockElapsed:Math.max(0,Number(state.falling.lockElapsed)||0),lockStartedAt:0,intervalMs:Number(state.falling.intervalMs)||getFallingIntervalForLevel()}:null;
+    pairPlacements=Math.max(0,Number(state.pairPlacements)||0);fallingChainBonusTotal=Math.max(0,Number(state.fallingChainBonusTotal)||0);pairSettling=false;
     updateBoardUI();updateInfoPanels();updateHints();updateFallingControls();return true;
   }catch(e){return false;}
 }
@@ -888,7 +900,8 @@ function isGameScreenActive() {
   return !!(game && game.classList.contains('active'));
 }
 function isBattleMode() { return currentMode === 'battle'; }
-function isPairFallingMode() { return currentMode === 'pairFalling'; }
+function getActiveRuleMode() { return isTutorialMode() ? 'two' : (isBattleMode() ? (typeof battleState !== 'undefined' ? battleState.ruleMode : 'two') : ruleMode); }
+function isPairFallingMode() { return currentMode === 'pairFalling' || (isBattleMode() && typeof battleState !== 'undefined' && battleState.fallMode === 'pairFalling'); }
 function isThreeMinuteFallingMode() { return currentMode === 'falling' || currentMode === 'pairFalling'; }
 function isFallingMode() {
   return currentMode === 'falling' || currentMode === 'fallingTutorial' || isPairFallingMode() || isBattleMode();
@@ -1127,20 +1140,41 @@ function openFallingIntro() {
   requestGameFullscreen();
   stopCurrentGame();
   showScreen('fallingIntro');
+  document.getElementById('falling-intro-rule').textContent = getRuleLabel(selectedSoloRule);
+}
+function getRuleLabel(rule = getActiveRuleMode()) {
+  return {two:'2つで10', three:'3つで10', either:'どっちでも10'}[rule];
+}
+function selectSoloRule(rule) {
+  if (!TenTowerRules.ruleModes.includes(rule)) throw new RangeError('Invalid ruleMode');
+  selectedSoloRule = rule;
+  document.querySelectorAll('[data-solo-rule]').forEach(button => {
+    button.setAttribute('aria-pressed', String(button.dataset.soloRule === rule));
+  });
+  document.getElementById('solo-rule-description').textContent = {
+    two:'たて・よこに 2こで10！', three:'たて・よこに 3こで10！', either:'2こでも 3こでも10！'
+  }[rule];
+}
+function startSelectedSoloMode(mode) {
+  if (!['free','timed','falling','pairFalling'].includes(mode)) throw new RangeError('Invalid solo mode');
+  startGame(mode, {ruleMode:selectedSoloRule});
 }
 function returnToTitle() {
   if (isBattleMode() && typeof battleLeaveToModes === 'function') { battleLeaveToModes(); return; }
+  if (gameRunning && currentMode === 'free' && !isTutorialMode()) { endGame('quit'); return; }
   stopCurrentGame();
   showScreen('title');
 }
 function returnToModes() {
   if (isBattleMode() && typeof battleLeaveToModes === 'function') { battleLeaveToModes(); return; }
+  if (gameRunning && currentMode === 'free' && !isTutorialMode()) { endGame('quit'); return; }
   stopCurrentGame();
   showScreen('mode');
 }
 function stopCurrentGame() {
   cancelPairResultRequest();
   gameRunning = false; endingGame = false; paused = true; animating = false;
+  timedTimeExpired = false;
   fallingPiece = null; resumeCountdownActive = false;
   tutorialKind = null; tutorialStep = 0; tutorialTargetCol = null; tutorialExpectedControl = null;
   activeFallingTimeMs = 0; activeClockLastAt = 0; fallingSpeedLevel = 0;
@@ -1166,12 +1200,16 @@ function hidePauseLayers() {
 }
 
 // ========= ゲーム開始 =========
-function startGame(mode) {
+function startGame(mode, options = {}) {
+  const requestedRule = options.ruleMode === undefined ? 'two' : options.ruleMode;
+  if (!TenTowerRules.ruleModes.includes(requestedRule)) throw new RangeError('Invalid ruleMode');
   requestGameFullscreen(); stopCurrentGame(); resetTransientUI(); loadStoredSettings();
   currentMode = mode; tutorialKind = null; tutorialStep = 0;
+  ruleMode = isBattleMode() || isTutorialMode() ? 'two' : requestedRule;
   BOARD_COLS = isFallingMode() ? FALLING_COLS : configuredCols;
   BOARD_ROWS = isFallingMode() ? FALLING_ROWS : configuredRows;
   paused = false; animating = false; gameRunning = true; endingGame = false; resumeCountdownActive = false;
+  timedTimeExpired = false;
   const session = ++gameSessionToken;
   board = Array.from({ length: BOARD_COLS }, () => []);
   bricks = 0; tenCount = 0; bestChain = 0; noTenCounter = 0; towerStage = 0; completedTowers = 0;
@@ -1187,7 +1225,8 @@ function startGame(mode) {
   gameScreen.classList.remove('tutorial-mode');
   updateActionControlVisibility();
   const caption = document.getElementById('board-caption');
-  caption.textContent = isPairFallingMode() ? '2こを まわして れんさをねらえ！' : (isFallingMode() ? '◀ ▶で うごかそう！' : 'おきたい れつを タップ！');
+  caption.textContent = isBattleMode() || isTutorialMode() ? '◀ ▶で うごかそう！' :
+    `${getRuleLabel()}・${isPairFallingMode() ? 'ペアを まわそう！' : (isFallingMode() ? '◀ ▶で うごかそう！' : 'れつを タップ！')}`;
   setTutorialChrome(false);
 
   if (timerInterval) clearInterval(timerInterval);
@@ -1295,13 +1334,21 @@ function randomNumber() {
     allowed = [1,2,3,4,5,6,7,8,9];
   }
 
-  if (noTenCounter >= 4) {
+  const rescueAfter = getActiveRuleMode() === 'either' ? 6 : 4;
+  if (['free','timed'].includes(currentMode) && noTenCounter >= rescueAfter) {
     const candidatesSet = new Set();
-    for (let c = 0; c < BOARD_COLS; c++) {
-      for (let r = 0; r < board[c].length; r++) {
-        const complement = 10 - board[c][r].val;
-        if (complement >= 1 && complement <= 9) candidatesSet.add(complement);
+    if (getActiveRuleMode() === 'two') {
+      // Keep the original two-rule rescue distribution in free/timed.
+      for (let c = 0; c < BOARD_COLS; c++) {
+        for (let r = 0; r < board[c].length; r++) {
+          const complement = 10 - board[c][r].val;
+          if (complement >= 1 && complement <= 9) candidatesSet.add(complement);
+        }
       }
+    } else {
+      allowed.forEach(value => {
+        if (TenTowerRules.findPlacementHints(board, {ruleMode:getActiveRuleMode(), value, maxRows:BOARD_ROWS}).length) candidatesSet.add(value);
+      });
     }
     const candidates = allowed.filter(n => candidatesSet.has(n));
     if (candidates.length > 0) return candidates[Math.floor(Math.random() * candidates.length)];
@@ -1327,6 +1374,12 @@ function renderBoard() {
   let cellSize = Math.max(minCell, Math.min(maxCell, cellByHeight, cellByWidth));
   if (window.TowerMobileLayout && TowerMobileLayout.isCompact()) {
     cellSize = TowerMobileLayout.cellSize(BOARD_COLS, BOARD_ROWS, isPairFallingMode() ? 2 : (isFallingMode() ? 1 : 0));
+  } else if (isBattleMode()) {
+    const stage = document.querySelector('#game-screen .board-stage');
+    if (stage && stage.clientHeight && stage.clientWidth) {
+      const above = isPairFallingMode() ? 1.1 : 1;
+      cellSize = Math.max(14, Math.min(54, Math.floor((stage.clientHeight - 48) / (BOARD_ROWS + above)) - 4, Math.floor((stage.clientWidth - 54) / BOARD_COLS) - 4));
+    }
   }
   document.documentElement.style.setProperty('--cell-size', cellSize + 'px');
 
@@ -1649,18 +1702,22 @@ function clearHintHighlights() {
   if (hintText) hintText.textContent = '';
 }
 function getHintColumns(current) {
-  const hintCols = [];
-  for (let col = 0; col < BOARD_COLS; col++) {
-    const colData = board[col];
-    if (colData.length >= BOARD_ROWS) continue;
-    const rowIndex = colData.length;
-    let immediate = false;
-    if (rowIndex > 0 && colData[rowIndex - 1].val + current === 10) immediate = true;
-    if (col > 0 && board[col - 1].length > rowIndex && board[col - 1][rowIndex].val + current === 10) immediate = true;
-    if (col < BOARD_COLS - 1 && board[col + 1].length > rowIndex && board[col + 1][rowIndex].val + current === 10) immediate = true;
-    if (immediate) hintCols.push(col);
+  return TenTowerRules.findPlacementHints(board, {ruleMode:getActiveRuleMode(), value:current, maxRows:BOARD_ROWS}).map(hint => hint.col);
+}
+function getNumberHintText(current) {
+  const rule = getActiveRuleMode();
+  if (rule === 'three' && current === 9) return '9は ほしで けそう！';
+  const hints = TenTowerRules.findPlacementHints(board, {ruleMode:rule, value:current, maxRows:BOARD_ROWS});
+  if (rule === 'two') {
+    return hints.length ? (isFallingMode() ? `${10-current}の となりを めざそう！` : `${10-current}を さがしてみよう！`) :
+      (isFallingMode() ? 'つぎの すうじも みてみよう' : `${10-current}を さがしてみよう！`);
   }
-  return hintCols;
+  if (!hints.length) return rule === 'three' ? 'たて・よこに 3こで10！' : '2こか 3こで10を ねらおう！';
+  const hint = hints[0], group = hint.groups[0], anchor = `${hint.col},${hint.row}`;
+  const others = group.cells.filter(key => key !== anchor).map(key => {
+    const [col,row] = key.split(',').map(Number); return board[col][row].val;
+  });
+  return `${others.join('と')}に つなげよう！`;
 }
 function updateHints() {
   document.querySelectorAll('#board .column').forEach(col => col.classList.remove('hint'));
@@ -1675,17 +1732,12 @@ function updateHints() {
   if (isStarBlock(currentObj)) { hintIcon.style.display='block'; hintText.textContent='すきな れつで じゅうじに けそう！'; return; }
   if (isPairBlock(currentObj)) {
     hintIcon.style.display='block';
-    hintText.textContent='2こを まわして 10と れんさを ねらおう！';
+    hintText.textContent=getActiveRuleMode()==='three'&&[currentObj.first.val,currentObj.second.val].includes(9)?'9は ほしで けそう！':{two:'ペアを まわして 2こで10！',three:'ペアを まわして 3こで10！',either:'ペアを まわして 2こか3こで10！'}[getActiveRuleMode()];
     return;
   }
   const current = currentObj.val;
-  const hintCols = getHintColumns(current);
   hintIcon.style.display = 'block';
-  if (hintCols.length > 0) {
-    hintText.textContent = isFallingMode() ? `${10 - current}の となりを めざそう！` : `${10 - current}を さがしてみよう！`;
-  } else {
-    hintText.textContent = isFallingMode() ? 'つぎの すうじも みてみよう' : `${10 - current}を さがしてみよう！`;
-  }
+  hintText.textContent = getNumberHintText(current);
 }
 
 // ========= 通常モードの配置 =========
@@ -1967,6 +2019,7 @@ function resolveSettledPair() {
   animating=false; pairSettling=false;
   updateHints(); updateFallingControls();
   if(isThreeMinuteFallingMode()&&fallingTimeExpired){maybeFinalizeExpiredFalling();return;}
+  if(isBattleMode()){battleAfterMove();return;}
   scheduleSpawn(160);
 }
 function settlePairFallingPiece(fromHardDrop) {
@@ -2063,25 +2116,8 @@ function finishFallingFull() {
 
 // ========= 配置後の共通処理 =========
 function getImmediatePairs(col, row, currentObj) {
-  const toDelete = new Set();
-  let immediatePairs = 0;
-  const colData = board[col];
-  if (row > 0 && colData[row - 1].val + currentObj.val === 10) {
-    toDelete.add(`${col},${row - 1}`);
-    toDelete.add(`${col},${row}`);
-    immediatePairs++;
-  }
-  if (col > 0 && board[col - 1].length > row && board[col - 1][row].val + currentObj.val === 10) {
-    toDelete.add(`${col - 1},${row}`);
-    toDelete.add(`${col},${row}`);
-    immediatePairs++;
-  }
-  if (col < BOARD_COLS - 1 && board[col + 1].length > row && board[col + 1][row].val + currentObj.val === 10) {
-    toDelete.add(`${col + 1},${row}`);
-    toDelete.add(`${col},${row}`);
-    immediatePairs++;
-  }
-  return { toDelete, immediatePairs };
+  const found = TenTowerRules.findTenGroups(board, { ruleMode: getActiveRuleMode(), scope: 'anchor', anchor: { col, row } });
+  return { toDelete: found.unionCells, immediatePairs: found.groupCount };
 }
 function resolvePlacedBlock(col, row, currentObj) {
   if (!gameRunning) return;
@@ -2094,6 +2130,7 @@ function resolvePlacedBlock(col, row, currentObj) {
     if (isTutorialMode()) { handleTutorialResolution({ pairs: 0, chainStages: 0, completedNow: 0 }); return; }
     if (isBattleMode() && typeof battleAfterMove === 'function') { battleAfterMove({ pairs: 0, chainStages: 0, completedNow: 0 }); return; }
     if (isThreeMinuteFallingMode() && fallingTimeExpired) { maybeFinalizeExpiredFalling(); return; }
+    if (maybeFinalizeExpiredTimed()) return;
     if (isFallingMode()) scheduleSpawn(160); else if (isBoardFull()) endGame('full');
   }
 }
@@ -2131,6 +2168,7 @@ function processRemovals(initialSet, initialPairs) {
           if (isTutorialMode()) { handleTutorialResolution({ pairs: totalPairs, chainStages, completedNow }); return; }
           if (isBattleMode() && typeof battleAfterMove === 'function') { battleAfterMove({ pairs: totalPairs, chainStages, completedNow }); return; }
           if (isThreeMinuteFallingMode() && fallingTimeExpired) { maybeFinalizeExpiredFalling(); return; }
+          if (maybeFinalizeExpiredTimed()) return;
           if (isFallingMode()) scheduleSpawn(150); else if (isBoardFull()) endGame('full');
         }, wait);
       }, 200);
@@ -2157,25 +2195,8 @@ function removeAndDrop(set) {
   for (let c = 0; c < BOARD_COLS; c++) board[c] = board[c].filter(item => item !== null);
 }
 function findAllPairs() {
-  const toDelete = new Set();
-  let countPairs = 0;
-  for (let c = 0; c < BOARD_COLS; c++) {
-    const colData = board[c];
-    for (let r = 0; r < colData.length; r++) {
-      const val = colData[r].val;
-      if (r > 0 && val + colData[r - 1].val === 10) {
-        toDelete.add(`${c},${r}`);
-        toDelete.add(`${c},${r - 1}`);
-        countPairs++;
-      }
-      if (c > 0 && board[c - 1].length > r && val + board[c - 1][r].val === 10) {
-        toDelete.add(`${c},${r}`);
-        toDelete.add(`${c - 1},${r}`);
-        countPairs++;
-      }
-    }
-  }
-  return { set: toDelete, count: countPairs };
+  const found = TenTowerRules.findTenGroups(board, { ruleMode: getActiveRuleMode() });
+  return { set: found.unionCells, count: found.groupCount };
 }
 function isBoardFull() {
   return board.every(col => col.length >= BOARD_ROWS);
@@ -2344,7 +2365,7 @@ function chooseFallingNextGoal(snapshot, recordInfo, communityStats=null) {
   return `あと${toNextTower}れんがで ${nextTower}とう！`;
 }
 function resetFallingResultPresentation() {
-  const card=document.getElementById('result-card'); if(card) card.classList.remove('falling-result-active','pair-result-active');
+  const card=document.getElementById('result-card'); if(card) card.classList.remove('falling-result-active','pair-result-active','solo-result-active');
   const panel=document.getElementById('falling-result-panel'); if(panel) panel.hidden=true;
   const pairPanel=document.getElementById('pair-result-panel'); if(pairPanel) pairPanel.hidden=true;
   const standard=document.getElementById('standard-result-numbers'); if(standard) standard.hidden=false;
@@ -2436,9 +2457,13 @@ function updatePairCommunityCard(stats,snapshot,recordInfo) {
   document.getElementById('pair-next-goal').textContent=chooseFallingNextGoal(snapshot,recordInfo,{collecting:false,percentile:pct});
 }
 function cancelPairResultRequest() {
+  if(soloResultRequest){soloResultRequest.cancel();soloResultRequest=null;}
   if(!pairResultRequest)return;
   clearTimeout(pairResultRequest.timeout);clearTimeout(pairResultRequest.retryTimer);
   pairResultRequest=null;
+}
+function cancelSoloOnPageHide() {
+  cancelPairResultRequest();fallingResultViewToken++;
 }
 function submitPairCommunityResult(snapshot,recordInfo,viewToken) {
   cancelPairResultRequest();
@@ -2501,16 +2526,26 @@ function submitFallingCommunityResult(snapshot, recordInfo, viewToken, attempt=0
       });
   }catch(e){updateFallingCommunityCard({ok:false},snapshot,recordInfo);}
 }
+function maybeFinalizeExpiredTimed() {
+  if (currentMode !== 'timed' || !timedTimeExpired || !gameRunning || animating || starEffectActive) return false;
+  endGame('time');
+  return true;
+}
 function endGame(reason = '') {
   if (isBattleMode()) { if (typeof battleEliminate === 'function') battleEliminate(reason || 'full'); return; }
   if (isBasicTutorial()) { completeBasicTutorial(); return; }
   if (isFallingTutorial()) { completeFallingTutorial(); return; }
   if (!gameRunning) return;
-  const wasFalling=isRealFallingMode();
-  const wasPair=isPairFallingMode();
-  const finalTotalBricks=(wasFalling||wasPair)?getFallingTotalBricks():completedTowers*TOWER_BRICKS+bricks;
-  const fallingSnapshot=wasFalling?{resultId:makeFallingResultId(),totalBricks:finalTotalBricks,maxChain:bestChain,chainBonusTotal:fallingChainBonusTotal}:null;
-  const pairSnapshot=wasPair?{resultId:'pair-'+makeFallingResultId(),totalBricks:finalTotalBricks,maxChain:bestChain,chainBonusTotal:fallingChainBonusTotal,pairPlacements}:null;
+  if (currentMode === 'timed' && reason === 'time' && (animating || starEffectActive)) {
+    timedTimeExpired = true; timeLeft = 0;
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null; updateTimeDisplay();
+    return;
+  }
+  const snapshot={gameMode:currentMode,ruleMode:getActiveRuleMode(),
+    resultId:(isPairFallingMode()?'pair-':'')+makeFallingResultId(),totalBricks:getFallingTotalBricks(),
+    maxChain:bestChain,chainBonusTotal:isThreeMinuteFallingMode()?fallingChainBonusTotal:0,
+    tenCount,pairPlacements:isPairFallingMode()?pairPlacements:0,endReason:reason||'full'};
   gameRunning = false;
   endingGame = false;
   paused = true;
@@ -2520,9 +2555,9 @@ function endGame(reason = '') {
   clearGameTimers();
   removeFallingVisuals();
   gameSessionToken++;
-  if(!wasPair) saveGeneralRecords();
-  const fallingRecord = wasFalling ? saveAndGetFalling3MinuteRecord(finalTotalBricks) : null;
-  const pairRecord = wasPair ? saveAndGetPair3MinuteRecord(pairSnapshot) : null;
+  let recordInfo;
+  try{recordInfo=TenTowerSoloRecords.save(localStorage,snapshot);}
+  catch(e){recordInfo={saved:false,storageUnavailable:true,firstPlay:true,isNewRecord:false,bestTotal:snapshot.totalBricks,bestChain:snapshot.maxChain,previousBestTotal:null};}
 
   document.getElementById('result-towers').textContent = completedTowers + 'こ';
   document.getElementById('result-bricks').textContent = bricks + ' / ' + TOWER_BRICKS;
@@ -2542,33 +2577,54 @@ function endGame(reason = '') {
 
   resetFallingResultPresentation();
   const bestNote = document.getElementById('falling-best-note'); if(bestNote) bestNote.hidden=true;
-  if(wasFalling){
-    const viewToken=++fallingResultViewToken;
-    renderFallingEnhancedResult(fallingSnapshot,fallingRecord,reason);
-    hidePauseLayers(); showScreen('result');
-    submitFallingCommunityResult(fallingSnapshot,fallingRecord,viewToken);
-    return;
-  }
-  if(wasPair){
-    const viewToken=++fallingResultViewToken;
-    renderPairEnhancedResult(pairSnapshot,pairRecord,reason);
-    hidePauseLayers(); showScreen('result');
-    submitPairCommunityResult(pairSnapshot,pairRecord,viewToken);
-    return;
-  }
-
-  const title=document.getElementById('result-title'); if(title) title.textContent='おつかれさま！';
-  let message;
-  if (completedTowers >= 3) message = `とうが ${completedTowers}こも できた！すごい！`;
-  else if (completedTowers > 0) message = `とうが ${completedTowers}こ できたよ！`;
-  else if (towerStage >= TOWER_IMAGES.length - 2) message = 'あと すこしで とうが できそう！';
-  else if (towerStage > 0) message = 'とうが そだってきたね！';
-  else message = 'つぎは とうを たてよう！';
-  const messageEl = document.getElementById('result-message');
-  messageEl.firstChild ? messageEl.firstChild.textContent = message : messageEl.textContent = message;
+  const viewToken=++fallingResultViewToken;
+  renderSoloEnhancedResult(snapshot,recordInfo);
   hidePauseLayers(); showScreen('result');
+  if(snapshot.endReason!=='quit')submitSoloCommunityResult(snapshot,recordInfo,viewToken);
 }
-
+function getSoloModeLabel(mode) {
+  return {free:'じっくり',timed:'チャレンジ',falling:'おちてくる3分',pairFalling:'ペアおち3分'}[mode];
+}
+function renderSoloEnhancedResult(snapshot,recordInfo) {
+  renderPairEnhancedResult(snapshot,recordInfo,snapshot.endReason);
+  document.getElementById('result-card').classList.add('solo-result-active');
+  document.getElementById('result-title').innerHTML=snapshot.endReason==='quit'?'<span class="text-chunk">ここまで</span> <span class="text-chunk">おつかれさま！</span>':snapshot.endReason==='time'?'<span class="text-chunk">じかんだよ！</span> <span class="text-chunk">おつかれさま！</span>':'おつかれさま！';
+  document.getElementById('solo-result-department').textContent=`${getSoloModeLabel(snapshot.gameMode)} ／ ${getRuleLabel(snapshot.ruleMode)}`;
+  document.getElementById('solo-record-label').textContent='🏰 とうのきろく';
+  const falling=['falling','pairFalling'].includes(snapshot.gameMode);
+  document.getElementById('solo-second-stat-label').textContent=falling?'✨ れんさボーナス':'✨ できた10';
+  document.getElementById('pair-result-chain-bonus').textContent=falling?`＋${snapshot.chainBonusTotal}れんが`:`${snapshot.tenCount}かい`;
+  document.querySelector('#pair-result-panel .pair-placement-note').hidden=snapshot.gameMode!=='pairFalling';
+  let old=null;
+  try{if(snapshot.ruleMode==='two'&&['free','timed'].includes(snapshot.gameMode))old=TenTowerSoloRecords.legacyGeneral(localStorage);}catch(e){}
+  const oldNote=document.getElementById('solo-legacy-best');oldNote.hidden=old===null;
+  oldNote.textContent=old===null?'':`以前の共通ベスト：${formatFallingTowerRecord(old).text}（モード分け前）`;
+  document.getElementById('result-title-btn').hidden=false;
+  updateSoloCommunityCard(snapshot.endReason==='quit'?{localOnly:true}:null,snapshot,recordInfo,true);
+}
+function updateSoloCommunityCard(stats,snapshot,recordInfo,loading=false) {
+  const card=document.getElementById('pair-community-card'),value=document.getElementById('pair-community-value'),note=document.getElementById('pair-community-note');
+  card.classList.remove('community-high','community-soft');
+  const local=recordInfo.saved?'ベストは このたんまつに ほぞんしたよ':'このたんまつには ほぞんできていないよ';
+  if(stats?.localOnly){value.textContent='じぶんで おわった きろく';note.textContent=local+'／みんなのきろくには おくらないよ';return;}
+  if(loading){value.textContent='みんなのきろくを みています…';note.textContent=local;return;}
+  const valid=stats?.ok&&stats.gameMode===snapshot.gameMode&&stats.ruleMode===snapshot.ruleMode&&Number.isSafeInteger(stats.totalRecordCount)&&stats.totalRecordCount>=0;
+  if(!valid){value.textContent='今回は みんなのきろくを よみこめませんでした';note.textContent=(stats?.saved?'今回のきろくは おくれたよ／':'')+local;return;}
+  const count=stats.totalRecordCount;
+  if(count<50||stats.collecting){value.textContent='みんなのきろくを あつめています！';note.textContent=`このぶもん ${count}かいぶん／50かいから くらべるよ`;return;}
+  if(!Number.isFinite(stats.percentile)||stats.percentile<1||stats.percentile>100){value.textContent='今回は みんなのきろくを よみこめませんでした';note.textContent=local;return;}
+  const pct=Math.round(stats.percentile);value.textContent=`上位${pct}％！`;note.textContent=`このぶもん ${count}かいぶんの きろくと くらべたよ`;
+  if(pct<=20)card.classList.add('community-high');else if(pct>60)card.classList.add('community-soft');
+  document.getElementById('pair-next-goal').textContent=chooseFallingNextGoal(snapshot,recordInfo,{collecting:false,percentile:pct});
+}
+function submitSoloCommunityResult(snapshot,recordInfo,viewToken) {
+  if(soloResultRequest)soloResultRequest.cancel();
+  soloResultRequest=TenTowerSoloRecords.createSubmission({transport:window.TowerRecordTransport,onUpdate:stats=>{
+    if(viewToken!==fallingResultViewToken||currentMode!==snapshot.gameMode||getActiveRuleMode()!==snapshot.ruleMode||!document.getElementById('result-screen').classList.contains('active'))return;
+    updateSoloCommunityCard(stats,snapshot,recordInfo);
+  }});
+  soloResultRequest.start(snapshot);
+}
 
 function resetTransientUI() {
   const chain = document.getElementById('chain-toast');
@@ -2736,6 +2792,7 @@ window.addEventListener('load', () => {
   syncControls();
   if (window.BGMController) BGMController.init();
 });
+window.addEventListener('pagehide', cancelSoloOnPageHide);
 document.addEventListener('visibilitychange', () => {
   if (typeof isBattleMode === 'function' && isBattleMode()) return;
   const hidden = document.visibilityState === 'hidden';
@@ -2815,7 +2872,7 @@ function serializeTestPiece(obj) {
 if (new URLSearchParams(location.search).get('test') === '1') {
   window.__tenTowerTest = {
     getState: () => ({
-      mode: currentMode, cols: BOARD_COLS, rows: BOARD_ROWS,
+      mode: currentMode, ruleMode: getActiveRuleMode(), cols: BOARD_COLS, rows: BOARD_ROWS,
       board: board.map(col => col.map(x => x.val)),
       queue: numbersQueue.map(serializeTestPiece),
       falling: serializeTestPiece(fallingPiece),

@@ -70,6 +70,8 @@
     }
     async call(method, args, options = {}) {
       if (!methods.has(method)) throw error('BRIDGE_METHOD_NOT_ALLOWED');
+      if (method === 'createBattleRoom' && args.length > 1 && !TenTowerBattleRules.settings(args[1])) throw error('INVALID_ARGUMENT');
+      if (method === 'syncBattle' && args[1]?.clientState?.version === 2 && !TenTowerBattleRules.validState(args[1].clientState)) throw error('INVALID_ARGUMENT');
       const deadline = Date.now() + Math.max(1000, Math.min(15000, Number(options.timeoutMs) || this.timeoutMs));
       await this.connect();
       const remaining = deadline - Date.now(); if (remaining <= 0) throw error('BRIDGE_REQUEST_TIMEOUT');
