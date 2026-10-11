@@ -1,4 +1,10 @@
-/* Solo rule selection only; the approved gameplay layout remains in place. */
+/* Solo rule selection and responsive layout. */
+/* Reserve the footer and controls before measuring the desktop board. */
+html:not(.tower-mobile) #game-screen:not(.battle-mode) .play-area { grid-template-rows:minmax(0,1fr); }
+html:not(.tower-mobile) #game-screen:not(.battle-mode) .board-section,
+html:not(.tower-mobile) #game-screen:not(.battle-mode) .tower-side { min-height:0; }
+html:not(.tower-mobile) #game-screen:not(.battle-mode) .board-stage { flex:1; width:100%; }
+html:not(.tower-mobile) #game-screen:not(.battle-mode) #falling-controls { flex:none; }
 #mode-screen { overflow-y:auto; overflow-x:hidden; }
 #mode-screen .mode-panel { position:relative; left:auto; top:auto; transform:none; margin:14px auto 24px; }
 .solo-rule-picker { position:relative; z-index:2; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
@@ -31,3 +37,29 @@
 #solo-legacy-best { display:block; font-size:10px; line-height:1.5; }
 #solo-legacy-best[hidden], .pair-placement-note[hidden] { display:none!important; }
 .solo-result-active .falling-result-card strong { word-break:keep-all; overflow-wrap:break-word; }
+
+/* Let every result row keep its content height before placing the actions. */
+#result-screen { overflow-y:auto; overflow-x:hidden; }
+#result-screen .result-card.solo-result-active {
+  position:relative; left:auto; top:auto; transform:none;
+  height:auto; min-height:min(650px,94dvh); margin:12px auto 20px;
+  grid-template-rows:auto auto auto auto; row-gap:10px;
+}
+#result-screen .solo-result-active .result-main {
+  grid-template-columns:minmax(0,.76fr) minmax(0,1.24fr);
+  overflow:visible; align-items:center; padding:0;
+}
+#result-screen .solo-result-active .result-visual { height:clamp(180px,38dvh,340px); }
+#result-screen .solo-result-active .falling-result-panel { align-content:start; }
+#result-screen .solo-result-active .result-actions { flex-wrap:wrap; gap:8px; margin-top:4px; }
+#result-screen .solo-result-active #result-retry-btn { transform:none; }
+@media (max-width:850px) and (orientation:portrait) {
+  #result-screen .result-card.solo-result-active { min-height:0; margin:8px auto 18px; }
+  #result-screen .solo-result-active .result-main { grid-template-columns:1fr; }
+  #result-screen .solo-result-active .result-visual { height:clamp(170px,25dvh,240px); }
+}
+@media (max-height:540px) and (orientation:landscape) {
+  #result-screen .result-card.solo-result-active { min-height:0; }
+  #result-screen .solo-result-active .result-main { grid-template-columns:minmax(0,.6fr) minmax(0,1.4fr); }
+  #result-screen .solo-result-active .result-visual { height:180px; }
+}
