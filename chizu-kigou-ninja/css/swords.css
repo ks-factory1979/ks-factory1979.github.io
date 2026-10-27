@@ -1,0 +1,79 @@
+#sword-select{position:fixed;inset:0;z-index:1000;width:min(100%,1240px);height:100%;margin:auto;padding:16px 18px 12px;display:flex;flex-direction:column;gap:12px;color:#fff5d8;font:18px "Yu Gothic",Meiryo,sans-serif;touch-action:manipulation}
+#sword-select [hidden]{display:none!important}#sword-select button{font:inherit;color:inherit;cursor:pointer;min-height:44px;border:1px solid #648296;border-radius:12px;background:#10283e;padding:9px 16px}
+#sword-select button:disabled{cursor:default;opacity:.55}#sword-select button:focus-visible{outline:3px solid #fff5c8;outline-offset:2px}#sword-select button:not(:disabled):hover{background-color:#23475b}
+.sword-header,.shop-heading,.sword-header>div,.shop-wallet{display:flex;align-items:center;gap:12px}.sword-header{justify-content:space-between;flex-shrink:0}.sword-header h1{font-size:30px;white-space:nowrap;margin:0}
+.shop-wallet{gap:6px;background:#081b2b;padding:5px 14px;border-radius:24px;border:1px solid #a48a50}.shop-wallet img{width:32px;height:32px;object-fit:contain}.shop-wallet strong{font-size:25px;font-variant-numeric:tabular-nums}
+.shop-body{display:grid;grid-template-columns:minmax(225px,.36fr) 1fr;gap:20px;flex:1;min-height:0}.sword-choices{display:grid;grid-template-columns:1fr;grid-template-rows:repeat(5,minmax(44px,1fr));gap:9px;min-height:0}
+#sword-select .sword-choices button{display:flex;align-items:center;gap:12px;padding:6px 12px;border:2px solid #58718b;background:linear-gradient(130deg,#18354d,#091b2c);text-align:left;min-width:0}
+#sword-select .sword-choices button[aria-pressed=true]{border-color:#f2d48c;background:#254859;box-shadow:inset 0 0 24px #f0c86b12}.sword-choices img{width:105px;height:70px;object-fit:contain;flex-shrink:0}.shop-choice-copy{display:flex;flex-direction:column;gap:7px;min-width:0}.shop-choice-copy strong{font-size:21px;white-space:nowrap}.sword-choice-state{font-size:15px;color:#f8db91;white-space:nowrap}
+.shop-detail{border:1px solid #9f8c5e;border-radius:20px;background:linear-gradient(135deg,#f9edcded,#dacfafed);color:#183446;display:flex;flex-direction:column;gap:8px;padding:16px 22px;min-height:0}
+.shop-detail{position:relative}#sword-select .shop-actions button:not(.sword-equip){color:#fff5d8}
+.is-practicing .shop-detail{background:transparent;border-color:#aec2cf}.is-practicing .shop-information{background:#f7ebd0ed;padding:5px;border-radius:10px}.is-practicing .shop-visual{background:#071b2c10}
+#sword-select button.sword-preview:not(:disabled),#sword-select button.sword-preview:not(:disabled):hover{background:transparent}
+.is-practicing .sword-preview-hint{color:#f3f3df;text-shadow:0 1px 3px #000}
+#sword-select.is-practicing [data-sword-action=color]{position:absolute;right:12px;top:12px;min-width:0;font-size:14px;z-index:2}
+.shop-visual{flex:1;min-height:110px;position:relative;display:grid;place-items:center;border-radius:13px;background:linear-gradient(140deg,#fffaf155,#e8d6af55);overflow:visible}.shop-art{position:absolute;width:100%;height:100%;object-fit:contain;transform:translate(var(--art-x,0),var(--art-y,0)) scale(var(--art-scale,1))}
+#sword-select .sword-preview{position:absolute;inset:0;width:100%;height:100%;background:transparent;border:1px dashed #556c7a;touch-action:none;border-radius:12px}#sword-select .sword-preview:hover{background:#122b3d08}.sword-preview-hint{position:absolute;bottom:8px;left:0;right:0;font-size:16px;color:#183446;pointer-events:none}
+.shop-visual{isolation:isolate;overflow:hidden}.shop-detail .shop-visual{background:radial-gradient(ellipse at center,#18354d,#071b2d)}.shop-art{z-index:0}.shop-preview-surface{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;mix-blend-mode:screen}.shop-preview-surface canvas{display:block;width:1366px!important;height:768px!important;max-width:none;max-height:none;transform-origin:0 0;pointer-events:none}#sword-select .sword-preview{z-index:2}
+.shop-information{flex-shrink:0;text-align:center}.shop-information h2{margin:0 0 5px;font-size:30px}.sword-description{margin:0;font-size:18px;line-height:1.45}
+.shop-price{display:flex;align-items:center;justify-content:center;gap:8px;font-size:24px;margin-top:5px}.shop-price img{width:32px;height:32px;object-fit:contain}.shop-price>span{font-size:17px;font-weight:bold;padding:3px 12px;border-radius:20px;background:#c6b58b;color:#253d40}.shop-guidance{font-size:17px;font-weight:bold;margin:4px 0 0;min-height:24px;color:#725322}
+.shop-actions{display:flex;gap:12px;justify-content:center;flex-shrink:0}#sword-select .shop-actions button{min-width:185px;font-size:21px}#sword-select .sword-equip{background:#e5b754;color:#142d3d;font-weight:bold;border-color:#a57826}#sword-select .sword-equip:not(:disabled):hover{background:#f5cd77}
+.sword-footer{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-shrink:0;background:#071b2ce8;border-radius:10px;padding:8px 14px;min-height:42px}.sword-footer p{margin:0;line-height:1.35;font-size:17px}.sword-footer .sword-note{font-size:15px;color:#c6d8df;white-space:nowrap}
+.sword-effects-backdrop{position:fixed;inset:0;z-index:3;background:#020c17df;display:grid;place-items:center;padding:12px 16px}.sword-effects-dialog{width:min(100%,700px);max-height:100%;overflow-y:auto;background:#10283e;color:#fff5d8;border:1px solid #92acb9;border-radius:20px;padding:20px;box-shadow:0 12px 48px #0008}
+.sword-effects-dialog header{display:flex;align-items:center;justify-content:space-between;gap:12px}.sword-effects-dialog h2{font-size:26px;margin:0}.sword-effects-dialog p{line-height:1.5;margin:12px 0}.sword-effects-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+#sword-select .sword-effects-choices button{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:14px;text-align:left;line-height:1.5;background:#091b2c}#sword-select .sword-effects-choices button[aria-pressed=true]{border:2px solid #f5dea0;background:#28434e}.sword-effects-choices strong{font-size:21px;color:#ffe8a8}
+.shop-confirm .sword-effects-dialog{text-align:center;width:min(100%,530px)}.shop-confirm-art{display:block;width:100%;height:170px;object-fit:contain}.shop-confirm-price{display:flex;align-items:center;justify-content:center;font-size:26px;gap:8px}.shop-confirm-price img{width:36px;height:36px;object-fit:contain}.shop-confirm-actions{display:flex;justify-content:center;gap:22px}.shop-confirm-actions button{min-width:145px}
+.shop-flying-coin{position:fixed;width:40px;height:40px;object-fit:contain;z-index:4;pointer-events:none;left:-100px;top:-100px}.shop-dev{position:absolute;bottom:0;left:15px;z-index:5;background:#071b2c;border:1px solid #9b84c7;font-size:14px}.shop-dev div{display:flex;gap:8px;padding:8px}
+@media(max-height:560px) and (orientation:landscape){
+#sword-select{padding:6px max(12px,env(safe-area-inset-right)) 6px max(12px,env(safe-area-inset-left));gap:6px}.sword-header h1{font-size:23px}.sword-header,.shop-heading,.sword-header>div{gap:8px}.shop-wallet{padding:2px 10px}.shop-wallet img{width:28px;height:28px}.shop-wallet strong{font-size:22px}#sword-select .sword-header button{font-size:16px;padding:6px 11px}
+.shop-body{grid-template-columns:minmax(180px,.35fr) 1fr;gap:10px}.sword-choices{gap:5px}#sword-select .sword-choices button{padding:2px 7px;gap:8px}.sword-choices img{width:75px;height:45px}.shop-choice-copy{gap:2px}.shop-choice-copy strong{font-size:17px}.sword-choice-state{font-size:13px}
+.shop-detail{padding:7px 12px;gap:4px;border-radius:12px}.shop-visual{min-height:85px}.shop-information h2{font-size:23px;margin-bottom:0}.sword-description{font-size:15px;line-height:1.3}.shop-price{font-size:21px;margin-top:2px}.shop-price img{width:26px;height:26px}.shop-price>span{font-size:14px}.shop-guidance{font-size:14px;min-height:18px;margin-top:2px}
+#sword-select .shop-actions button{font-size:17px;min-width:145px;padding:6px 10px}.shop-actions{gap:9px}.sword-footer{padding:4px 10px;min-height:29px}.sword-footer p{font-size:14px}.sword-footer .sword-note{font-size:12px}
+.sword-effects-dialog{padding:12px 16px}.sword-effects-dialog h2{font-size:23px}.sword-effects-dialog p{margin:7px 0}.shop-confirm-art{height:110px}.shop-confirm-price{font-size:23px}
+}
+@media(max-width:700px) and (orientation:landscape){.sword-header h1{font-size:21px}.shop-wallet{padding:2px 6px}.shop-wallet strong{font-size:20px}.shop-wallet img{width:24px;height:24px}#sword-select .sword-header button{font-size:14px;padding:5px 8px}.shop-body{grid-template-columns:180px 1fr}.sword-footer .sword-note{display:none}.sword-description{font-size:14px}.shop-information h2{font-size:21px}}
+
+
+/* v0.3.17: retain the existing Japanese shop, clarify its controls. */
+.shop-product{position:absolute;inset:0;transform-origin:center;mix-blend-mode:screen}
+#sword-select .sword-choices button{position:relative;border-width:2px;transition:background-color .12s,border-color .12s;gap:10px}
+#sword-select .sword-choices button[aria-pressed=true]{border:3px solid #ffe6a6;padding:5px 11px;background:linear-gradient(125deg,#355a65,#152d40);box-shadow:0 0 9px #f4d17b55,inset 0 0 16px #f7d28b18}
+.shop-choice-thumb{width:102px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#sword-select .shop-choice-thumb>img{width:102px;height:56px;object-fit:contain}
+.shop-selected{font-size:12px;line-height:17px;color:#ffe6a6;visibility:hidden;white-space:nowrap;font-weight:bold}
+[aria-pressed=true] .shop-selected{visibility:visible}
+.shop-choice-copy{gap:4px;line-height:1.15}.shop-choice-copy strong{font-size:21px}
+.shop-choice-price{display:flex;align-items:center;gap:4px;font-size:16px;white-space:nowrap;color:#f9dfa4}
+#sword-select .shop-choice-price>img{width:19px;height:23px;object-fit:contain;flex-shrink:0}
+.sword-choice-state{font-size:14px;color:#d5e0e5;display:inline-flex;align-self:flex-start;padding:2px 8px;border-radius:5px;background:#06172488}
+[data-ownership=equipped] .sword-choice-state{color:#ffe4a3;border:1px solid #af985b}
+[data-ownership=owned] .sword-choice-state{color:#a9edd1}
+#sword-select .sword-equip[data-purchase-state=shortage],#sword-select .sword-equip[data-purchase-state=problem],#sword-select .sword-equip[data-purchase-state=equipped],#sword-select .sword-equip[data-purchase-state=busy]{background:#68747c;color:#e8ecee;border-color:#7b8589;box-shadow:none;opacity:1}
+#sword-select .sword-equip[data-purchase-state=owned]{background:#3b7568;color:#fff9e4;border-color:#78ac98}
+.shop-actions{gap:22px}.sword-header button{min-height:46px}.shop-information h2{line-height:1.2}.shop-price{min-height:35px;gap:10px}.shop-guidance{margin-top:7px}
+.sword-footer{padding:9px 16px;min-height:44px}.sword-footer p{font-size:18px}.shop-card-feedback{animation:shop-card-tap .14s ease-out}
+@keyframes shop-card-tap{0%{filter:brightness(1.25)}100%{filter:brightness(1)}}
+.shop-layout-guides{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:3000}
+#shop-layout-editor{position:fixed;left:12px;top:110px;width:310px;max-height:calc(100% - 125px);overflow:auto;z-index:4000;background:#081e30f5;border:1px solid #bda16a;border-radius:10px;color:#fff5d8;font:14px Meiryo,sans-serif;box-shadow:0 5px 18px #0008}
+#shop-layout-editor header{position:sticky;top:0;background:#15364a;display:flex;align-items:center;gap:5px;padding:7px;z-index:1}
+#shop-layout-editor header strong{flex:1}#shop-layout-editor button,#shop-layout-editor select,#shop-layout-editor input{font:inherit;color:inherit;background:#15364a;border:1px solid #7593a2;border-radius:4px;min-height:30px}
+#shop-layout-editor button{padding:3px 6px;cursor:pointer}#shop-layout-editor label{display:flex;align-items:center;gap:5px;margin:5px 0}#shop-layout-editor select{max-width:220px}#shop-layout-editor input[type=number]{width:90px}
+.shop-editor-content{padding:8px 10px}.shop-editor-content p{margin:4px 0 8px;line-height:1.5}.shop-editor-actions{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0}
+.shop-editor-nudges{display:grid;grid-template-columns:15px repeat(4,1fr);gap:4px}#shop-layout-editor textarea{width:100%;min-height:90px;background:#041321;color:#dbedf5;font:12px monospace}
+#shop-layout-editor.collapsed{max-height:none;width:auto}#shop-layout-editor.collapsed .shop-editor-content{display:none}
+#shop-layout-editor[data-dock="1"]{left:auto;right:12px}#shop-layout-editor[data-dock="2"]{top:auto;bottom:12px;left:auto;right:12px}#shop-layout-editor[data-dock="3"]{top:auto;bottom:12px}
+.shop-editing{cursor:move}.shop-editing button{cursor:move!important}
+@media(max-height:560px) and (orientation:landscape){
+#sword-select .shop-choice-thumb{width:64px}#sword-select .shop-choice-thumb>img{width:64px;height:28px}.shop-selected{font-size:12px;line-height:13px}
+#sword-select .sword-choices button{gap:5px;padding:2px 6px}#sword-select .sword-choices button[aria-pressed=true]{padding:1px 5px}
+.shop-choice-copy{display:grid;grid-template-columns:auto auto;gap:2px 5px}.shop-choice-copy strong{font-size:17px;grid-column:1/-1;line-height:1.1}
+.shop-choice-price{font-size:12px;gap:2px}#sword-select .shop-choice-price>img{width:12px;height:16px}.sword-choice-state{font-size:12px;padding:1px 3px;line-height:1.15}
+.shop-actions{gap:18px}.shop-guidance{margin-top:2px}.sword-footer{min-height:29px;padding:4px 10px}.sword-footer p{font-size:14px}.sword-header button{min-height:44px}
+#shop-layout-editor{top:65px;max-height:calc(100% - 75px);width:285px}
+}
+@media(prefers-reduced-motion:reduce){.shop-card-feedback{animation:none}#sword-select .sword-choices button{transition:none}}
+
+#shop-layout-editor{overflow-x:hidden}#shop-layout-editor select{min-width:0;flex:1}#shop-layout-editor input[type=file]{width:100%;min-width:0;font-size:12px}#shop-layout-editor label:has(input[type=file]){display:block}
+
+@media(max-width:700px) and (orientation:landscape){.sword-footer .sword-note{display:block;font-size:12px;white-space:normal}}
+#sword-select [data-sword-action=color]{color:#fff5d8}

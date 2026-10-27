@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 100 100" role="img" aria-labelledby="title">
+  <title id="title">病院の地図記号</title>
+  <path d="M18 15 H82 V65 L50 88 L18 65 Z" fill="none" stroke="#111" stroke-width="7" stroke-linejoin="miter"/>
+  <path d="M50 30 V67 M32 48.5 H68" fill="none" stroke="#111" stroke-width="7" stroke-linecap="square"/>
+</svg>

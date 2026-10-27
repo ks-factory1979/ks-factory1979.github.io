@@ -1,0 +1,14 @@
+#save-info{position:fixed;inset:0;z-index:11000;display:grid;place-items:center;padding:12px;background:#03101de8;color:#243a48;font:16px "Yu Gothic",Meiryo,sans-serif;line-height:1.75}
+#save-info .save-info-card{box-sizing:border-box;display:flex;flex-direction:column;width:min(760px,100%);max-height:calc(100dvh - 24px);overflow:hidden;background:#fff7df;border:2px solid #c2a65c;border-radius:16px;box-shadow:0 10px 60px #0008}
+#save-info header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border-bottom:1px solid #d4c49a;flex-shrink:0}
+#save-info h2{margin:0;font-size:25px;line-height:1.4}#save-info h3{margin:14px 0 4px;font-size:18px;color:#164c6b}#save-info p{margin:0 0 10px}
+#save-info .save-info-body{overflow-y:auto;overscroll-behavior:contain;min-height:0;padding:14px 24px}
+#save-info #save-info-intro{font-weight:bold;font-size:17px}
+#save-info details{padding:10px 12px;border:1px solid #d4c49a;border-radius:8px;background:#f4ead0;margin:14px 0 4px}
+#save-info summary{min-height:44px;display:list-item;align-content:center;cursor:pointer;font-weight:bold;color:#164c6b}
+#save-info details[open] summary{margin-bottom:8px}#save-info details p{font-size:14px}
+#save-info footer{flex-shrink:0;padding:10px 20px 14px;border-top:1px solid #d4c49a;text-align:center}#save-info footer p{font-size:12px;margin:0 0 7px}
+#save-info button{min-height:44px;padding:7px 16px;border:1px solid #285874;border-radius:8px;background:#143f5b;color:#fff7df;font:700 16px "Yu Gothic",Meiryo,sans-serif;cursor:pointer;touch-action:manipulation}
+#save-info header button{min-width:44px;padding:3px 10px;font-size:24px;line-height:1}#save-info footer button{width:min(320px,100%)}
+#save-info button:focus-visible,#save-info summary:focus-visible,#save-info .save-info-body:focus-visible{outline:3px solid #246b97;outline-offset:2px}
+@media(max-height:500px),(max-width:600px){#save-info{padding:8px;font-size:14px;line-height:1.65}#save-info .save-info-card{max-height:calc(100dvh - 16px)}#save-info header{padding:7px 12px}#save-info h2{font-size:20px}#save-info h3{font-size:16px}#save-info .save-info-body{padding:8px 14px}#save-info #save-info-intro{font-size:15px}#save-info footer{padding:7px 12px}#save-info footer p{font-size:11px;margin-bottom:5px}}

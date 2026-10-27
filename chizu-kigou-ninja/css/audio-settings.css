@@ -1,0 +1,8 @@
+#sound-settings{position:fixed;inset:0;z-index:5000;display:grid;place-items:center;background:#03101de8;padding:12px;font-family:"Yu Gothic","Meiryo",sans-serif;color:#fff4d3}
+#sound-settings .sound-card{box-sizing:border-box;width:min(460px,100%);max-height:calc(100dvh - 24px);overflow-y:auto;background:linear-gradient(145deg,#193749,#0b202f);border:2px solid #c2a65c;border-radius:18px;padding:20px 28px;box-shadow:0 10px 60px #0008;text-align:center}
+#sound-settings h2{margin:0 0 8px;font-size:26px}#sound-settings p{margin:8px 0 14px;font-size:15px;line-height:1.6}
+#sound-settings button{display:block;width:100%;min-height:44px;margin:9px 0;border:1px solid #9bb7c5;border-radius:9px;background:#203e50;color:#fff4d3;font:700 19px "Yu Gothic","Meiryo",sans-serif;cursor:pointer}
+#sound-settings button[aria-pressed=true]{border-color:#d7bc6a;background:#365346}#sound-settings button:focus-visible,#sound-settings input:focus-visible{outline:3px solid #fff1a1;outline-offset:3px}
+#sound-settings .sound-volume{display:block;text-align:left;font-weight:bold;margin:18px 0 10px}#sound-settings output{float:right}#sound-settings input{display:block;width:100%;min-height:38px;accent-color:#e8c76c}
+#sound-settings .sound-note{color:#c6d7df;font-size:13px}#sound-settings .sound-close{background:#d8ba70;color:#132a38;border-color:#fce3a0}
+@media(max-height:500px){#sound-settings .sound-card{padding:8px 22px}#sound-settings h2{font-size:22px;margin-bottom:6px}#sound-settings p:first-of-type{display:none}#sound-settings p{margin:3px 0 6px}#sound-settings button{margin:4px 0}#sound-settings .sound-volume{margin:6px 0}#sound-settings input{min-height:32px}#sound-settings .sound-note{font-size:11px;line-height:1.4}#sound-settings .sound-note br{display:none}}

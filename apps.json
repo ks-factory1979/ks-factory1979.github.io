@@ -3,7 +3,7 @@
   "siteSubtitle": "教育アプリ",
   "siteUrl": "https://ks-factory1979.github.io/",
   "pageTitle": "K's Factory｜小学生向けの無料教育ゲーム",
-  "description": "小学生が遊びながら学べる無料の教育ゲーム。タイピング、ひらがなの読み、計算を、学校でも家庭でも楽しく練習できます。",
+  "description": "小学生が遊びながら学べる無料の教育ゲーム。タイピング、ひらがなの読み、計算、地図記号を、学校でも家庭でも楽しく練習できます。",
   "googleSiteVerification": "lk7gTjAaGcX70h_opGOd6GD_nm6KaXMOuPx9XsMFYYo",
   "counterUrl": "https://script.google.com/macros/s/AKfycbzx1yag8bWOtnXKi4fnHjg3QL83Isjy8URSExovs2kK0XPrLoWGEAy5fxl2WKoREf5k/exec",
   "apps": [
@@ -117,6 +117,32 @@
       ],
       "leadParts": [
         "こたえて、ひっぱれ！"
+      ]
+    },
+    {
+      "id": "chizu-kigou-ninja",
+      "title": "地図記号忍者",
+      "category": "社会・地図記号",
+      "status": "published",
+      "lead": "記号を見きわめ、斬り進め！",
+      "description": "60種類の地図記号を見分けて、正しい札をスワイプで斬ろう。下忍から上忍へ修行し、忍術帖で記号の意味やひみつを読み、忍小判で好きな属性刀を選べます。",
+      "tags": [
+        "地図記号60種類",
+        "スワイプアクション",
+        "修行・忍術帖・刀ショップ"
+      ],
+      "requirements": "タッチ・マウス対応・横向き推奨・Googleログイン不要",
+      "url": "https://ks-factory1979.github.io/chizu-kigou-ninja/",
+      "cover": "chizu-kigou-ninja/portal-cover.png",
+      "coverAlt": "地図記号忍者の和風の修行道場。夜の庭園と木の舞台。",
+      "logo": "chizu-kigou-ninja/portal-logo.png",
+      "note": "学習記録・小判・購入済みの刀は、この端末・ブラウザに保存されます。共有端末では記録も共有されます。氏名入力やログインはありません。",
+      "titleParts": [
+        "地図記号忍者"
+      ],
+      "leadParts": [
+        "記号を見きわめ、",
+        "斬り進め！"
       ]
     }
   ]
