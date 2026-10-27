@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#071426">
+  <meta name="description" content="飛んでくる正しい地図記号をスワイプで斬る、小学生向け学習アクションゲームです。">
+  <title>地図記号忍者｜記号を見きわめ、斬り進め！</title>
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/swords.css">
+  <link rel="stylesheet" href="./css/audio-settings.css">
+  <link rel="stylesheet" href="./css/learning-save.css">
+  <link rel="stylesheet" href="./css/economy-save.css">
+  <link rel="stylesheet" href="./css/save-info.css">
+</head>
+<body>
+  <main id="app" aria-label="地図記号忍者">
+    <div id="game-container" aria-label="ゲーム画面"></div>
+    <p id="live-region" class="sr-only" aria-live="polite"></p>
+  </main>
+
+  <aside id="orientation-overlay" role="dialog" aria-modal="true" aria-label="画面を横向きにしてください">
+    <div class="orientation-card">
+      <div class="phone-turn" aria-hidden="true">↻</div>
+      <strong>よこむきにしてね！</strong>
+      <span>画面を横にすると 修行をつづけられるよ</span>
+    </div>
+  </aside>
+
+  <noscript>このゲームを遊ぶにはJavaScriptを有効にしてください。</noscript>
+
+  <script src="./js/vendor/phaser.min.js"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/config/AssetKeys.js"></script>
+  <script src="./js/config/UnlockScrollConfig.js"></script>
+  <script src="./js/config/NinjutsuBookLayoutConfig.js"></script>
+  <script src="./js/game/data/uiAssetData.js"></script>
+  <script src="./js/game/data/unlockScrollData.js"></script>
+  <script src="./js/game/data/collectionAssetData.js"></script>
+  <script src="./js/game/data/slashAudioData.js"></script>
+  <script src="./js/game/data/elementalAudioData.js"></script>
+  <script src="./js/game/ElementalSoundPreferences.js"></script>
+  <script src="./js/core/ElementalAudio.js"></script>
+  <script src="./js/core/AudioManager.js"></script>
+  <script src="./js/core/AudioPreferences.js"></script>
+  <script src="./js/game/data/bgmAudioData.js"></script>
+  <script src="./js/core/BGMManager.js"></script>
+  <script src="./js/core/ComboSystem.js"></script>
+  <script src="./js/core/SpawnSystem.js"></script>
+  <script src="./js/core/WaveSpawnSystem.js"></script>
+  <script src="./js/core/ZoneSystem.js"></script>
+  <script src="./js/core/ZoneWorldData.js"></script>
+  <script src="./js/core/HitLabelData.js"></script>
+  <script src="./js/core/SpecialHitPresentationSystem.js"></script>
+  <script src="./js/core/ZoneVisualSystem.js"></script>
+  <script src="./js/core/ZoneSpawnSystem.js"></script>
+  <script src="./js/core/RoundSystem.js"></script>
+  <script src="./js/core/HitStopSystem.js"></script>
+  <script src="./js/core/CutEffectSystem.js"></script>
+  <script src="./js/core/InkMaterialData.js"></script>
+  <script src="./js/core/SplashMaterialData.js"></script>
+  <script src="./js/core/ProceduralFireVFX.js"></script>
+  <script src="./js/core/ProceduralLightningVFX.js"></script>
+  <script src="./js/core/ProceduralIceVFX.js"></script>
+  <script src="./js/core/ProceduralWindVFX.js"></script>
+  <script src="./js/core/DynamicSlashVFXSystem.js"></script>
+  <script src="./js/core/SlashTraceSystem.js"></script>
+  <script src="./js/core/CriticalSlashSystem.js"></script>
+  <script src="./js/core/SwipeSlashSystem.js"></script>
+  <script src="./js/core/UnlockScrollOverlay.js"></script>
+  <script src="./js/game/SwordPreferences.js"></script>
+  <script src="./js/game/SwordCatalog.js"></script>
+  <script src="./js/game/EconomyManager.js"></script>
+  <script src="./js/game/data/shopAssetData.js"></script>
+  <script src="./js/ui/KobanPresentation.js"></script>
+  <script src="./js/game/EffectPreferences.js"></script>
+  <script src="./js/game/DevSettings.js"></script>
+  <script src="./js/game/DevPanel.js"></script>
+  <script src="./js/game/ZoneAudioPanel.js"></script>
+  <script src="./js/game/data/symbols.js"></script>
+  <script src="./js/game/data/chuninSymbols.js"></script>
+  <script src="./js/game/data/joninSymbols.js"></script>
+  <script src="./js/game/MapSymbolData.js"></script>
+  <script src="./js/game/data/MapSymbolSecrets.js"></script>
+  <script src="./js/game/data/chuninMapSymbolSecrets.js"></script>
+  <script src="./js/game/data/joninMapSymbolSecrets.js"></script>
+  <script src="./js/progression/ProgressConfig.js"></script>
+  <script src="./js/progression/StageData.js"></script>
+  <script src="./js/progression/TargetDeck.js"></script>
+  <script src="./js/progression/ProgressManager.js"></script>
+  <script src="./js/progression/ProgressDevTools.js"></script>
+  <script src="./js/game/data/symbolRenderers.js"></script>
+  <script src="./js/game/data/chuninSymbolRenderers.js"></script>
+  <script src="./js/game/data/joninSymbolRenderers.js"></script>
+  <script src="./js/progression/TrainingSelection.js"></script>
+  <script src="./js/game/CardPalette.js"></script>
+  <script src="./js/game/CardTextureFactory.js"></script>
+  <script src="./js/game/MapSymbolGame.js"></script>
+  <script src="./js/ui/UIButton.js"></script>
+  <script src="./js/ui/SceneUI.js"></script>
+  <script src="./js/ui/JapaneseTextLayout.js"></script>
+  <script src="./js/ui/SoundSettingsPanel.js"></script>
+  <script src="./js/ui/SaveInfoPanel.js"></script>
+  <script src="./js/ui/LearningSaveNotice.js"></script>
+  <script src="./js/ui/EconomySaveNotice.js"></script>
+  <script src="./js/ui/CollectionBookModel.js"></script>
+  <script src="./js/ui/BookItemButton.js"></script>
+  <script src="./js/ui/BookLayoutModel.js"></script>
+  <script src="./js/ui/BookLayoutEditor.js"></script>
+  <script src="./js/ui/NinjutsuBookReader.js"></script>
+  <script src="./js/ui/UnlockScrollUI.js"></script>
+  <script src="./js/ui/ResultUnlockPresenter.js"></script>
+  <script src="./js/game/scenes/BootScene.js"></script>
+  <script src="./js/game/scenes/PreloadScene.js"></script>
+  <script src="./js/game/scenes/SymbolCheckScene.js"></script>
+  <script src="./js/game/scenes/TitleScene.js"></script>
+  <script src="./js/config/ShopLayoutConfig.js"></script>
+  <script src="./js/ui/ShopLayoutModel.js"></script>
+  <script src="./js/ui/ShopLayoutController.js"></script>
+  <script src="./js/ui/ShopLayoutEditor.js"></script>
+  <script src="./js/ui/ShopPreviewSurface.js"></script>
+  <script src="./js/game/scenes/SwordSelectScene.js"></script>
+  <script src="./js/game/scenes/TrainingSelectScene.js"></script>
+  <script src="./js/game/scenes/NinjutsuBookScene.js"></script>
+  <script src="./js/game/scenes/HowToScene.js"></script>
+  <script src="./js/game/scenes/PreviewScene.js"></script>
+  <script src="./js/game/scenes/UnlockPreviewScene.js"></script>
+  <script src="./js/game/scenes/GameScene.js"></script>
+  <script src="./js/game/scenes/ResultScene.js"></script>
+  <script src="./js/main.js"></script>
+</body>
+</html>
+

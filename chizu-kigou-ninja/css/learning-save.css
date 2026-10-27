@@ -1,0 +1,17 @@
+#learning-save-notice{position:fixed;left:max(8px,env(safe-area-inset-left));bottom:max(8px,env(safe-area-inset-bottom));z-index:7000;width:340px;max-width:calc(100vw - 16px);padding:8px 10px;border:2px solid #c68b27;border-radius:11px;background:#fff0c9;color:#342710;box-shadow:0 3px 12px #0006;font:14px "Yu Gothic",Meiryo,sans-serif;line-height:1.45;pointer-events:none;touch-action:manipulation}
+#learning-save-notice[hidden],#learning-save-notice [hidden]{display:none!important}
+#learning-save-notice .learning-save-heading{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#learning-save-notice strong{font-size:16px;line-height:1.35}
+#learning-save-notice p{margin:5px 0 0;font-size:13px}
+#learning-save-notice button{flex-shrink:0;min-height:44px;padding:7px 10px;border:1px solid #285874;border-radius:8px;background:#143f5b;color:#fff7df;font:700 14px "Yu Gothic",Meiryo,sans-serif;cursor:pointer;pointer-events:auto;touch-action:manipulation}
+#learning-save-notice button:disabled{cursor:wait;opacity:.65}
+#learning-save-notice button:focus-visible{outline:3px solid #164e9c;outline-offset:2px}
+#learning-save-notice[data-save-status=saved]{background:#e7f5df;border-color:#4c8644;color:#23431d}
+#learning-save-notice.learning-save-brief p{display:none}
+#learning-save-notice.learning-save-small{padding:5px 6px}
+#learning-save-notice.learning-save-small strong{font-size:12px}
+#learning-save-notice.learning-save-small button{font-size:12px;padding:5px 6px}
+#learning-save-notice.learning-save-small p{display:none}
+#learning-save-notice.learning-save-inline{position:relative;left:auto!important;top:auto!important;bottom:auto!important;width:auto!important;max-width:none;margin:0;flex-shrink:0;box-shadow:none;z-index:auto}
+#sword-select.has-learning-save-notice{overflow-y:auto}
+body.is-portrait #learning-save-notice{visibility:hidden}

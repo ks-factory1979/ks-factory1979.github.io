@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 100 100" role="img" aria-labelledby="title">
+  <title id="title">小・中学校の地図記号</title>
+  <g fill="none" stroke="#111" stroke-width="7" stroke-linecap="square" stroke-linejoin="round">
+    <path d="M43 14 L57 25 M17 34 H83"/>
+    <path d="M36 43 C42 59 56 75 82 86 M67 42 C59 62 44 77 18 87"/>
+  </g>
+</svg>
