@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="ja"><head><meta name="robots" content="noindex,nofollow"><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0c142c"><title>PINをいれて参加｜クイズショー</title>  <script type="module" crossorigin src="./assets/enter-DPpOdBoJ.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/style-DM0KUojN.js">
+  <link rel="stylesheet" crossorigin href="./assets/style-C4_vZfld.css">
+  <link rel="stylesheet" crossorigin href="./assets/enter-XO2SZUqW.css">
+</head>
+<body data-role="student"><div id="app">
+  <a class="skip-link" href="#page-main">本文へすすむ</a>
+  <header><a class="brand" href="./index.html">QUIZ SHOW<span>みんなのひらめき、いっせいに。</span></a><span class="spacer"></span><span class="role-label">児童のPIN入力</span></header>
+  <main id="page-main" tabindex="-1" class="container narrow pin-entry">
+    <div class="hero"><p class="eyebrow">JOIN THE QUIZ</p><h1>クイズにさんか</h1><p class="muted">先生から教わった6けたのPINをいれてね。</p></div>
+    <section class="panel"><form action="./join.html" method="get">
+      <label for="entry-pin">6けたのPIN</label><input id="entry-pin" name="pin" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="off" placeholder="004271" required aria-describedby="entry-hint">
+      <input type="hidden" name="enter" value="1"><p id="entry-hint" class="muted">PINをいれたら、つぎの画面でなまえと番号をいれます。</p>
+      <p id="entry-status" class="muted" role="status" hidden></p><p id="entry-error" class="notice error" role="alert" hidden></p><p id="entry-recovery" hidden><a href="./join.html">前の参加状態を確認する</a></p><button id="entry-next" type="submit" class="gold main-button">つぎへ</button>
+    </form></section><p class="footer-note">先生のPINがまだなくても、このページをブックマークして待てます。</p><p><a href="./teacher.html">先生はこちら</a></p>
+  </main></div></body></html>
