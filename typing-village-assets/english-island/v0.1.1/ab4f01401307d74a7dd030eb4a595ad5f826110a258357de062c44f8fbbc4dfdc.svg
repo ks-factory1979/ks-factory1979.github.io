@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 340" role="img" aria-label="大きな巻き貝を背負った、やさしいヤドカリの番人">
+<defs><linearGradient id="shell" x2=".8" y2="1"><stop stop-color="#ffdc83"/><stop offset="1" stop-color="#e39553"/></linearGradient><linearGradient id="body" x2="0" y2="1"><stop stop-color="#ff9e6d"/><stop offset="1" stop-color="#ed725c"/></linearGradient></defs>
+<ellipse cx="230" cy="301" rx="167" ry="22" fill="#b78354" opacity=".18"/>
+<g stroke="#80473c" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+<path d="M118 220Q79 226 59 270L102 264M144 244Q117 274 115 294L151 279M302 247Q335 273 336 294L306 279M327 220Q371 225 395 270L354 263" fill="#ee8a66"/>
+<path d="M143 220C106 173 120 95 172 58C220 22 305 25 345 75C386 124 364 210 317 242Z" fill="url(#shell)"/>
+<path d="M323 204C366 141 326 72 263 72C199 72 170 137 202 180C228 215 281 203 290 168C300 133 272 111 246 124C221 136 232 163 250 158" fill="none" stroke="#bd6b46" stroke-width="10"/>
+<path d="M155 144Q156 78 214 54M181 187Q160 157 166 130" fill="none" stroke="#fff0b5" stroke-width="10"/>
+<path d="M137 216Q148 164 226 162Q309 161 329 216L325 246Q309 292 232 291Q154 291 136 249Z" fill="url(#body)"/>
+<path d="M136 223L100 198Q79 181 58 199L44 224Q39 247 58 256Q79 268 97 247L120 243M325 221L357 197Q377 181 397 198L411 222Q419 244 400 256Q380 269 361 245L339 242" fill="url(#body)"/>
+<path d="M53 207L76 227L54 247M397 205L378 226L401 246" fill="none"/>
+<path d="M186 182L180 139M274 181L283 139" fill="none" stroke="#e77a5d" stroke-width="17"/>
+<ellipse cx="179" cy="133" rx="19" ry="24" fill="#fffaf0"/><ellipse cx="284" cy="133" rx="19" ry="24" fill="#fffaf0"/>
+<ellipse cx="183" cy="137" rx="7" ry="12" fill="#344b4c" stroke="none"/><ellipse cx="280" cy="137" rx="7" ry="12" fill="#344b4c" stroke="none"/>
+<path d="M208 220Q231 239 254 219" fill="none" stroke-width="5"/>
+<path d="M202 262Q230 272 262 261" fill="none" stroke="#d45f51" stroke-width="4"/>
+<path d="M212 78L222 65L236 71L231 87Z" fill="#68c8bd" stroke="#3c8e8f" stroke-width="4"/>
+</g><ellipse cx="170" cy="212" rx="15" ry="7" fill="#f8bc9b"/><ellipse cx="290" cy="212" rx="15" ry="7" fill="#f8bc9b"/>
+</svg>

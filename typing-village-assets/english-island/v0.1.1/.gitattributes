@@ -1,0 +1,5 @@
+*.png binary
+*.webp binary
+*.svg -text
+manifest.json text eol=lf
+README.md text eol=lf

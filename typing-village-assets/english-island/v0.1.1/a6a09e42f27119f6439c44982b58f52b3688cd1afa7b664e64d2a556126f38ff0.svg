@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 340" role="img" aria-labelledby="title"><title id="title">元気なカモメの見張り</title>
+<ellipse cx="221" cy="304" rx="104" ry="13" fill="#4c8570" opacity=".16"/>
+<g stroke="#5d7d87" stroke-width="5" stroke-linejoin="round">
+<g fill="#f5fcfc"><path d="M165 177C119 144 80 107 42 96 35 128 73 181 142 213Z"/><path d="M274 177C321 144 360 107 398 96 405 128 367 181 298 213Z"/></g>
+<g fill="none" stroke="#a5c0ca" stroke-width="4"><path d="M54 116Q95 157 143 183M61 136Q99 175 139 191M386 116Q345 157 297 183M379 136Q341 175 301 191"/></g>
+<path d="M190 271L180 295 151 297 171 280M249 271L260 295 289 297 268 280" fill="#ffc963" stroke="#b88747"/>
+<path d="M154 175C135 224 145 280 215 285 291 291 309 241 287 191L267 150Z" fill="#f7fcf8"/>
+<path d="M159 222Q171 265 218 266 269 267 287 228" fill="#e4efec" stroke="none"/>
+<path d="M154 158C147 94 171 58 218 57 269 56 296 99 283 161 278 194 253 210 220 210 185 210 160 191 154 158Z" fill="#fffefa"/>
+<path d="M184 63Q184 40 205 46L215 60Q226 35 241 46L239 62" fill="#fffefa"/>
+<ellipse cx="191" cy="132" rx="16" ry="24" fill="#fff"/><ellipse cx="250" cy="132" rx="16" ry="24" fill="#fff"/>
+<g fill="#37535d" stroke="none"><ellipse cx="194" cy="137" rx="8" ry="13"/><ellipse cx="247" cy="137" rx="8" ry="13"/></g>
+<g fill="#fff" stroke="none"><circle cx="196" cy="131" r="3"/><circle cx="249" cy="131" r="3"/></g>
+<path d="M202 161Q221 147 240 161L221 185Z" fill="#ffd26d" stroke="#b88747"/>
+<path d="M207 163H235" fill="none" stroke="#c79750" stroke-width="3"/>
+<g fill="#f4b49d" stroke="none"><ellipse cx="175" cy="168" rx="13" ry="7"/><ellipse cx="265" cy="168" rx="13" ry="7"/></g>
+<path d="M158 207Q219 230 280 207L267 232Q220 248 171 230Z" fill="#72bab9" stroke="#4a9297"/><path d="M259 224L293 231 277 243 290 259 254 244Z" fill="#72bab9" stroke="#4a9297"/>
+</g></svg>

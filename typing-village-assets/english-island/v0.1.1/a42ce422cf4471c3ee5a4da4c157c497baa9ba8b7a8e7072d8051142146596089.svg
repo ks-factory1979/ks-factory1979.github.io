@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 340" role="img" aria-labelledby="title"><title id="title">ほほえむウミガメの長老</title>
+<defs><filter id="shell-glow" x="-35%" y="-35%" width="170%" height="170%"><feGaussianBlur stdDeviation="5"/></filter></defs>
+<ellipse cx="224" cy="303" rx="145" ry="13" fill="#47796c" opacity=".16"/>
+<g stroke="#52796b" stroke-width="5" stroke-linejoin="round">
+<path d="M87 213L38 235 85 245" fill="#8fb6a0"/>
+<path d="M111 246Q80 256 77 285 117 296 141 262M236 251Q251 288 283 287L285 260" fill="#a0c5a5"/>
+<path d="M88 220C95 252 150 273 234 257L300 219 267 181Z" fill="#c9d7a0"/>
+<ellipse cx="173" cy="171" rx="128" ry="102" fill="#63e9d4" opacity=".6" filter="url(#shell-glow)"/><g id="shell"><ellipse cx="173" cy="171" rx="126" ry="100" fill="#71c8b6"/>
+<path d="M71 157L116 106 175 88 228 115 274 168 246 221 175 252 103 224Z" fill="#3a9d99"/>
+<path d="M125 137L178 116 222 145 214 194 162 216 119 185Z" fill="#a3efce"/>
+<g fill="none" stroke="#577d70" stroke-width="4"><path d="M125 137L116 106M178 116L175 88M222 145L228 115M214 194L246 221M162 216L175 252M119 185L103 224M119 185L71 157M222 145L274 168"/></g></g>
+<path d="M238 200C250 222 272 237 307 228L323 188" fill="#a4c7a9"/>
+<path d="M278 231Q269 258 292 281 319 282 322 249" fill="#a0c5a5"/>
+<path d="M267 125C269 81 318 63 351 86 381 107 380 157 356 181 323 210 276 188 267 154Z" fill="#b1d0ab"/>
+<path d="M273 116Q291 112 307 119M323 117Q343 104 358 109" fill="none" stroke="#f6f4dc" stroke-width="11" stroke-linecap="round"/>
+<path d="M284 136Q296 121 308 135M329 133Q341 119 353 133" fill="none" stroke="#36574e" stroke-width="4" stroke-linecap="round"/><g id="eyes" opacity="0" fill="#fffdf2"><ellipse cx="296" cy="133" rx="13" ry="19"/><ellipse cx="341" cy="131" rx="13" ry="19"/></g>
+<g id="pupils" opacity="0" fill="#36574e" stroke="none"><ellipse cx="299" cy="137" rx="6" ry="10"/><ellipse cx="338" cy="135" rx="6" ry="10"/></g>
+<path id="mouth" d="M303 161Q321 186 339 159" fill="none" stroke="#63826b" stroke-width="4" stroke-linecap="round"/>
+<g fill="#e5b89e" stroke="none"><ellipse cx="282" cy="158" rx="10" ry="5"/><ellipse cx="353" cy="155" rx="9" ry="5"/></g>
+<path d="M294 179Q299 202 312 205L319 195 328 205Q343 197 346 177L328 183 319 178 309 184Z" fill="#f6f4dc" stroke="#d2d7bf" stroke-width="3"/>
+</g></svg>
